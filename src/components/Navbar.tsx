@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ThemeSwitcher from "./ThemeSwitcher";
 import { useTheme } from "@/contexts/ThemeContext";
+import Image from "next/image";
 
 const Navbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -24,7 +25,10 @@ const Navbar = () => {
     >
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between">
-          <div className="text-xl font-bold">OratorsBase</div>
+          <div className="flex items-center space-x-1">
+            <Image src={"/logo.png"} alt="Logo" width={40} height={40} />
+            <div className="text-xl font-bold">OratorsBase</div>
+          </div>
 
           <div className="flex items-center space-x-4">
             <ThemeSwitcher />

@@ -11,8 +11,11 @@ export default function ThemeSwitcher() {
     <Button
       icon={theme === "light" ? <MoonOutlined /> : <SunOutlined />}
       onClick={toggleTheme}
-      className="bg-transparent"
       size="large"
+      style={{
+        backgroundColor: theme === "dark" ? "#1f1f1f" : "#fff",
+        color: theme === "dark" ? "#fff" : "#000",
+      }}
     />
   );
 }
