@@ -31,10 +31,7 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
   const selectClassName = theme === "dark" ? "dark-select" : "";
 
   return (
-    <div
-      className="flex flex-wrap gap-2 p-2 rounded max-w-5xl mx-auto"
-      style={{ backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5" }}
-    >
+    <div className="flex flex-wrap gap-2">
       <Space.Compact>
         <Tooltip title="Bold">
           <Button

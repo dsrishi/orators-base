@@ -7,6 +7,8 @@ import TextStyle from "@tiptap/extension-text-style";
 import FontFamily from "@tiptap/extension-font-family";
 import { useTheme } from "@/contexts/ThemeContext";
 import TipTapMenuBar from "./TipTapMenuBar";
+import { Button, Input } from "antd";
+import { HomeOutlined, InfoCircleOutlined } from "@ant-design/icons";
 
 export default function TiptapEditor() {
   const { theme } = useTheme();
@@ -25,10 +27,36 @@ export default function TiptapEditor() {
   return (
     <>
       <div
-        className="fixed w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 z-10 top-16"
-        style={{ backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff" }}
+        className="fixed w-full mx-auto px-4 sm:px-6 lg:px-8 py-3 z-10 top-16"
+        style={{
+          backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
+          borderBottom:
+            theme === "dark" ? "solid 1px #2d2d2d" : "solid 1px #e5e5e5",
+        }}
       >
-        <TipTapMenuBar editor={editor} />
+        <div className="flex items-center">
+          <div className="">
+            <div className="flex items-center gap-2">
+              <HomeOutlined />
+              /
+              <Input
+                placeholder="Speech Title"
+                style={{
+                  background: theme === "dark" ? "#2d2d2d" : "#ffffff",
+                  borderColor: theme === "dark" ? "#3d3d3d" : "#d9d9d9",
+                  color: theme === "dark" ? "#ffffff" : "#000000",
+                }}
+              />
+              <div>
+                <Button icon={<InfoCircleOutlined />} />
+              </div>
+            </div>
+          </div>
+          <div className="mx-4">|</div>
+          <div className="">
+            <TipTapMenuBar editor={editor} />
+          </div>
+        </div>
       </div>
       <div className="mt-40 mb-16">
         <div
