@@ -29,3 +29,28 @@ body {
 .font-inter {
   font-family: "Inter", sans-serif;
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.ProseMirror {
+  outline: none;
+}
+
+.ProseMirror p {
+  margin: 0.5em 0;
+}
+
+/* Ant Design dark mode overrides */
+[data-theme='dark'] .ant-select-dropdown {
+  background-color: #2d2d2d;
+}
+
+[data-theme='dark'] .ant-select-item-option-content {
+  color: #ffffff;
+}
+
+[data-theme='dark'] .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: #1f1f1f;
+}
