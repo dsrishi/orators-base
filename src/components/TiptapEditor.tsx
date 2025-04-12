@@ -17,10 +17,12 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 import SpeechAnalysisDrawer from "./SpeechAnalysisDrawer";
+import AddSpeechInfoModal from "./AddSpeechInfoModal";
 
 export default function TiptapEditor() {
   const { theme } = useTheme();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
 
   const editor = useEditor({
     extensions: [StarterKit, TextStyle, Color, FontFamily],
@@ -48,6 +50,7 @@ export default function TiptapEditor() {
             <div className="flex items-center gap-1">
               <Link href="/dashboard">
                 <Button
+                  size="small"
                   type="text"
                   icon={
                     <HomeOutlined
@@ -80,6 +83,7 @@ export default function TiptapEditor() {
                     color: theme === "dark" ? "#ffffff" : "#000000",
                   }}
                   icon={<InfoCircleOutlined />}
+                  onClick={() => setInfoModalOpen(true)}
                 />
               </div>
             </div>
@@ -119,6 +123,11 @@ export default function TiptapEditor() {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         editor={editor}
+      />
+
+      <AddSpeechInfoModal
+        open={infoModalOpen}
+        onClose={() => setInfoModalOpen(false)}
       />
     </>
   );

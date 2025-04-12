@@ -98,3 +98,24 @@ body {
 .ant-drawer-title {
   color: inherit !important;
 }
+
+/* Dark mode datepicker styles */
+.ant-picker-panel {
+  background-color: #1e1e1e;
+}
+
+.ant-picker-content th {
+  color: #ffffff;
+}
+
+.dark .ant-picker-input > input {
+  color: #ffffff;
+}
+
+.dark .ant-picker-suffix {
+  color: #ffffff;
+}
+
+.dark .ant-form-item-label > label {
+  color: #ffffff;
+}
