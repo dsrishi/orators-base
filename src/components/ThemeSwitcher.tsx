@@ -10,6 +10,7 @@ export default function ThemeSwitcher() {
   return (
     <Button
       icon={theme === "light" ? <MoonOutlined /> : <SunOutlined />}
+      shape="circle"
       onClick={toggleTheme}
       size="large"
       style={{
