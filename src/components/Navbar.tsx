@@ -1,18 +1,46 @@
 "use client";
 
-import { useState } from "react";
 import ThemeSwitcher from "./ThemeSwitcher";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Dropdown, Avatar } from "antd";
+import type { MenuProps } from "antd";
+import { SettingOutlined, LogoutOutlined } from "@ant-design/icons";
 
 const Navbar = () => {
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { theme } = useTheme();
+  const { signOut } = useAuth();
+  const router = useRouter();
 
-  const handleLogout = () => {
-    // Add logout logic here
-    console.log("Logging out...");
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      router.push("/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
+
+  const items: MenuProps["items"] = [
+    {
+      key: "settings",
+      label: (
+        <a href="/settings" className="flex items-center gap-2">
+          <SettingOutlined /> Settings
+        </a>
+      ),
+    },
+    {
+      key: "logout",
+      label: (
+        <a onClick={handleLogout} className="flex items-center gap-2">
+          <LogoutOutlined /> Logout
+        </a>
+      ),
+    },
+  ];
 
   return (
     <nav
@@ -33,35 +61,16 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             <ThemeSwitcher />
 
-            <div className="relative">
-              <button
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center space-x-2 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
-              >
-                <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-600"></div>
-              </button>
-
-              {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5">
-                  <div className="py-1" role="menu">
-                    <a
-                      href="/settings"
-                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
-                      role="menuitem"
-                    >
-                      Settings
-                    </a>
-                    <button
-                      onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
-                      role="menuitem"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <Dropdown
+              menu={{ items }}
+              placement="bottomRight"
+              trigger={["click"]}
+            >
+              <Avatar
+                className="cursor-pointer bg-gray-200 dark:bg-gray-600"
+                size={40}
+              />
+            </Dropdown>
           </div>
         </div>
       </div>
