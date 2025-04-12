@@ -44,7 +44,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className="w-full border-b"
+      className="w-full border-b fixed top-0 left-0 right-0 z-50"
       style={{
         backgroundColor: theme === "dark" ? "#1f1f1f" : "#ffffff",
         borderBottom:
