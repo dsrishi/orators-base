@@ -53,9 +53,9 @@ export default function LoginPage() {
           height={64}
           className="mx-auto mb-4"
         />
-        <h2 className="text-center text-2xl font-bold">
+        <div className="text-center text-2xl font-bold font-inter mb-3">
           Welcome back to OratorsBase
-        </h2>
+        </div>
         <Form
           form={form}
           name="login"
