@@ -29,6 +29,12 @@ const MenuBar = ({ editor }: MenuBarProps) => {
     return null;
   }
 
+  const selectStyles = {
+    width: 150,
+  };
+
+  const selectClassName = theme === "dark" ? "dark-select" : "";
+
   return (
     <div
       className="flex flex-wrap gap-2 p-2 rounded max-w-5xl mx-auto"
@@ -63,7 +69,6 @@ const MenuBar = ({ editor }: MenuBarProps) => {
           <Button
             type={editor.isActive("underline") ? "primary" : "default"}
             icon={<UnderlineOutlined />}
-            // onClick={() => editor.chain().focus().toggleUnderline().run()}
             style={{
               background: theme === "dark" ? "#2d2d2d" : "#ffffff",
               borderColor: theme === "dark" ? "#3d3d3d" : "#d9d9d9",
@@ -74,15 +79,16 @@ const MenuBar = ({ editor }: MenuBarProps) => {
       </Space.Compact>
 
       <Select
-        style={{
-          background: theme === "dark" ? "#2d2d2d" : "#ffffff",
-          borderColor: theme === "dark" ? "#3d3d3d" : "#d9d9d9",
-          color: theme === "dark" ? "#ffffff" : "#000000",
-          width: 150,
-        }}
+        className={selectClassName}
+        style={selectStyles}
         defaultValue="Arial"
         onChange={(value) => editor.chain().focus().setFontFamily(value).run()}
-        prefix={<FontSizeOutlined />}
+        prefix={
+          <FontSizeOutlined
+            style={{ color: theme === "dark" ? "#ffffff" : "#000000" }}
+          />
+        }
+        popupClassName={theme === "dark" ? "dark-select-dropdown" : ""}
       >
         <Option value="Arial">Arial</Option>
         <Option value="Times New Roman">Times New Roman</Option>
@@ -90,15 +96,16 @@ const MenuBar = ({ editor }: MenuBarProps) => {
       </Select>
 
       <Select
-        style={{
-          background: theme === "dark" ? "#2d2d2d" : "#ffffff",
-          borderColor: theme === "dark" ? "#3d3d3d" : "#d9d9d9",
-          color: theme === "dark" ? "#ffffff" : "#000000",
-          width: 150,
-        }}
+        className={selectClassName}
+        style={selectStyles}
         defaultValue="#000000"
         onChange={(value) => editor.chain().focus().setColor(value).run()}
-        prefix={<FontColorsOutlined />}
+        prefix={
+          <FontColorsOutlined
+            style={{ color: theme === "dark" ? "#ffffff" : "#000000" }}
+          />
+        }
+        popupClassName={theme === "dark" ? "dark-select-dropdown" : ""}
       >
         <Option value="#000000">Black</Option>
         <Option value="#FF0000">Red</Option>
