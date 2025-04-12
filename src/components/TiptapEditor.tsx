@@ -15,9 +15,12 @@ import {
   UploadOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
+import { useState } from "react";
+import SpeechAnalysisDrawer from "./SpeechAnalysisDrawer";
 
 export default function TiptapEditor() {
   const { theme } = useTheme();
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const editor = useEditor({
     extensions: [StarterKit, TextStyle, Color, FontFamily],
@@ -91,6 +94,7 @@ export default function TiptapEditor() {
           <Button
             type="primary"
             icon={<LineChartOutlined />}
+            onClick={() => setDrawerOpen(true)}
             style={{
               background: "linear-gradient(to right, #5f0f40, #310e68)",
               border: "none",
@@ -110,6 +114,12 @@ export default function TiptapEditor() {
         </div>
       </div>
       <FloatButton icon={<UploadOutlined />} />
+
+      <SpeechAnalysisDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        editor={editor}
+      />
     </>
   );
 }

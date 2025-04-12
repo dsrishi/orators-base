@@ -81,3 +81,20 @@ body {
 .dark-select-dropdown .ant-select-item-option-content {
   color: #ffffff;
 }
+
+/* Drawer dark mode styles */
+.ant-drawer-header-title {
+  color: inherit !important;
+}
+
+.ant-drawer-close {
+  color: inherit !important;
+}
+
+[data-theme='dark'] .ant-drawer-close:hover {
+  background-color: #2d2d2d !important;
+}
+
+.ant-drawer-title {
+  color: inherit !important;
+}
