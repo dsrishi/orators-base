@@ -1,10 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { cookies } from 'next/headers'
+import type { CookieOptions } from '@supabase/ssr'
 
 // These routes require authentication
-const protectedRoutes = ['/dashboard', '/settings']
+const protectedRoutes = ['/dashboard', '/settings', '/speech']
 // These routes are only for non-authenticated users
 const publicOnlyRoutes = ['/login', '/register']
 
@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
         get(name: string) {
           return request.cookies.get(name)?.value
         },
-        set(name: string, value: string, options: any) {
+        set(name: string, value: string, options: CookieOptions) {
           request.cookies.set({
             name,
             value,
@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
             ...options,
           })
         },
-        remove(name: string, options: any) {
+        remove(name: string, options: CookieOptions) {
           request.cookies.set({
             name,
             value: '',
