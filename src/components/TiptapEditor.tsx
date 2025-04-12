@@ -7,8 +7,14 @@ import TextStyle from "@tiptap/extension-text-style";
 import FontFamily from "@tiptap/extension-font-family";
 import { useTheme } from "@/contexts/ThemeContext";
 import TipTapMenuBar from "./TipTapMenuBar";
-import { Button, Input } from "antd";
-import { HomeOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { Button, FloatButton, Input } from "antd";
+import {
+  HomeOutlined,
+  InfoCircleOutlined,
+  LineChartOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
+import Link from "next/link";
 
 export default function TiptapEditor() {
   const { theme } = useTheme();
@@ -34,11 +40,27 @@ export default function TiptapEditor() {
             theme === "dark" ? "solid 1px #2d2d2d" : "solid 1px #e5e5e5",
         }}
       >
-        <div className="flex items-center">
-          <div className="">
-            <div className="flex items-center gap-2">
-              <HomeOutlined />
-              /
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="flex items-center gap-1">
+              <Link href="/dashboard">
+                <Button
+                  type="text"
+                  icon={
+                    <HomeOutlined
+                      style={{
+                        color: theme === "dark" ? "#999" : "#aaa",
+                      }}
+                    />
+                  }
+                />
+              </Link>
+              <div
+                className="mr-1"
+                style={{ color: theme === "dark" ? "#999" : "#aaa" }}
+              >
+                /
+              </div>
               <Input
                 placeholder="Speech Title"
                 style={{
@@ -47,15 +69,36 @@ export default function TiptapEditor() {
                   color: theme === "dark" ? "#ffffff" : "#000000",
                 }}
               />
-              <div>
-                <Button icon={<InfoCircleOutlined />} />
+              <div className="ml-1">
+                <Button
+                  style={{
+                    background: theme === "dark" ? "#2d2d2d" : "#ffffff",
+                    borderColor: theme === "dark" ? "#3d3d3d" : "#d9d9d9",
+                    color: theme === "dark" ? "#ffffff" : "#000000",
+                  }}
+                  icon={<InfoCircleOutlined />}
+                />
               </div>
             </div>
-          </div>
-          <div className="mx-4">|</div>
-          <div className="">
+            <div
+              className="mx-4"
+              style={{ color: theme === "dark" ? "#999" : "#aaa" }}
+            >
+              |
+            </div>
             <TipTapMenuBar editor={editor} />
           </div>
+          <Button
+            type="primary"
+            icon={<LineChartOutlined />}
+            style={{
+              background: "linear-gradient(to right, #5f0f40, #310e68)",
+              border: "none",
+              boxShadow: "none",
+            }}
+          >
+            Analyse
+          </Button>
         </div>
       </div>
       <div className="mt-40 mb-16">
@@ -66,6 +109,7 @@ export default function TiptapEditor() {
           <EditorContent editor={editor} />
         </div>
       </div>
+      <FloatButton icon={<UploadOutlined />} />
     </>
   );
 }
