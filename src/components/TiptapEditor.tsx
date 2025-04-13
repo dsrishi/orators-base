@@ -75,7 +75,7 @@ export default function TiptapEditor({
                       title: <HomeOutlined />,
                     },
                     {
-                      title: <span>{speechData.title}</span>,
+                      title: speechData.title,
                     },
                   ]}
                 />
