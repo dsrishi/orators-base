@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@/contexts/UserContext";
-import { Form, Input, Button, Select, Card, message, Spin, Tabs } from "antd";
+import { Form, Input, Button, Select, message, Spin, Tabs } from "antd";
 import { userService } from "@/services/userService";
 import Navbar from "@/components/Navbar";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -10,7 +10,6 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { UpdateProfileData } from "@/types/user";
 
 const { Option } = Select;
-const { TabPane } = Tabs;
 
 export default function SettingsPage() {
   const { user, loading: userLoading } = useUser();
@@ -118,22 +117,153 @@ export default function SettingsPage() {
     );
   }
 
-  const cardStyle = {
-    background: theme === "dark" ? "#1e1e1e" : "#ffffff",
-    borderColor: theme === "dark" ? "#2d2d2d" : "#e5e5e5",
-  };
+  const tabItems = [
+    {
+      key: "1",
+      label: "Profile",
+      children: (
+        <div className="max-w-xl p-3">
+          <Form
+            form={profileForm}
+            layout="vertical"
+            onFinish={handleProfileUpdate}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Form.Item
+                label="First Name"
+                name="first_name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter your first name",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
 
-  const inputStyle = {
-    background: theme === "dark" ? "#2d2d2d" : "#ffffff",
-    borderColor: theme === "dark" ? "#3d3d3d" : "#d9d9d9",
-    color: theme === "dark" ? "#ffffff" : "#000000",
-  };
+              <Form.Item
+                label="Last Name"
+                name="last_name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter your last name",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </div>
 
-  const selectStyle = {
-    background: theme === "dark" ? "#2d2d2d" : "#ffffff",
-    borderColor: theme === "dark" ? "#3d3d3d" : "#d9d9d9",
-    color: theme === "dark" ? "#ffffff" : "#000000",
-  };
+            <Form.Item label="Gender" name="gender">
+              <Select>
+                <Option value="male">Male</Option>
+                <Option value="female">Female</Option>
+                <Option value="other">Other</Option>
+                <Option value="prefer_not_to_say">Prefer not to say</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={saving}
+                style={{
+                  background: "linear-gradient(to right, #5f0f40, #310e68)",
+                  border: "none",
+                  boxShadow: "none",
+                }}
+              >
+                Save Profile
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
+      ),
+    },
+    {
+      key: "2",
+      label: "Security",
+      children: (
+        <div className="max-w-xl p-3">
+          <Form
+            form={passwordForm}
+            layout="vertical"
+            onFinish={handlePasswordUpdate}
+          >
+            <Form.Item
+              label="Current Password"
+              name="currentPassword"
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter your current password",
+                },
+              ]}
+            >
+              <Input.Password />
+            </Form.Item>
+
+            <Form.Item
+              label="New Password"
+              name="password"
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter your new password",
+                },
+                {
+                  min: 8,
+                  message: "Password must be at least 8 characters",
+                },
+              ]}
+            >
+              <Input.Password />
+            </Form.Item>
+
+            <Form.Item
+              label="Confirm New Password"
+              name="confirmPassword"
+              dependencies={["password"]}
+              rules={[
+                {
+                  required: true,
+                  message: "Please confirm your new password",
+                },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue("password") === value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error("Passwords do not match"));
+                  },
+                }),
+              ]}
+            >
+              <Input.Password />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={saving}
+                style={{
+                  background: "linear-gradient(to right, #5f0f40, #310e68)",
+                  border: "none",
+                  boxShadow: "none",
+                }}
+              >
+                Update Password
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <ProtectedRoute>
@@ -148,152 +278,7 @@ export default function SettingsPage() {
             Settings
           </h1>
 
-          <Tabs defaultActiveKey="1">
-            <TabPane tab="Profile" key="1">
-              <Card style={cardStyle}>
-                <Form
-                  form={profileForm}
-                  layout="vertical"
-                  onFinish={handleProfileUpdate}
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Form.Item
-                      label="First Name"
-                      name="first_name"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter your first name",
-                        },
-                      ]}
-                    >
-                      <Input style={inputStyle} />
-                    </Form.Item>
-
-                    <Form.Item
-                      label="Last Name"
-                      name="last_name"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please enter your last name",
-                        },
-                      ]}
-                    >
-                      <Input style={inputStyle} />
-                    </Form.Item>
-                  </div>
-
-                  <Form.Item label="Gender" name="gender">
-                    <Select style={selectStyle}>
-                      <Option value="male">Male</Option>
-                      <Option value="female">Female</Option>
-                      <Option value="other">Other</Option>
-                      <Option value="prefer_not_to_say">
-                        Prefer not to say
-                      </Option>
-                    </Select>
-                  </Form.Item>
-
-                  <Form.Item>
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      loading={saving}
-                      style={{
-                        background:
-                          "linear-gradient(to right, #5f0f40, #310e68)",
-                        border: "none",
-                        boxShadow: "none",
-                      }}
-                    >
-                      Save Profile
-                    </Button>
-                  </Form.Item>
-                </Form>
-              </Card>
-            </TabPane>
-
-            <TabPane tab="Security" key="2">
-              <Card style={cardStyle}>
-                <Form
-                  form={passwordForm}
-                  layout="vertical"
-                  onFinish={handlePasswordUpdate}
-                >
-                  <Form.Item
-                    label="Current Password"
-                    name="currentPassword"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter your current password",
-                      },
-                    ]}
-                  >
-                    <Input.Password style={inputStyle} />
-                  </Form.Item>
-
-                  <Form.Item
-                    label="New Password"
-                    name="password"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter your new password",
-                      },
-                      {
-                        min: 8,
-                        message: "Password must be at least 8 characters",
-                      },
-                    ]}
-                  >
-                    <Input.Password style={inputStyle} />
-                  </Form.Item>
-
-                  <Form.Item
-                    label="Confirm New Password"
-                    name="confirmPassword"
-                    dependencies={["password"]}
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please confirm your new password",
-                      },
-                      ({ getFieldValue }) => ({
-                        validator(_, value) {
-                          if (!value || getFieldValue("password") === value) {
-                            return Promise.resolve();
-                          }
-                          return Promise.reject(
-                            new Error("Passwords do not match")
-                          );
-                        },
-                      }),
-                    ]}
-                  >
-                    <Input.Password style={inputStyle} />
-                  </Form.Item>
-
-                  <Form.Item>
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      loading={saving}
-                      style={{
-                        background:
-                          "linear-gradient(to right, #5f0f40, #310e68)",
-                        border: "none",
-                        boxShadow: "none",
-                      }}
-                    >
-                      Update Password
-                    </Button>
-                  </Form.Item>
-                </Form>
-              </Card>
-            </TabPane>
-          </Tabs>
+          <Tabs type="card" defaultActiveKey="1" items={tabItems} />
         </main>
       </div>
     </ProtectedRoute>
