@@ -25,6 +25,7 @@ const getAntdThemeConfig = (currentTheme: Theme): ThemeConfig => ({
     Button: {
       colorPrimary: "#310e68",
       algorithm: true,
+      primaryShadow: "none",
     },
     Select: {
       colorBgContainer: currentTheme === "dark" ? "#2d2d2d" : "#ffffff",
