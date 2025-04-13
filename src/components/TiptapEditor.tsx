@@ -18,6 +18,7 @@ import { useState } from "react";
 import SpeechAnalysisDrawer from "./SpeechAnalysisDrawer";
 import { Speech } from "@/types/speech";
 import SpeechInfoModal from "./SpeechInfoModal";
+import { speechService } from "@/services/speechService";
 
 interface TiptapEditorProps {
   speechId: string;
@@ -28,11 +29,12 @@ interface TiptapEditorProps {
 export default function TiptapEditor({
   speechId,
   initialContent,
-  speechData,
+  speechData: initialSpeechData,
 }: TiptapEditorProps) {
   const { theme } = useTheme();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
+  const [speechData, setSpeechData] = useState<Speech>(initialSpeechData);
 
   const editor = useEditor({
     extensions: [StarterKit, TextStyle, Color, FontFamily],
@@ -44,6 +46,13 @@ export default function TiptapEditor({
       },
     },
   });
+
+  const handleSpeechUpdate = async () => {
+    const { data, error } = await speechService.getSpeechWithVersion(speechId);
+    if (!error && data.speech) {
+      setSpeechData(data.speech);
+    }
+  };
 
   return (
     <>
@@ -124,6 +133,9 @@ export default function TiptapEditor({
       <SpeechInfoModal
         open={infoModalOpen}
         onClose={() => setInfoModalOpen(false)}
+        speechId={speechId}
+        speechData={speechData}
+        onUpdate={handleSpeechUpdate}
       />
     </>
   );

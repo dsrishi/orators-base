@@ -13,24 +13,43 @@ interface CreateSpeechData {
   main_type?: string;
 }
 
+interface UpdateSpeechData {
+  title?: string;
+  description?: string;
+  main_type?: string;
+  duration?: number;
+  target_audience?: string;
+  language?: string;
+  objective?: string;
+  purpose?: string;
+  tone?: string;
+  medium?: string;
+  occasion?: string;
+}
+
 export const speechService = {
   async getUserSpeeches(userId: string): Promise<{ data: Speech[] | null; error: ServiceError | null }> {
     const supabase = createClient();
     
     try {
-      // Fetch speeches for the user
       const { data, error } = await supabase
         .from("speeches")
-        .select(
-          `
+        .select(`
           id,
           title,
           description,
+          main_type,
           duration,
+          target_audience,
+          language,
+          objective,
+          purpose,
+          tone,
+          medium,
+          occasion,
           created_at,
-          main_type
-        `
-        )
+          updated_at
+        `)
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
 
@@ -131,16 +150,24 @@ export const speechService = {
     const supabase = createClient();
     
     try {
-      // Fetch speech data
+      // Fetch speech data with all fields
       const { data: speechData, error: speechError } = await supabase
         .from("speeches")
         .select(`
           id,
           title,
           description,
-          duration,
           main_type,
-          created_at
+          duration,
+          target_audience,
+          language,
+          objective,
+          purpose,
+          tone,
+          medium,
+          occasion,
+          created_at,
+          updated_at
         `)
         .eq('id', speechId)
         .single();
@@ -171,6 +198,35 @@ export const speechService = {
         data: { speech: null, content: null },
         error: {
           message: 'Failed to fetch speech data',
+          details: error instanceof Error ? error.message : error
+        }
+      };
+    }
+  },
+
+  async updateSpeechInfo(
+    speechId: string, 
+    data: UpdateSpeechData
+  ): Promise<{ error: ServiceError | null }> {
+    const supabase = createClient();
+    
+    try {
+      const { error } = await supabase
+        .from("speeches")
+        .update({
+          ...data,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', speechId);
+
+      if (error) throw error;
+
+      return { error: null };
+    } catch (error) {
+      console.error('Error updating speech:', error);
+      return {
+        error: {
+          message: 'Failed to update speech information',
           details: error instanceof Error ? error.message : error
         }
       };
