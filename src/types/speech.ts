@@ -14,3 +14,15 @@ export interface Speech {
   created_at: string;
   updated_at: string;
 } 
+
+export interface SpeechVersion {
+  id: string;
+  speech_id: string;
+  version_number: number;
+  version_name: string;
+  content: string;
+  created_by: string;
+  updated_by: string;
+  created_at: string;
+  updated_at: string;
+}

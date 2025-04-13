@@ -113,6 +113,7 @@ export default function SpeechInfoModal({
 
   return (
     <Modal
+      forceRender
       title="Speech Information"
       open={open}
       onCancel={onClose}

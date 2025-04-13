@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import { Speech } from '@/types/speech';
+import { Speech, SpeechVersion } from '@/types/speech';
 
 interface ServiceError {
   message: string;
@@ -143,7 +143,7 @@ export const speechService = {
   async getSpeechWithVersion(speechId: string): Promise<{
     data: {
       speech: Speech | null;
-      content: string | null;
+      version: SpeechVersion | null;
     };
     error: ServiceError | null;
   }> {
@@ -177,7 +177,7 @@ export const speechService = {
       // Fetch version 1 content
       const { data: versionData, error: versionError } = await supabase
         .from("speech_versions")
-        .select('content')
+        .select('id, speech_id, version_number, version_name, content, created_by, updated_by, created_at, updated_at')
         .eq('speech_id', speechId)
         .eq('version_number', 1)
         .single();
@@ -187,7 +187,7 @@ export const speechService = {
       return {
         data: {
           speech: speechData,
-          content: versionData?.content || null
+          version: versionData,
         },
         error: null
       };
@@ -195,7 +195,7 @@ export const speechService = {
     } catch (error) {
       console.error('Error fetching speech:', error);
       return {
-        data: { speech: null, content: null },
+        data: { speech: null, version: null },
         error: {
           message: 'Failed to fetch speech data',
           details: error instanceof Error ? error.message : error

@@ -16,20 +16,20 @@ import {
 } from "@ant-design/icons";
 import { useState } from "react";
 import SpeechAnalysisDrawer from "./SpeechAnalysisDrawer";
-import { Speech } from "@/types/speech";
+import { Speech, SpeechVersion } from "@/types/speech";
 import SpeechInfoModal from "./SpeechInfoModal";
 import { speechService } from "@/services/speechService";
 
 interface TiptapEditorProps {
   speechId: string;
-  initialContent: string;
   speechData: Speech;
+  version: SpeechVersion;
 }
 
 export default function TiptapEditor({
   speechId,
-  initialContent,
   speechData: initialSpeechData,
+  version: initialVersion,
 }: TiptapEditorProps) {
   const { theme } = useTheme();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -38,7 +38,7 @@ export default function TiptapEditor({
 
   const editor = useEditor({
     extensions: [StarterKit, TextStyle, Color, FontFamily],
-    content: initialContent,
+    content: initialVersion?.content,
     editorProps: {
       attributes: {
         class:

@@ -5,13 +5,13 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import TiptapEditor from "@/components/TiptapEditor";
 import { useEffect, useState } from "react";
 import { speechService } from "@/services/speechService";
-import { Speech } from "@/types/speech";
+import { Speech, SpeechVersion } from "@/types/speech";
 import { Spin, message } from "antd";
 import { useParams } from "next/navigation";
 
 export default function SpeechPage() {
   const [speech, setSpeech] = useState<Speech | null>(null);
-  const [content, setContent] = useState<string | null>(null);
+  const [version, setVersion] = useState<SpeechVersion | null>(null);
   const [loading, setLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
   const params = useParams();
@@ -34,7 +34,7 @@ export default function SpeechPage() {
         }
 
         setSpeech(data.speech);
-        setContent(data.content);
+        setVersion(data.version);
       } catch (err) {
         messageApi.error({
           content: "Failed to load speech",
@@ -59,7 +59,7 @@ export default function SpeechPage() {
     );
   }
 
-  if (!speech || !content) {
+  if (!speech || !version) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-red-500">Speech not found</div>
@@ -75,8 +75,8 @@ export default function SpeechPage() {
         <main className="mt-16">
           <TiptapEditor
             speechId={speechId}
-            initialContent={content}
             speechData={speech}
+            version={version}
           />
         </main>
       </div>
