@@ -13,8 +13,6 @@ import {
   Breadcrumb,
 } from "antd";
 import { userService } from "@/services/userService";
-import Navbar from "@/components/Navbar";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import { useTheme } from "@/contexts/ThemeContext";
 import { UpdateProfileData } from "@/types/user";
 import { HomeOutlined } from "@ant-design/icons";
@@ -119,11 +117,9 @@ export default function SettingsPage() {
 
   if (userLoading || loading) {
     return (
-      <ProtectedRoute>
-        <div className="min-h-screen flex items-center justify-center">
-          <Spin size="large" />
-        </div>
-      </ProtectedRoute>
+      <div className="min-h-screen flex items-center justify-center">
+        <Spin size="large" />
+      </div>
     );
   }
 
@@ -284,32 +280,29 @@ export default function SettingsPage() {
   ];
 
   return (
-    <ProtectedRoute>
+    <>
       {contextHolder}
-      <div className="min-h-screen">
-        <Navbar />
-        <main className="mx-auto px-4 sm:px-6 lg:px-8 py-6 mt-16">
-          <Breadcrumb
-            items={[
-              {
-                href: "/dashboard",
-                title: <HomeOutlined />,
-              },
-              {
-                title: "Settings",
-              },
-            ]}
-          />
-          <h1
-            className="text-2xl font-bold mb-6"
-            style={{ color: theme === "dark" ? "#ffffff" : "#000000" }}
-          >
-            Settings
-          </h1>
+      <main className="mx-auto px-4 sm:px-6 lg:px-8 py-6 mt-16">
+        <Breadcrumb
+          items={[
+            {
+              href: "/dashboard",
+              title: <HomeOutlined />,
+            },
+            {
+              title: "Settings",
+            },
+          ]}
+        />
+        <h1
+          className="text-2xl font-bold mb-6"
+          style={{ color: theme === "dark" ? "#ffffff" : "#000000" }}
+        >
+          Settings
+        </h1>
 
-          <Tabs type="card" defaultActiveKey="1" items={tabItems} />
-        </main>
-      </div>
-    </ProtectedRoute>
+        <Tabs type="card" defaultActiveKey="1" items={tabItems} />
+      </main>
+    </>
   );
 }

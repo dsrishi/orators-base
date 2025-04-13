@@ -1,7 +1,5 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import TiptapEditor from "@/components/TiptapEditor";
 import { useEffect, useState } from "react";
 import { speechService } from "@/services/speechService";
@@ -68,18 +66,15 @@ export default function SpeechPage() {
   }
 
   return (
-    <ProtectedRoute>
+    <>
       {contextHolder}
-      <div className="min-h-screen">
-        <Navbar />
-        <main className="mt-16">
-          <TiptapEditor
-            speechId={speechId}
-            speechData={speech}
-            version={version}
-          />
-        </main>
-      </div>
-    </ProtectedRoute>
+      <main className="mt-16">
+        <TiptapEditor
+          speechId={speechId}
+          speechData={speech}
+          version={version}
+        />
+      </main>
+    </>
   );
 }
