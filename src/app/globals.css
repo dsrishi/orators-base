@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap");
 
 :root {
   --background: #ffffff;
@@ -22,5 +23,115 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Inter", sans-serif;
+}
+
+.font-inter {
+  font-family: "Inter", sans-serif;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.ProseMirror {
+  outline: none;
+}
+
+.ProseMirror p {
+  margin: 0.5em 0;
+}
+
+/* Dark mode select styles */
+.dark-select .ant-select-selector {
+  background-color: #2d2d2d !important;
+  border-color: #3d3d3d !important;
+}
+
+.dark-select .ant-select-selection-item {
+  color: #ffffff !important;
+}
+
+.dark-select .ant-select-arrow {
+  color: #ffffff !important;
+}
+
+.dark-select .ant-select-selection-placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Existing dark dropdown styles */
+.dark-select-dropdown.ant-select-dropdown {
+  background-color: #2d2d2d;
+  border-color: #3d3d3d;
+}
+
+.dark-select-dropdown .ant-select-item {
+  color: #ffffff;
+}
+
+.dark-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: #1f1f1f;
+}
+
+.dark-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background-color: #3d3d3d;
+}
+
+.dark-select-dropdown .ant-select-item-option-content {
+  color: #ffffff;
+}
+
+/* Drawer dark mode styles */
+.ant-drawer-header-title {
+  color: inherit !important;
+}
+
+.ant-drawer-close {
+  color: inherit !important;
+}
+
+[data-theme='dark'] .ant-drawer-close:hover {
+  background-color: #2d2d2d !important;
+}
+
+.ant-drawer-title {
+  color: inherit !important;
+}
+
+/* Dark mode datepicker styles */
+.ant-picker-panel {
+  background-color: #1e1e1e;
+}
+
+.ant-picker-content th {
+  color: #ffffff;
+}
+
+.dark .ant-picker-input > input {
+  color: #ffffff;
+}
+
+.dark .ant-picker-suffix {
+  color: #ffffff;
+}
+
+.dark .ant-form-item-label > label {
+  color: #ffffff;
+}
+
+@layer utilities {
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+  
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
 }
