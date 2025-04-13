@@ -1,44 +1,72 @@
+"use client";
+
 import Navbar from "@/components/Navbar";
-import { Button, Space, Empty } from "antd";
+import { Button, Space, Empty, message, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Link from "next/link";
 import SpeechCard from "@/components/SpeechCard";
-
-// Temporary mock data - replace with your actual data fetching logic
-const mockSpeeches = [
-  {
-    id: "1",
-    title: "Introduction to AI",
-    description:
-      "A comprehensive overview of artificial intelligence and its impact on modern technology. Exploring key concepts and future trends.",
-    duration: 15,
-    created_at: "2024-03-20",
-    main_type: "technical",
-  },
-  {
-    id: "2",
-    title: "Leadership in Crisis",
-    description:
-      "Strategies for effective leadership during challenging times. Learn how to guide your team through uncertainty and change.",
-    duration: 20,
-    created_at: "2024-03-19",
-    main_type: "business",
-  },
-  {
-    id: "3",
-    title: "Personal Growth",
-    description:
-      "Discover the key principles of personal development and how to achieve your goals through consistent self-improvement.",
-    duration: 25,
-    created_at: "2024-03-18",
-    main_type: "motivational",
-  },
-];
+import { useEffect, useState } from "react";
+import { Speech } from "@/types/speech";
+import { speechService } from "@/services/speechService";
+import { useUser } from "@/contexts/UserContext";
 
 export default function Dashboard() {
+  const [speeches, setSpeeches] = useState<Speech[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [messageApi, contextHolder] = message.useMessage();
+  const { user, loading: userLoading, error: userError } = useUser();
+
+  useEffect(() => {
+    async function fetchSpeeches() {
+      if (!user) return;
+
+      try {
+        const { data, error } = await speechService.getUserSpeeches(user.id);
+
+        if (error) {
+          messageApi.error({
+            content: error.message,
+            duration: 5,
+          });
+          console.error("Detailed error:", error.details);
+          return;
+        }
+
+        setSpeeches(data || []);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (!userLoading && user) {
+      fetchSpeeches();
+    }
+  }, [messageApi, user, userLoading]);
+
+  if (userLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (userError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Empty
+          description={
+            <span className="text-red-500">Error loading user data</span>
+          }
+        />
+      </div>
+    );
+  }
+
   return (
     <ProtectedRoute>
+      {contextHolder}
       <div className="min-h-screen">
         <Navbar />
         <main className="mx-auto px-4 sm:px-6 lg:px-8 py-6 mt-16">
@@ -61,9 +89,12 @@ export default function Dashboard() {
             </Space>
           </div>
 
-          {mockSpeeches.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {mockSpeeches.map((speech) => (
+          {loading ? (
+            // Add loading skeleton here if needed
+            <div>Loading...</div>
+          ) : speeches.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {speeches.map((speech) => (
                 <SpeechCard key={speech.id} {...speech} />
               ))}
             </div>
