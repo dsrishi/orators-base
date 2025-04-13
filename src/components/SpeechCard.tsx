@@ -75,7 +75,7 @@ export default function SpeechCard({
                 style={{ color: theme === "dark" ? "#999" : "#666" }}
               />
               <Text style={{ color: theme === "dark" ? "#999" : "#666" }}>
-                {duration} min
+                {duration ? duration : "-"} min
               </Text>
             </div>
             <div className="flex items-center gap-2">

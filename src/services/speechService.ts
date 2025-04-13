@@ -6,6 +6,13 @@ interface ServiceError {
   details?: unknown;
 }
 
+interface CreateSpeechData {
+  userId: string;
+  title: string;
+  description?: string;
+  main_type?: string;
+}
+
 export const speechService = {
   async getUserSpeeches(userId: string): Promise<{ data: Speech[] | null; error: ServiceError | null }> {
     const supabase = createClient();
@@ -47,6 +54,67 @@ export const speechService = {
         data: null,
         error: {
           message: 'Unexpected error occurred',
+          details: error instanceof Error ? error.message : error
+        }
+      };
+    }
+  },
+
+  async createNewSpeech(data: CreateSpeechData): Promise<{ 
+    speechId: string | null; 
+    error: ServiceError | null 
+  }> {
+    const supabase = createClient();
+    
+    try {
+      // Generate UUID for the speech using Supabase's built-in function
+      const { data: speechData, error: speechError } = await supabase
+        .from("speeches")
+        .insert({
+          user_id: data.userId,
+          title: data.title || "Untitled Speech",
+          description: data.description || "",
+          main_type: data.main_type || "other",
+          created_by: data.userId,
+          updated_by: data.userId,
+        })
+        .select('id')
+        .single();
+
+      if (speechError) {
+        console.error('Speech creation error:', speechError);
+        throw speechError;
+      }
+      if (!speechData) throw new Error('Failed to create speech');
+
+      // Create initial version
+      const { error: versionError } = await supabase
+        .from("speech_versions")
+        .insert({
+          speech_id: speechData.id, // This will be a proper UUID now
+          version_number: 1,
+          version_name: "Initial Version",
+          content: "<p>Start writing here...</p>",
+          created_by: data.userId,
+          updated_by: data.userId
+        });
+
+      if (versionError) {
+        console.error('Version creation error:', versionError);
+        throw versionError;
+      }
+
+      return {
+        speechId: speechData.id,
+        error: null
+      };
+
+    } catch (error) {
+      console.error('Error creating speech:', error);
+      return {
+        speechId: null,
+        error: {
+          message: 'Failed to create speech',
           details: error instanceof Error ? error.message : error
         }
       };

@@ -4,18 +4,20 @@ import Navbar from "@/components/Navbar";
 import { Button, Space, Empty, message, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import Link from "next/link";
 import SpeechCard from "@/components/SpeechCard";
 import { useEffect, useState } from "react";
 import { Speech } from "@/types/speech";
 import { speechService } from "@/services/speechService";
 import { useUser } from "@/contexts/UserContext";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
   const [speeches, setSpeeches] = useState<Speech[]>([]);
   const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const { user, loading: userLoading, error: userError } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchSpeeches() {
@@ -43,6 +45,38 @@ export default function Dashboard() {
       fetchSpeeches();
     }
   }, [messageApi, user, userLoading]);
+
+  const handleCreateNewSpeech = async () => {
+    if (!user) return;
+
+    setCreating(true);
+    try {
+      const { speechId, error } = await speechService.createNewSpeech({
+        userId: user.id,
+        title: "Untitled Speech",
+      });
+
+      if (error) {
+        messageApi.error({
+          content: error.message,
+          duration: 5,
+        });
+        return;
+      }
+
+      if (speechId) {
+        router.push(`/speech?id=${speechId}`);
+      }
+    } catch (err) {
+      messageApi.error({
+        content: "Failed to create new speech",
+        duration: 5,
+      });
+      console.error("Creation error:", err);
+    } finally {
+      setCreating(false);
+    }
+  };
 
   if (userLoading) {
     return (
@@ -73,19 +107,19 @@ export default function Dashboard() {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Speeches</h1>
             <Space>
-              <Link href="/speech">
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  style={{
-                    background: "linear-gradient(to right, #5f0f40, #310e68)",
-                    border: "none",
-                    boxShadow: "none",
-                  }}
-                >
-                  New Speech
-                </Button>
-              </Link>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleCreateNewSpeech}
+                loading={creating}
+                style={{
+                  background: "linear-gradient(to right, #5f0f40, #310e68)",
+                  border: "none",
+                  boxShadow: "none",
+                }}
+              >
+                New Speech
+              </Button>
             </Space>
           </div>
 
