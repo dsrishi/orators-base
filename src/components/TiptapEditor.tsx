@@ -7,7 +7,7 @@ import TextStyle from "@tiptap/extension-text-style";
 import FontFamily from "@tiptap/extension-font-family";
 import { useTheme } from "@/contexts/ThemeContext";
 import TipTapMenuBar from "./TipTapMenuBar";
-import { Breadcrumb, Button, FloatButton } from "antd";
+import { Breadcrumb, Button, FloatButton, message } from "antd";
 import {
   EditOutlined,
   HomeOutlined,
@@ -19,6 +19,7 @@ import SpeechAnalysisDrawer from "./SpeechAnalysisDrawer";
 import { Speech, SpeechVersion } from "@/types/speech";
 import SpeechInfoModal from "./SpeechInfoModal";
 import { speechService } from "@/services/speechService";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface TiptapEditorProps {
   speechId: string;
@@ -35,6 +36,34 @@ export default function TiptapEditor({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [speechData, setSpeechData] = useState<Speech>(initialSpeechData);
+  const [saving, setSaving] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const saveContent = async (content: string) => {
+    if (!initialVersion?.id) return;
+
+    setSaving(true);
+    const { error } = await speechService.updateVersionContent(
+      speechId,
+      initialVersion.id,
+      { content }
+    );
+
+    if (error) {
+      messageApi.error({
+        content: "Failed to save changes",
+        duration: 3,
+      });
+    } else {
+      messageApi.success({
+        content: "Changes saved",
+        duration: 1,
+      });
+    }
+    setSaving(false);
+  };
+
+  const debouncedSave = useDebounce(saveContent, 2000);
 
   const editor = useEditor({
     extensions: [StarterKit, TextStyle, Color, FontFamily],
@@ -44,6 +73,10 @@ export default function TiptapEditor({
         class:
           "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none",
       },
+    },
+    onUpdate: ({ editor }) => {
+      const content = editor.getHTML();
+      debouncedSave(content);
     },
   });
 
@@ -56,6 +89,7 @@ export default function TiptapEditor({
 
   return (
     <>
+      {contextHolder}
       <div
         className="fixed w-full mx-auto px-4 sm:px-6 lg:px-8 py-3 z-10 top-16"
         style={{
@@ -100,18 +134,30 @@ export default function TiptapEditor({
             </div>
             <TipTapMenuBar editor={editor} />
           </div>
-          <Button
-            type="primary"
-            icon={<LineChartOutlined />}
-            onClick={() => setDrawerOpen(true)}
-            style={{
-              background: "linear-gradient(to right, #5f0f40, #310e68)",
-              border: "none",
-              boxShadow: "none",
-            }}
-          >
-            Analyse
-          </Button>
+          <div className="flex items-center gap-2">
+            {saving && (
+              <span
+                style={{
+                  color: theme === "dark" ? "#999" : "#666",
+                  fontSize: "14px",
+                }}
+              >
+                Saving...
+              </span>
+            )}
+            <Button
+              type="primary"
+              icon={<LineChartOutlined />}
+              onClick={() => setDrawerOpen(true)}
+              style={{
+                background: "linear-gradient(to right, #5f0f40, #310e68)",
+                border: "none",
+                boxShadow: "none",
+              }}
+            >
+              Analyse
+            </Button>
+          </div>
         </div>
       </div>
       <div className="mt-40 mb-16">

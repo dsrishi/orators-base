@@ -27,6 +27,10 @@ interface UpdateSpeechData {
   occasion?: string;
 }
 
+interface UpdateVersionData {
+  content: string;
+}
+
 export const speechService = {
   async getUserSpeeches(userId: string): Promise<{ data: Speech[] | null; error: ServiceError | null }> {
     const supabase = createClient();
@@ -227,6 +231,37 @@ export const speechService = {
       return {
         error: {
           message: 'Failed to update speech information',
+          details: error instanceof Error ? error.message : error
+        }
+      };
+    }
+  },
+
+  async updateVersionContent(
+    speechId: string,
+    versionId: string,
+    data: UpdateVersionData
+  ): Promise<{ error: ServiceError | null }> {
+    const supabase = createClient();
+    
+    try {
+      const { error } = await supabase
+        .from("speech_versions")
+        .update({
+          content: data.content,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', versionId)
+        .eq('speech_id', speechId);
+
+      if (error) throw error;
+
+      return { error: null };
+    } catch (error) {
+      console.error('Error updating version content:', error);
+      return {
+        error: {
+          message: 'Failed to update version content',
           details: error instanceof Error ? error.message : error
         }
       };
