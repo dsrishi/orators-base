@@ -9,7 +9,7 @@ interface AddSpeechInfoModalProps {
 
 const { Option } = Select;
 
-export default function AddSpeechInfoModal({
+export default function SpeechInfoModal({
   open,
   onClose,
 }: AddSpeechInfoModalProps) {

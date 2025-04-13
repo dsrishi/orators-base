@@ -7,18 +7,17 @@ import TextStyle from "@tiptap/extension-text-style";
 import FontFamily from "@tiptap/extension-font-family";
 import { useTheme } from "@/contexts/ThemeContext";
 import TipTapMenuBar from "./TipTapMenuBar";
-import { Button, FloatButton, Input } from "antd";
+import { Breadcrumb, Button, FloatButton } from "antd";
 import {
+  EditOutlined,
   HomeOutlined,
-  InfoCircleOutlined,
   LineChartOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
-import Link from "next/link";
 import { useState } from "react";
 import SpeechAnalysisDrawer from "./SpeechAnalysisDrawer";
-import AddSpeechInfoModal from "./AddSpeechInfoModal";
 import { Speech } from "@/types/speech";
+import SpeechInfoModal from "./SpeechInfoModal";
 
 interface TiptapEditorProps {
   speechId: string;
@@ -59,33 +58,19 @@ export default function TiptapEditor({
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="flex items-center gap-1">
-              <Link href="/dashboard">
-                <Button
-                  size="small"
-                  type="text"
-                  icon={
-                    <HomeOutlined
-                      style={{
-                        color: theme === "dark" ? "#999" : "#aaa",
-                      }}
-                    />
-                  }
+              <div>
+                <Breadcrumb
+                  items={[
+                    {
+                      href: "/dashboard",
+                      title: <HomeOutlined />,
+                    },
+                    {
+                      title: <span>{speechData.title}</span>,
+                    },
+                  ]}
                 />
-              </Link>
-              <div
-                className="mr-1"
-                style={{ color: theme === "dark" ? "#999" : "#aaa" }}
-              >
-                /
               </div>
-              <Input
-                placeholder="Speech Title"
-                style={{
-                  background: theme === "dark" ? "#2d2d2d" : "#ffffff",
-                  borderColor: theme === "dark" ? "#3d3d3d" : "#d9d9d9",
-                  color: theme === "dark" ? "#ffffff" : "#000000",
-                }}
-              />
               <div className="ml-1">
                 <Button
                   style={{
@@ -93,7 +78,7 @@ export default function TiptapEditor({
                     borderColor: theme === "dark" ? "#3d3d3d" : "#d9d9d9",
                     color: theme === "dark" ? "#ffffff" : "#000000",
                   }}
-                  icon={<InfoCircleOutlined />}
+                  icon={<EditOutlined />}
                   onClick={() => setInfoModalOpen(true)}
                 />
               </div>
@@ -136,7 +121,7 @@ export default function TiptapEditor({
         editor={editor}
       />
 
-      <AddSpeechInfoModal
+      <SpeechInfoModal
         open={infoModalOpen}
         onClose={() => setInfoModalOpen(false)}
       />
