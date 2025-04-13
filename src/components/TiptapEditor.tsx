@@ -18,15 +18,26 @@ import Link from "next/link";
 import { useState } from "react";
 import SpeechAnalysisDrawer from "./SpeechAnalysisDrawer";
 import AddSpeechInfoModal from "./AddSpeechInfoModal";
+import { Speech } from "@/types/speech";
 
-export default function TiptapEditor() {
+interface TiptapEditorProps {
+  speechId: string;
+  initialContent: string;
+  speechData: Speech;
+}
+
+export default function TiptapEditor({
+  speechId,
+  initialContent,
+  speechData,
+}: TiptapEditorProps) {
   const { theme } = useTheme();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
 
   const editor = useEditor({
     extensions: [StarterKit, TextStyle, Color, FontFamily],
-    content: "<p>Start writing here...</p>",
+    content: initialContent,
     editorProps: {
       attributes: {
         class:

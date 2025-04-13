@@ -65,7 +65,7 @@ export default function Dashboard() {
       }
 
       if (speechId) {
-        router.push(`/speech?id=${speechId}`);
+        router.push(`/speech/${speechId}`);
       }
     } catch (err) {
       messageApi.error({

@@ -119,5 +119,61 @@ export const speechService = {
         }
       };
     }
+  },
+
+  async getSpeechWithVersion(speechId: string): Promise<{
+    data: {
+      speech: Speech | null;
+      content: string | null;
+    };
+    error: ServiceError | null;
+  }> {
+    const supabase = createClient();
+    
+    try {
+      // Fetch speech data
+      const { data: speechData, error: speechError } = await supabase
+        .from("speeches")
+        .select(`
+          id,
+          title,
+          description,
+          duration,
+          main_type,
+          created_at
+        `)
+        .eq('id', speechId)
+        .single();
+
+      if (speechError) throw speechError;
+
+      // Fetch version 1 content
+      const { data: versionData, error: versionError } = await supabase
+        .from("speech_versions")
+        .select('content')
+        .eq('speech_id', speechId)
+        .eq('version_number', 1)
+        .single();
+
+      if (versionError) throw versionError;
+
+      return {
+        data: {
+          speech: speechData,
+          content: versionData?.content || null
+        },
+        error: null
+      };
+      
+    } catch (error) {
+      console.error('Error fetching speech:', error);
+      return {
+        data: { speech: null, content: null },
+        error: {
+          message: 'Failed to fetch speech data',
+          details: error instanceof Error ? error.message : error
+        }
+      };
+    }
   }
 }; 

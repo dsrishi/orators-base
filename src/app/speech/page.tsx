@@ -1,15 +1,12 @@
 import Navbar from "@/components/Navbar";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import TiptapEditor from "@/components/TiptapEditor";
 
 export default function Speech() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen">
         <Navbar />
-        <main className="mt-16">
-          <TiptapEditor />
-        </main>
+        <main className="mt-16">Create a new speech</main>
       </div>
     </ProtectedRoute>
   );

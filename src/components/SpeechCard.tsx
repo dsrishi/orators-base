@@ -38,7 +38,7 @@ export default function SpeechCard({
   };
 
   return (
-    <Link href={`/speech?id=${id}`}>
+    <Link href={`/speech/${id}`}>
       <Card
         hoverable
         style={{
