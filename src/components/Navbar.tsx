@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Dropdown, Avatar } from "antd";
 import type { MenuProps } from "antd";
 import { SettingOutlined, LogoutOutlined } from "@ant-design/icons";
+import Link from "next/link";
 
 const Navbar = () => {
   const { theme } = useTheme();
@@ -27,9 +28,9 @@ const Navbar = () => {
     {
       key: "settings",
       label: (
-        <a href="/settings" className="flex items-center gap-2">
+        <Link href="/settings" className="flex items-center gap-2">
           <SettingOutlined /> Settings
-        </a>
+        </Link>
       ),
     },
     {

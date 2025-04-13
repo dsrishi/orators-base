@@ -1,35 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
-import { Speech, SpeechVersion } from '@/types/speech';
+import { Speech, SpeechVersion, ServiceError, CreateSpeechData, UpdateSpeechData, UpdateVersionData } from '@/types/speech';
 
-interface ServiceError {
-  message: string;
-  details?: unknown;
-}
-
-interface CreateSpeechData {
-  userId: string;
-  title: string;
-  description?: string;
-  main_type?: string;
-}
-
-interface UpdateSpeechData {
-  title?: string;
-  description?: string;
-  main_type?: string;
-  duration?: number;
-  target_audience?: string;
-  language?: string;
-  objective?: string;
-  purpose?: string;
-  tone?: string;
-  medium?: string;
-  occasion?: string;
-}
-
-interface UpdateVersionData {
-  content: string;
-}
 
 export const speechService = {
   async getUserSpeeches(userId: string): Promise<{ data: Speech[] | null; error: ServiceError | null }> {
