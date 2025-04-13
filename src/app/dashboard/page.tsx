@@ -13,8 +13,8 @@ const mockSpeeches = [
     description:
       "A comprehensive overview of artificial intelligence and its impact on modern technology. Exploring key concepts and future trends.",
     duration: 15,
-    createdAt: "2024-03-20",
-    category: "technical",
+    created_at: "2024-03-20",
+    main_type: "technical",
   },
   {
     id: "2",
@@ -22,8 +22,8 @@ const mockSpeeches = [
     description:
       "Strategies for effective leadership during challenging times. Learn how to guide your team through uncertainty and change.",
     duration: 20,
-    createdAt: "2024-03-19",
-    category: "business",
+    created_at: "2024-03-19",
+    main_type: "business",
   },
   {
     id: "3",
@@ -31,8 +31,8 @@ const mockSpeeches = [
     description:
       "Discover the key principles of personal development and how to achieve your goals through consistent self-improvement.",
     duration: 25,
-    createdAt: "2024-03-18",
-    category: "motivational",
+    created_at: "2024-03-18",
+    main_type: "motivational",
   },
 ];
 
