@@ -30,6 +30,14 @@ body {
   font-family: "Inter", sans-serif;
 }
 
+.primary-gradient {
+  background: linear-gradient(to right, #5f0f40, #310e68);
+}
+
+.primary-gradient:hover {
+  background: linear-gradient(to right, #7f1d5f, #4a1596) !important;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

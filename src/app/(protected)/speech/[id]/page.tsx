@@ -4,8 +4,9 @@ import TiptapEditor from "@/components/TiptapEditor";
 import { useEffect, useState } from "react";
 import { speechService } from "@/services/speechService";
 import { Speech, SpeechVersion } from "@/types/speech";
-import { Spin, message } from "antd";
-import { useParams } from "next/navigation";
+import { Button, Empty, Spin, message } from "antd";
+import { useParams, useRouter } from "next/navigation";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function SpeechPage() {
   const [speech, setSpeech] = useState<Speech | null>(null);
@@ -14,6 +15,8 @@ export default function SpeechPage() {
   const [messageApi, contextHolder] = message.useMessage();
   const params = useParams();
   const speechId = params.id as string;
+  const router = useRouter();
+  const { theme } = useTheme();
 
   useEffect(() => {
     async function loadSpeechData() {
@@ -52,7 +55,7 @@ export default function SpeechPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Spin size="large" />
+        <Spin />
       </div>
     );
   }
@@ -60,7 +63,24 @@ export default function SpeechPage() {
   if (!speech || !version) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-500">Speech not found</div>
+        <div>
+          <Empty description={<span className="">Speech not found</span>} />
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="w-full primary-gradient mt-3"
+            onClick={() => router.push("/dashboard")}
+            style={{
+              height: "40px",
+              fontSize: "16px",
+              border: "none",
+              boxShadow:
+                theme === "dark" ? "0 2px 8px rgba(0, 0, 0, 0.3)" : "none",
+            }}
+          >
+            Go to Dashboard
+          </Button>
+        </div>
       </div>
     );
   }

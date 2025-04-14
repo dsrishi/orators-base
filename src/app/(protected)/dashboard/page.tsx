@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Space, Empty, message, Spin } from "antd";
+import { Button, Space, Empty, message, Spin, Skeleton, Card } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import SpeechCard from "@/components/SpeechCard";
 import { useEffect, useState } from "react";
@@ -79,7 +79,7 @@ export default function Dashboard() {
   if (userLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Spin size="large" />
+        <Spin />
       </div>
     );
   }
@@ -87,11 +87,7 @@ export default function Dashboard() {
   if (userError) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Empty
-          description={
-            <span className="text-red-500">Error loading user data</span>
-          }
-        />
+        <Empty description={<span className="">Getting user data...</span>} />
       </div>
     );
   }
@@ -109,10 +105,10 @@ export default function Dashboard() {
               onClick={handleCreateNewSpeech}
               loading={creating}
               style={{
-                background: "linear-gradient(to right, #5f0f40, #310e68)",
                 border: "none",
                 boxShadow: "none",
               }}
+              className="primary-gradient"
             >
               New Speech
             </Button>
@@ -120,8 +116,20 @@ export default function Dashboard() {
         </div>
 
         {loading ? (
-          // Add loading skeleton here if needed
-          <div>Loading...</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <Card>
+              <Skeleton active />
+            </Card>
+            <Card>
+              <Skeleton active />
+            </Card>
+            <Card>
+              <Skeleton active />
+            </Card>
+            <Card>
+              <Skeleton active />
+            </Card>
+          </div>
         ) : speeches.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {speeches.map((speech) => (
@@ -129,7 +137,24 @@ export default function Dashboard() {
             ))}
           </div>
         ) : (
-          <Empty description="No speeches found" className="mt-8" />
+          <>
+            <Empty description="No speeches found" className="mt-8 mb-3" />
+            <div className="text-center">
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleCreateNewSpeech}
+                loading={creating}
+                style={{
+                  border: "none",
+                  boxShadow: "none",
+                }}
+                className="primary-gradient"
+              >
+                New Speech
+              </Button>
+            </div>
+          </>
         )}
       </main>
     </>

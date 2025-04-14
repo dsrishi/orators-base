@@ -118,7 +118,7 @@ export default function SettingsPage() {
   if (userLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Spin size="large" />
+        <Spin />
       </div>
     );
   }
@@ -179,10 +179,10 @@ export default function SettingsPage() {
                   htmlType="submit"
                   loading={saving}
                   style={{
-                    background: "linear-gradient(to right, #5f0f40, #310e68)",
                     border: "none",
                     boxShadow: "none",
                   }}
+                  className="primary-gradient"
                 >
                   Save Profile
                 </Button>
@@ -264,10 +264,10 @@ export default function SettingsPage() {
                   htmlType="submit"
                   loading={saving}
                   style={{
-                    background: "linear-gradient(to right, #5f0f40, #310e68)",
                     border: "none",
                     boxShadow: "none",
                   }}
+                  className="primary-gradient"
                 >
                   Update Password
                 </Button>

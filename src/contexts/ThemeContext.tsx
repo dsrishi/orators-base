@@ -62,6 +62,13 @@ const getAntdThemeConfig = (currentTheme: Theme): ThemeConfig => ({
           ? "rgba(255, 255, 255, 0.45)"
           : "rgba(0, 0, 0, 0.45)",
     },
+    Tabs: {
+      colorText: currentTheme === "dark" ? "#ffffff" : "#000000",
+      itemSelectedColor: currentTheme === "dark" ? "#ffffff" : "#000000",
+      itemHoverColor: currentTheme === "dark" ? "#ffffff" : "#000000",
+      itemActiveColor: currentTheme === "dark" ? "#ffffff" : "#000000",
+      itemColor: currentTheme === "dark" ? "#ffffff" : "#000000",
+    },
   },
 });
 

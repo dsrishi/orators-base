@@ -47,15 +47,11 @@ export default function Home() {
             <Button
               type="primary"
               htmlType="submit"
-              className="w-full"
+              className="w-full primary-gradient"
               onClick={() => router.push("/login")}
               style={{
                 height: "40px",
                 fontSize: "16px",
-                background:
-                  theme === "dark"
-                    ? "linear-gradient(to right, #7f1d5f, #4a1596)"
-                    : "linear-gradient(to right, #5f0f40, #310e68)",
                 border: "none",
                 boxShadow:
                   theme === "dark" ? "0 2px 8px rgba(0, 0, 0, 0.3)" : "none",

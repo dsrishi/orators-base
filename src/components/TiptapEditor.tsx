@@ -150,10 +150,10 @@ export default function TiptapEditor({
               icon={<LineChartOutlined />}
               onClick={() => setDrawerOpen(true)}
               style={{
-                background: "linear-gradient(to right, #5f0f40, #310e68)",
                 border: "none",
                 boxShadow: "none",
               }}
+              className="primary-gradient"
             >
               Analyse
             </Button>
