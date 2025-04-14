@@ -11,17 +11,17 @@ export interface ServiceError {
     last_name: string;
     profile_picture?: string;
     gender?: string;
-    date_of_birth?: string;
+    date_of_birth?: Date;
     experience_level?: string;
     speaking_pace?: number;
     created_at: string;
   }
-  
+
  export interface UpdateProfileData {
     first_name?: string;
     last_name?: string;
     gender?: string;
-    date_of_birth?: string;
+    date_of_birth?: Date;
     experience_level?: string;
     speaking_pace?: number;
   }

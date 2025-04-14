@@ -18,6 +18,7 @@ import { userService } from "@/services/userService";
 import { useTheme } from "@/contexts/ThemeContext";
 import { UpdateProfileData } from "@/types/user";
 import { HomeOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -36,7 +37,9 @@ export default function SettingsPage() {
         first_name: user.first_name || "",
         last_name: user.last_name || "",
         gender: user.gender || undefined,
-        date_of_birth: user.date_of_birth || undefined,
+        date_of_birth: user.date_of_birth
+          ? dayjs(user.date_of_birth)
+          : undefined,
         experience_level: user.experience_level || undefined,
         speaking_pace: user.speaking_pace || undefined,
       });
@@ -114,7 +117,7 @@ export default function SettingsPage() {
       forceRender: true,
       children: (
         <div className="p-3">
-          <div className="text-lg font-semibold mb-3">Personal Details</div>
+          <div className="text-lg font-semibold mb-3">Personal Profile</div>
           <div className="max-w-xl">
             <Form
               form={profileForm}
@@ -162,7 +165,7 @@ export default function SettingsPage() {
                 </Form.Item>
               </div>
 
-              <div className="text-lg font-semibold mb-3">Speaker Details</div>
+              <div className="text-lg font-semibold mb-3">Speaker Profile</div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
                 <Form.Item label="Experience Level" name="experience_level">
