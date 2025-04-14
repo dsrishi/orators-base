@@ -20,6 +20,7 @@ export default function Login() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const { theme } = useTheme();
+  const [messageApi, contextHolder] = message.useMessage();
 
   const onFinish = async (values: LoginFormData) => {
     try {
@@ -37,11 +38,13 @@ export default function Login() {
         throw error;
       }
 
-      message.success("Login successful!");
+      messageApi.success("Login successful!");
       router.push("/dashboard"); // Redirect after successful login
       router.refresh(); // Refresh the page to update auth state
     } catch (error) {
-      message.error(error instanceof Error ? error.message : "Login failed!");
+      messageApi.error(
+        error instanceof Error ? error.message : "Login failed!"
+      );
     } finally {
       setLoading(false);
     }
@@ -49,6 +52,7 @@ export default function Login() {
 
   return (
     <PublicRoute>
+      {contextHolder}
       <div className="min-h-screen relative">
         <div className="absolute top-4 right-4">
           <ThemeSwitcher />
