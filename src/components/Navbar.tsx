@@ -8,11 +8,14 @@ import { useRouter } from "next/navigation";
 import { Dropdown, Avatar } from "antd";
 import type { MenuProps } from "antd";
 import { SettingOutlined, LogoutOutlined } from "@ant-design/icons";
+import Link from "next/link";
+import { useUser } from "@/contexts/UserContext";
 
 const Navbar = () => {
   const { theme } = useTheme();
   const { signOut } = useAuth();
   const router = useRouter();
+  const { user } = useUser();
 
   const handleLogout = async () => {
     try {
@@ -27,9 +30,9 @@ const Navbar = () => {
     {
       key: "settings",
       label: (
-        <a href="/settings" className="flex items-center gap-2">
+        <Link href="/settings" className="flex items-center gap-2">
           <SettingOutlined /> Settings
-        </a>
+        </Link>
       ),
     },
     {
@@ -67,8 +70,17 @@ const Navbar = () => {
               trigger={["click"]}
             >
               <Avatar
-                className="cursor-pointer bg-gray-200 dark:bg-gray-600"
+                className="cursor-pointer"
                 size={40}
+                src={
+                  user
+                    ? user.gender === "male"
+                      ? "/man.svg"
+                      : user.gender === "female"
+                      ? "/woman.svg"
+                      : "user.svg"
+                    : "/user.svg"
+                }
               />
             </Dropdown>
           </div>

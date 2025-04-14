@@ -12,8 +12,8 @@ interface SpeechCardProps {
   title: string;
   description: string;
   duration: number;
-  createdAt: string;
-  category: string;
+  created_at: string;
+  main_type: string;
 }
 
 export default function SpeechCard({
@@ -21,12 +21,12 @@ export default function SpeechCard({
   title,
   description,
   duration,
-  createdAt,
-  category,
+  created_at,
+  main_type,
 }: SpeechCardProps) {
   const { theme } = useTheme();
 
-  const getCategoryColor = (category: string) => {
+  const getMainTypeColor = (main_type: string) => {
     const colors: { [key: string]: string } = {
       business: "blue",
       technical: "green",
@@ -34,11 +34,11 @@ export default function SpeechCard({
       educational: "purple",
       other: "default",
     };
-    return colors[category] || "default";
+    return colors[main_type] || "default";
   };
 
   return (
-    <Link href={`/speech?id=${id}`}>
+    <Link href={`/speech/${id}`}>
       <Card
         hoverable
         style={{
@@ -59,7 +59,7 @@ export default function SpeechCard({
             >
               {title}
             </Title>
-            <Tag color={getCategoryColor(category)}>{category}</Tag>
+            <Tag color={getMainTypeColor(main_type)}>{main_type}</Tag>
           </div>
 
           <Text
@@ -75,7 +75,7 @@ export default function SpeechCard({
                 style={{ color: theme === "dark" ? "#999" : "#666" }}
               />
               <Text style={{ color: theme === "dark" ? "#999" : "#666" }}>
-                {duration} min
+                {duration ? duration : "-"} min
               </Text>
             </div>
             <div className="flex items-center gap-2">
@@ -83,7 +83,7 @@ export default function SpeechCard({
                 style={{ color: theme === "dark" ? "#999" : "#666" }}
               />
               <Text style={{ color: theme === "dark" ? "#999" : "#666" }}>
-                {new Date(createdAt).toLocaleDateString()}
+                {new Date(created_at).toLocaleDateString()}
               </Text>
             </div>
           </div>

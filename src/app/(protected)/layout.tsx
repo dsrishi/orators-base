@@ -1,15 +1,16 @@
 import Navbar from "@/components/Navbar";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import TiptapEditor from "@/components/TiptapEditor";
 
-export default function Speech() {
+export default function ProtectedLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <ProtectedRoute>
       <div className="min-h-screen">
         <Navbar />
-        <main className="mt-16">
-          <TiptapEditor />
-        </main>
+        {children}
       </div>
     </ProtectedRoute>
   );
