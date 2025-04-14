@@ -68,7 +68,7 @@ export default function SpeechInfoModal({
         target_audience: speechData.target_audience,
         language: speechData.language,
         objective: speechData.objective,
-        purpose: speechData.purpose,
+        primary_purpose: speechData.primary_purpose,
         tone: speechData.tone,
         medium: speechData.medium,
         occasion: speechData.occasion,
@@ -309,10 +309,10 @@ export default function SpeechInfoModal({
         <Form.Item
           label={
             <span style={{ color: theme === "dark" ? "#ffffff" : "#000000" }}>
-              Purpose
+              Primary Purpose
             </span>
           }
-          name="purpose"
+          name="primary_purpose"
         >
           <Input style={inputStyle} />
         </Form.Item>

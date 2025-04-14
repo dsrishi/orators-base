@@ -20,7 +20,7 @@ export interface Database {
           target_audience: string | null
           language: string | null
           objective: string | null
-          purpose: string | null
+          primary_purpose: string | null
           tone: string | null
           medium: string | null
           occasion: string | null
@@ -39,7 +39,7 @@ export interface Database {
           target_audience?: string | null
           language?: string | null
           objective?: string | null
-          purpose?: string | null
+          primary_purpose?: string | null
           tone?: string | null
           medium?: string | null
           occasion?: string | null
@@ -58,7 +58,7 @@ export interface Database {
           target_audience?: string | null
           language?: string | null
           objective?: string | null
-          purpose?: string | null
+          primary_purpose?: string | null
           tone?: string | null
           medium?: string | null
           occasion?: string | null

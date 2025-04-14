@@ -7,7 +7,7 @@ export interface Speech {
   target_audience: string;
   language: string;
   objective: string;
-  purpose: string;
+  primary_purpose: string;
   tone: string;
   medium: string;
   occasion: string;
@@ -47,7 +47,7 @@ export interface UpdateSpeechData {
   target_audience?: string;
   language?: string;
   objective?: string;
-  purpose?: string;
+  primary_purpose?: string;
   tone?: string;
   medium?: string;
   occasion?: string;
