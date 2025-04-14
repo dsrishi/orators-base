@@ -1,19 +1,35 @@
 import { Drawer } from "antd";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Editor } from "@tiptap/react";
+import { Editor, JSONContent } from "@tiptap/react";
+import { Speech } from "@/types/speech";
+import { useUser } from "@/contexts/UserContext";
 
 interface SpeechAnalysisDrawerProps {
   open: boolean;
   onClose: () => void;
   editor: Editor | null;
+  speechData: Speech;
 }
 
 export default function SpeechAnalysisDrawer({
   open,
   onClose,
   editor,
+  speechData,
 }: SpeechAnalysisDrawerProps) {
   const { theme } = useTheme();
+  const { user } = useUser();
+
+  const getWordCount = (content: string | JSONContent | JSONContent[]) => {
+    // Convert JSONContent to string
+    const contentString =
+      typeof content === "string" ? content : JSON.stringify(content);
+    const tempElement = document.createElement("div");
+    tempElement.innerHTML = contentString;
+    const textContent = tempElement.textContent || tempElement.innerText || "";
+    const words = textContent.trim().split(/\s+/);
+    return words.length;
+  };
 
   return (
     <Drawer
@@ -48,56 +64,41 @@ export default function SpeechAnalysisDrawer({
       }}
     >
       <div className="flex flex-col gap-6">
-        <div
-          className="p-6 rounded-lg"
-          style={{
-            backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5",
-          }}
-        >
-          <h3 className="text-xl font-semibold mb-4">Speech Statistics</h3>
-          <div className="space-y-3">
-            <p className="text-base">
-              Word Count: {editor?.storage?.characterCount?.words() || 0}
-            </p>
-            <p className="text-base">
-              Character Count:{" "}
-              {editor?.storage?.characterCount?.characters() || 0}
-            </p>
-            <p className="text-base">
-              Estimated Duration:{" "}
-              {Math.ceil((editor?.storage?.characterCount?.words() || 0) / 130)}{" "}
-              minutes
-            </p>
+        <div className="grid grid-cols-2 gap-6">
+          <div
+            className="p-6 rounded"
+            style={{
+              backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5",
+            }}
+          >
+            <h3 className="text-lg font-semibold mb-2">Word Count</h3>
+            <div className="space-y-1">
+              <p>Planned Count: {speechData.duration || "-"}</p>
+              <p>
+                Estimated Count:{" "}
+                {getWordCount(editor?.options?.content || "") || 0}
+              </p>
+            </div>
           </div>
-        </div>
 
-        <div
-          className="p-6 rounded-lg"
-          style={{
-            backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5",
-          }}
-        >
-          <h3 className="text-xl font-semibold mb-4">Key Metrics</h3>
-          <div className="space-y-3">
-            <p className="text-base">Complexity Score: Calculating...</p>
-            <p className="text-base">Engagement Level: Analyzing...</p>
-            <p className="text-base">Clarity Index: Processing...</p>
-          </div>
-        </div>
-
-        <div
-          className="p-6 rounded-lg"
-          style={{
-            backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5",
-          }}
-        >
-          <h3 className="text-xl font-semibold mb-4">Suggestions</h3>
-          <div className="space-y-3">
-            <p className="text-base">
-              Analyzing your speech for improvements...
-            </p>
-            <p className="text-base">Checking for potential enhancements...</p>
-            <p className="text-base">Reviewing structure and flow...</p>
+          <div
+            className="p-6 rounded"
+            style={{
+              backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5",
+            }}
+          >
+            <h3 className="text-lg font-semibold mb-2">Duration</h3>
+            <div className="space-y-1">
+              <p>Planned Duration: {speechData.duration || "-"} min</p>
+              <p>
+                Estimated Duration:{" "}
+                {Math.ceil(
+                  (getWordCount(editor?.options?.content || "") || 0) /
+                    (user?.speaking_pace || 140)
+                )}{" "}
+                min
+              </p>
+            </div>
           </div>
         </div>
       </div>

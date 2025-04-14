@@ -9,6 +9,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import TipTapMenuBar from "./TipTapMenuBar";
 import { Breadcrumb, Button, FloatButton, message } from "antd";
 import {
+  AudioOutlined,
   EditOutlined,
   HomeOutlined,
   LineChartOutlined,
@@ -20,6 +21,7 @@ import { Speech, SpeechVersion } from "@/types/speech";
 import SpeechInfoModal from "./SpeechInfoModal";
 import { speechService } from "@/services/speechService";
 import { useDebounce } from "@/hooks/useDebounce";
+import ComingSoonModal from "./ComingSoonModal";
 
 interface TiptapEditorProps {
   speechId: string;
@@ -38,6 +40,7 @@ export default function TiptapEditor({
   const [speechData, setSpeechData] = useState<Speech>(initialSpeechData);
   const [saving, setSaving] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+  const [isComingSoonModalOpen, setIsComingSoonModalOpen] = useState(false);
 
   const saveContent = async (content: string) => {
     if (!initialVersion?.id) return;
@@ -168,12 +171,30 @@ export default function TiptapEditor({
           <EditorContent editor={editor} />
         </div>
       </div>
-      <FloatButton icon={<UploadOutlined />} />
+      <FloatButton.Group shape="circle" style={{ insetInlineEnd: 24 }}>
+        <FloatButton
+          onClick={() => setIsComingSoonModalOpen(true)}
+          icon={<AudioOutlined />}
+          tooltip={<div>Record</div>}
+        />
+        <FloatButton
+          onClick={() => setIsComingSoonModalOpen(true)}
+          icon={<UploadOutlined />}
+          tooltip={<div>Upload</div>}
+        />
+      </FloatButton.Group>
+
+      <ComingSoonModal
+        open={isComingSoonModalOpen}
+        onClose={() => setIsComingSoonModalOpen(false)}
+        featureTitle="Upload/Record a speech" // Pass the name of the feature
+      />
 
       <SpeechAnalysisDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         editor={editor}
+        speechData={speechData}
       />
 
       <SpeechInfoModal
