@@ -194,6 +194,7 @@ export default function TiptapEditor({
         onClose={() => setDrawerOpen(false)}
         editor={editor}
         speechData={speechData}
+        key={drawerOpen ? "open-drawer" : "closed-drawer"}
       />
 
       <SpeechInfoModal

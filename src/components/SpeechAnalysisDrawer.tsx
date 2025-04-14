@@ -4,6 +4,7 @@ import { Editor, JSONContent } from "@tiptap/react";
 import { Speech } from "@/types/speech";
 import { useUser } from "@/contexts/UserContext";
 import { estimatedDuration } from "@/helpers/speechHelpers";
+import { useEffect, useState } from "react";
 
 interface SpeechAnalysisDrawerProps {
   open: boolean;
@@ -20,6 +21,37 @@ export default function SpeechAnalysisDrawer({
 }: SpeechAnalysisDrawerProps) {
   const { theme } = useTheme();
   const { user } = useUser();
+  const [wordCount, setWordCount] = useState(0);
+
+  // Update word count when the drawer opens or editor changes
+  useEffect(() => {
+    if (open && editor) {
+      // Get current content directly from the editor
+      const content = editor.getHTML();
+      setWordCount(getWordCount(content));
+    }
+  }, [open, editor]);
+
+  // Update on every editor change when drawer is open
+  useEffect(() => {
+    if (!open || !editor) return;
+
+    const updateStats = () => {
+      const content = editor.getHTML();
+      setWordCount(getWordCount(content));
+    };
+
+    // Subscribe to editor changes
+    editor.on("update", updateStats);
+
+    // Initial update
+    updateStats();
+
+    // Cleanup
+    return () => {
+      editor.off("update", updateStats);
+    };
+  }, [editor, open]);
 
   const getWordCount = (content: string | JSONContent | JSONContent[]) => {
     // Convert JSONContent to string
@@ -75,10 +107,7 @@ export default function SpeechAnalysisDrawer({
             <h3 className="text-lg font-semibold mb-2">Word Count</h3>
             <div className="space-y-1">
               <p>Planned Count: {speechData.word_count || "-"}</p>
-              <p>
-                Estimated Count:{" "}
-                {getWordCount(editor?.options?.content || "") || 0}
-              </p>
+              <p>Estimated Count: {wordCount}</p>
             </div>
           </div>
 
@@ -93,10 +122,7 @@ export default function SpeechAnalysisDrawer({
               <p>Planned Duration: {speechData.duration || "-"} min</p>
               <p>
                 Estimated Duration:{" "}
-                {estimatedDuration(
-                  getWordCount(editor?.options?.content || ""),
-                  user?.speaking_pace || 140
-                )}
+                {estimatedDuration(wordCount, user?.speaking_pace || 140)}
               </p>
             </div>
           </div>
