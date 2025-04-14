@@ -22,42 +22,21 @@ const { Option } = Select;
 export default function SettingsPage() {
   const { user, loading: userLoading } = useUser();
   const { theme } = useTheme();
-  const [profileForm] = Form.useForm();
-  const [passwordForm] = Form.useForm();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+  const [profileForm] = Form.useForm();
+  const [passwordForm] = Form.useForm();
 
   useEffect(() => {
-    async function fetchProfile() {
-      if (!user) return;
-
-      try {
-        const { data, error } = await userService.getProfile(user.id);
-
-        if (error) {
-          messageApi.error({
-            content: error.message,
-            duration: 5,
-          });
-          return;
-        }
-
-        if (data) {
-          profileForm.setFieldsValue({
-            first_name: data.first_name || "",
-            last_name: data.last_name || "",
-            gender: data.gender || undefined,
-          });
-        }
-      } finally {
-        setLoading(false);
-      }
+    if (user) {
+      profileForm.setFieldsValue({
+        first_name: user.first_name || "",
+        last_name: user.last_name || "",
+        gender: user.gender || undefined,
+      });
     }
-
-    if (!userLoading && user) {
-      fetchProfile();
-    }
+    setLoading(false);
   }, [user, userLoading, profileForm, messageApi]);
 
   const handleProfileUpdate = async (values: UpdateProfileData) => {
@@ -127,6 +106,7 @@ export default function SettingsPage() {
     {
       key: "1",
       label: "Profile",
+      forceRender: true,
       children: (
         <div className="p-3">
           <div className="text-lg font-semibold mb-3">Personal Details</div>
@@ -195,6 +175,7 @@ export default function SettingsPage() {
     {
       key: "2",
       label: "Security",
+      forceRender: true,
       children: (
         <div className="p-3">
           <div className="text-lg font-semibold mb-3">Change Password</div>
