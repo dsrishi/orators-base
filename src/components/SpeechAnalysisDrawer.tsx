@@ -3,6 +3,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Editor, JSONContent } from "@tiptap/react";
 import { Speech } from "@/types/speech";
 import { useUser } from "@/contexts/UserContext";
+import { estimatedDuration } from "@/helpers/speechHelpers";
 
 interface SpeechAnalysisDrawerProps {
   open: boolean;
@@ -73,7 +74,7 @@ export default function SpeechAnalysisDrawer({
           >
             <h3 className="text-lg font-semibold mb-2">Word Count</h3>
             <div className="space-y-1">
-              <p>Planned Count: {speechData.duration || "-"}</p>
+              <p>Planned Count: {speechData.word_count || "-"}</p>
               <p>
                 Estimated Count:{" "}
                 {getWordCount(editor?.options?.content || "") || 0}
@@ -92,11 +93,10 @@ export default function SpeechAnalysisDrawer({
               <p>Planned Duration: {speechData.duration || "-"} min</p>
               <p>
                 Estimated Duration:{" "}
-                {Math.ceil(
-                  (getWordCount(editor?.options?.content || "") || 0) /
-                    (user?.speaking_pace || 140)
-                )}{" "}
-                min
+                {estimatedDuration(
+                  getWordCount(editor?.options?.content || ""),
+                  user?.speaking_pace || 140
+                )}
               </p>
             </div>
           </div>

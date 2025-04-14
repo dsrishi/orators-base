@@ -57,11 +57,6 @@ export default function TiptapEditor({
         content: "Failed to save changes",
         duration: 3,
       });
-    } else {
-      messageApi.success({
-        content: "Changes saved",
-        duration: 1,
-      });
     }
     setSaving(false);
   };
@@ -84,6 +79,10 @@ export default function TiptapEditor({
   });
 
   const handleSpeechUpdate = async () => {
+    messageApi.success({
+      content: "Changes saved",
+      duration: 1,
+    });
     const { data, error } = await speechService.getSpeechWithVersion(speechId);
     if (!error && data.speech) {
       setSpeechData(data.speech);

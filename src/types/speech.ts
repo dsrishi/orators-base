@@ -8,6 +8,7 @@ export interface Speech {
   language: string;
   objective: string;
   primary_purpose: string;
+  word_count: number;
   tone: string;
   medium: string;
   occasion: string;
@@ -48,6 +49,7 @@ export interface UpdateSpeechData {
   language?: string;
   objective?: string;
   primary_purpose?: string;
+  word_count?: number;
   tone?: string;
   medium?: string;
   occasion?: string;

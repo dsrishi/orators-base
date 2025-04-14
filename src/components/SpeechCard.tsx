@@ -4,6 +4,7 @@ import { Card, Tag, Typography } from "antd";
 import { ClockCircleOutlined, CalendarOutlined } from "@ant-design/icons";
 import { useTheme } from "@/contexts/ThemeContext";
 import Link from "next/link";
+import { capitalize } from "@/helpers/wordHelpers";
 
 const { Text, Title } = Typography;
 
@@ -13,7 +14,7 @@ interface SpeechCardProps {
   description: string;
   duration: number;
   created_at: string;
-  main_type: string;
+  primary_purpose: string;
 }
 
 export default function SpeechCard({
@@ -22,19 +23,19 @@ export default function SpeechCard({
   description,
   duration,
   created_at,
-  main_type,
+  primary_purpose,
 }: SpeechCardProps) {
   const { theme } = useTheme();
 
-  const getMainTypeColor = (main_type: string) => {
+  const getStatusColor = (purpose: string) => {
     const colors: { [key: string]: string } = {
-      business: "blue",
-      technical: "green",
-      motivational: "orange",
-      educational: "purple",
+      inform: "blue",
+      persuade: "green",
+      entertain: "orange",
+      inspire: "purple",
       other: "default",
     };
-    return colors[main_type] || "default";
+    return colors[purpose] || "default";
   };
 
   return (
@@ -48,7 +49,7 @@ export default function SpeechCard({
         className="h-full"
       >
         <div className="flex flex-col h-full">
-          <div className="flex justify-between items-start mb-2">
+          <div className="flex justify-between items-center mb-2">
             <Title
               level={4}
               style={{
@@ -59,7 +60,9 @@ export default function SpeechCard({
             >
               {title}
             </Title>
-            <Tag color={getMainTypeColor(main_type)}>{main_type}</Tag>
+            <Tag color={getStatusColor(primary_purpose)}>
+              {capitalize(primary_purpose)}
+            </Tag>
           </div>
 
           <Text

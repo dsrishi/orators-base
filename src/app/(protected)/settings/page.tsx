@@ -178,7 +178,11 @@ export default function SettingsPage() {
                 </Form.Item>
 
                 <Form.Item label="Speaking Pace" name="speaking_pace">
-                  <InputNumber className="w-full" addonAfter="words/minute" />
+                  <InputNumber
+                    min={1}
+                    className="w-full"
+                    addonAfter="words/minute"
+                  />
                 </Form.Item>
               </div>
 
