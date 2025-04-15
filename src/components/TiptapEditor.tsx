@@ -5,9 +5,25 @@ import StarterKit from "@tiptap/starter-kit";
 import { Color } from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
 import FontFamily from "@tiptap/extension-font-family";
+import TextAlign from "@tiptap/extension-text-align";
+import Document from "@tiptap/extension-document";
+import Heading from "@tiptap/extension-heading";
+import Paragraph from "@tiptap/extension-paragraph";
+import Text from "@tiptap/extension-text";
+import Placeholder from "@tiptap/extension-placeholder";
+import BulletList from "@tiptap/extension-bullet-list";
+import OrderedList from "@tiptap/extension-ordered-list";
+import ListItem from "@tiptap/extension-list-item";
 import { useTheme } from "@/contexts/ThemeContext";
 import TipTapMenuBar from "./TipTapMenuBar";
-import { Breadcrumb, Button, FloatButton, message } from "antd";
+import {
+  Breadcrumb,
+  Button,
+  Divider,
+  FloatButton,
+  message,
+  Tooltip,
+} from "antd";
 import {
   AudioOutlined,
   EditOutlined,
@@ -64,7 +80,25 @@ export default function TiptapEditor({
   const debouncedSave = useDebounce(saveContent, 2000);
 
   const editor = useEditor({
-    extensions: [StarterKit, TextStyle, Color, FontFamily],
+    extensions: [
+      Document,
+      Paragraph,
+      Text,
+      Heading,
+      StarterKit,
+      TextStyle,
+      Color,
+      FontFamily,
+      BulletList,
+      OrderedList,
+      ListItem,
+      Placeholder.configure({
+        placeholder: "Start writing your speech...",
+      }),
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+    ],
     content: initialVersion?.content,
     editorProps: {
       attributes: {
@@ -117,23 +151,22 @@ export default function TiptapEditor({
                 />
               </div>
               <div className="ml-1">
-                <Button
-                  style={{
-                    background: theme === "dark" ? "#2d2d2d" : "#ffffff",
-                    borderColor: theme === "dark" ? "#3d3d3d" : "#d9d9d9",
-                    color: theme === "dark" ? "#ffffff" : "#000000",
-                  }}
-                  icon={<EditOutlined />}
-                  onClick={() => setInfoModalOpen(true)}
-                />
+                <Tooltip title="Edit">
+                  <Button
+                    icon={<EditOutlined />}
+                    onClick={() => setInfoModalOpen(true)}
+                  />
+                </Tooltip>
               </div>
             </div>
-            <div
-              className="mx-4"
-              style={{ color: theme === "dark" ? "#999" : "#aaa" }}
-            >
-              |
-            </div>
+            <Divider
+              type="vertical"
+              style={{
+                backgroundColor: theme === "dark" ? "#999" : "#aaa",
+                height: "24px",
+                margin: "auto 16px",
+              }}
+            />
             <TipTapMenuBar editor={editor} />
           </div>
           <div className="flex items-center gap-2">

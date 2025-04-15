@@ -1,13 +1,21 @@
 "use client";
 
 import { useTheme } from "@/contexts/ThemeContext";
-import { Button, Select, Space, Tooltip } from "antd";
+import { Button, Select, Space, Tooltip, Popover, Divider } from "antd";
 import {
   BoldOutlined,
   ItalicOutlined,
-  UnderlineOutlined,
+  StrikethroughOutlined,
+  OrderedListOutlined,
+  UnorderedListOutlined,
+  AlignLeftOutlined,
+  AlignCenterOutlined,
+  AlignRightOutlined,
+  ClearOutlined,
   FontColorsOutlined,
   FontSizeOutlined,
+  UndoOutlined,
+  RedoOutlined,
 } from "@ant-design/icons";
 import type { Editor } from "@tiptap/react";
 
@@ -16,6 +24,19 @@ const { Option } = Select;
 interface MenuBarProps {
   editor: Editor | null;
 }
+
+const COLORS = [
+  "#000000", // Black
+  "#ffffff", // White
+  "#ff0000", // Red
+  "#00ff00", // Green
+  "#0000ff", // Blue
+  "#ffff00", // Yellow
+  "#00ffff", // Cyan
+  "#ff00ff", // Magenta
+  "#c0c0c0", // Silver
+  "#808080", // Gray
+];
 
 const TipTapMenuBar = ({ editor }: MenuBarProps) => {
   const { theme } = useTheme();
@@ -30,6 +51,50 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
 
   const selectClassName = theme === "dark" ? "dark-select" : "";
 
+  const ColorPopover = (
+    <div className="flex flex-wrap gap-2 p-2 max-w-[200px]">
+      {/* Add default theme color button */}
+      <Tooltip title="Default (inherit theme color)">
+        <div
+          className="w-6 h-6 rounded cursor-pointer hover:opacity-80 border border-gray-300 flex items-center justify-center"
+          style={{
+            background: "linear-gradient(45deg, #ffffff 50%, #000000 50%)",
+          }}
+          onClick={() => {
+            // Instead of setting a color, we'll unset the color mark
+            editor.chain().focus().unsetColor().run();
+          }}
+        >
+          <span
+            style={{
+              color: theme === "dark" ? "#ffffff" : "#000000",
+              fontSize: "10px",
+              fontWeight: "bold",
+              textShadow:
+                theme === "dark" ? "0px 0px 2px #000" : "0px 0px 2px #fff",
+            }}
+          >
+            Aa
+          </span>
+        </div>
+      </Tooltip>
+      {COLORS.map((color) => (
+        <div
+          key={color}
+          className="w-6 h-6 rounded cursor-pointer hover:opacity-80 border border-gray-300"
+          style={{
+            backgroundColor: color,
+            outline: editor.isActive({ textStyle: { color } })
+              ? "2px solid #1890ff"
+              : "none",
+            outlineOffset: "2px",
+          }}
+          onClick={() => editor.chain().focus().setColor(color).run()}
+        />
+      ))}
+    </div>
+  );
+
   return (
     <div className="flex flex-wrap gap-2">
       <Space.Compact>
@@ -38,11 +103,6 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
             type={editor.isActive("bold") ? "primary" : "default"}
             icon={<BoldOutlined />}
             onClick={() => editor.chain().focus().toggleBold().run()}
-            style={{
-              background: theme === "dark" ? "#2d2d2d" : "#ffffff",
-              borderColor: theme === "dark" ? "#3d3d3d" : "#d9d9d9",
-              color: theme === "dark" ? "#ffffff" : "#000000",
-            }}
           />
         </Tooltip>
         <Tooltip title="Italic">
@@ -50,22 +110,13 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
             type={editor.isActive("italic") ? "primary" : "default"}
             icon={<ItalicOutlined />}
             onClick={() => editor.chain().focus().toggleItalic().run()}
-            style={{
-              background: theme === "dark" ? "#2d2d2d" : "#ffffff",
-              borderColor: theme === "dark" ? "#3d3d3d" : "#d9d9d9",
-              color: theme === "dark" ? "#ffffff" : "#000000",
-            }}
           />
         </Tooltip>
-        <Tooltip title="Underline">
+        <Tooltip title="Strike">
           <Button
-            type={editor.isActive("underline") ? "primary" : "default"}
-            icon={<UnderlineOutlined />}
-            style={{
-              background: theme === "dark" ? "#2d2d2d" : "#ffffff",
-              borderColor: theme === "dark" ? "#3d3d3d" : "#d9d9d9",
-              color: theme === "dark" ? "#ffffff" : "#000000",
-            }}
+            type={editor.isActive("strike") ? "primary" : "default"}
+            icon={<StrikethroughOutlined />}
+            onClick={() => editor.chain().focus().toggleStrike().run()}
           />
         </Tooltip>
       </Space.Compact>
@@ -87,22 +138,132 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
         <Option value="Courier New">Courier New</Option>
       </Select>
 
-      <Select
-        className={selectClassName}
-        style={selectStyles}
-        defaultValue="#000000"
-        onChange={(value) => editor.chain().focus().setColor(value).run()}
-        prefix={
-          <FontColorsOutlined
-            style={{ color: theme === "dark" ? "#ffffff" : "#000000" }}
-          />
-        }
-        popupClassName={theme === "dark" ? "dark-select-dropdown" : ""}
+      <Popover
+        content={ColorPopover}
+        trigger="click"
+        placement="bottom"
+        title="Text Color"
       >
-        <Option value="#000000">Black</Option>
-        <Option value="#FF0000">Red</Option>
-        <Option value="#0000FF">Blue</Option>
-      </Select>
+        <Tooltip title="Text Color">
+          <Button
+            icon={<FontColorsOutlined />}
+            style={{
+              borderBottom: "2px solid",
+              borderBottomColor:
+                editor.getAttributes("textStyle").color ||
+                (theme === "dark" ? "#ffffff" : "#000000"),
+              color:
+                editor.getAttributes("textStyle").color ||
+                (theme === "dark" ? "#ffffff" : "#000000"),
+            }}
+          />
+        </Tooltip>
+      </Popover>
+
+      <Divider
+        type="vertical"
+        style={{
+          backgroundColor: theme === "dark" ? "#999" : "#aaa",
+          height: "24px",
+          margin: "auto 8px",
+        }}
+      />
+
+      <Tooltip title="Bullet List">
+        <Button
+          type={editor.isActive("bulletList") ? "primary" : "default"}
+          icon={<UnorderedListOutlined />}
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+        />
+      </Tooltip>
+
+      <Tooltip title="Ordered List">
+        <Button
+          type={editor.isActive("orderedList") ? "primary" : "default"}
+          icon={<OrderedListOutlined />}
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        />
+      </Tooltip>
+
+      <Divider
+        type="vertical"
+        style={{
+          backgroundColor: theme === "dark" ? "#999" : "#aaa",
+          height: "24px",
+          margin: "auto 8px",
+        }}
+      />
+
+      <Tooltip title="Align Left">
+        <Button
+          type={editor.isActive({ textAlign: "left" }) ? "primary" : "default"}
+          icon={<AlignLeftOutlined />}
+          onClick={() => editor.chain().focus().setTextAlign("left").run()}
+        />
+      </Tooltip>
+
+      <Tooltip title="Align Center">
+        <Button
+          type={
+            editor.isActive({ textAlign: "center" }) ? "primary" : "default"
+          }
+          icon={<AlignCenterOutlined />}
+          onClick={() => editor.chain().focus().setTextAlign("center").run()}
+        />
+      </Tooltip>
+
+      <Tooltip title="Align Right">
+        <Button
+          type={editor.isActive({ textAlign: "right" }) ? "primary" : "default"}
+          icon={<AlignRightOutlined />}
+          onClick={() => editor.chain().focus().setTextAlign("right").run()}
+        />
+      </Tooltip>
+
+      <Divider
+        type="vertical"
+        style={{
+          backgroundColor: theme === "dark" ? "#999" : "#aaa",
+          height: "24px",
+          margin: "auto 8px",
+        }}
+      />
+
+      <Tooltip title="Undo">
+        <Button
+          icon={<UndoOutlined />}
+          onClick={() => editor.chain().focus().undo().run()}
+        />
+      </Tooltip>
+
+      <Tooltip title="Redo">
+        <Button
+          icon={<RedoOutlined />}
+          onClick={() => editor.chain().focus().redo().run()}
+        />
+      </Tooltip>
+
+      <Divider
+        type="vertical"
+        style={{
+          backgroundColor: theme === "dark" ? "#999" : "#aaa",
+          height: "24px",
+          margin: "auto 8px",
+        }}
+      />
+
+      <Tooltip title="Clear Formatting">
+        <Button
+          icon={<ClearOutlined />}
+          onClick={() => {
+            editor.chain().focus().unsetAllMarks().run();
+            editor.chain().focus().clearNodes().run();
+
+            // Instead of setting a default color, we'll remove color styling
+            editor.chain().focus().unsetColor().run();
+          }}
+        />
+      </Tooltip>
     </div>
   );
 };

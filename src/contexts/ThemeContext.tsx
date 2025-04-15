@@ -26,6 +26,12 @@ const getAntdThemeConfig = (currentTheme: Theme): ThemeConfig => ({
       colorPrimary: "#310e68",
       algorithm: true,
       primaryShadow: "none",
+      defaultBg: currentTheme === "dark" ? "#2d2d2d" : "#ffffff",
+      defaultColor: currentTheme === "dark" ? "#ffffff" : "#000000",
+      defaultBorderColor: currentTheme === "dark" ? "#3d3d3d" : "#d9d9d9",
+      defaultHoverBg: currentTheme === "dark" ? "#3d3d3d" : "#f0f0f0",
+      defaultHoverColor: currentTheme === "dark" ? "#ffffff" : "#000000",
+      defaultHoverBorderColor: currentTheme === "dark" ? "#4d4d4d" : "#e0e0e0",
     },
     Select: {
       colorBgContainer: currentTheme === "dark" ? "#2d2d2d" : "#ffffff",
