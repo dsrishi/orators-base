@@ -50,6 +50,33 @@ body {
   margin: 0.5em 0;
 }
 
+/* Add styles for Tiptap lists within .prose */
+.prose ul {
+  list-style-type: disc; /* Or square, circle, etc. */
+  padding-left: 1.5em; /* Adjust indentation as needed */
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose ol {
+  list-style-type: decimal; /* Or lower-alpha, upper-roman, etc. */
+  padding-left: 1.5em; /* Adjust indentation as needed */
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose li {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+/* Ensure nested lists also get padding */
+.prose ul ul, .prose ol ol, .prose ul ol, .prose ol ul {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+  padding-left: 1.5em; 
+}
+
 /* Drawer dark mode styles */
 .ant-drawer-header-title {
   color: inherit !important;

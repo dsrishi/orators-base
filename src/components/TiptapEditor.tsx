@@ -6,14 +6,7 @@ import { Color } from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
 import FontFamily from "@tiptap/extension-font-family";
 import TextAlign from "@tiptap/extension-text-align";
-import Document from "@tiptap/extension-document";
-import Heading from "@tiptap/extension-heading";
-import Paragraph from "@tiptap/extension-paragraph";
-import Text from "@tiptap/extension-text";
 import Placeholder from "@tiptap/extension-placeholder";
-import BulletList from "@tiptap/extension-bullet-list";
-import OrderedList from "@tiptap/extension-ordered-list";
-import ListItem from "@tiptap/extension-list-item";
 import { useTheme } from "@/contexts/ThemeContext";
 import TipTapMenuBar from "./TipTapMenuBar";
 import {
@@ -79,26 +72,21 @@ export default function TiptapEditor({
 
   const debouncedSave = useDebounce(saveContent, 2000);
 
+  const editorExtensions = [
+    StarterKit, // This includes BulletList, OrderedList, ListItem, History, etc.
+    TextStyle,
+    Color,
+    FontFamily,
+    Placeholder.configure({
+      placeholder: "Start writing your speech...",
+    }),
+    TextAlign.configure({
+      types: ["heading", "paragraph"],
+    }),
+  ];
+
   const editor = useEditor({
-    extensions: [
-      Document,
-      Paragraph,
-      Text,
-      Heading,
-      StarterKit,
-      TextStyle,
-      Color,
-      FontFamily,
-      BulletList,
-      OrderedList,
-      ListItem,
-      Placeholder.configure({
-        placeholder: "Start writing your speech...",
-      }),
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-    ],
+    extensions: editorExtensions,
     content: initialVersion?.content,
     editorProps: {
       attributes: {
