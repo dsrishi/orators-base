@@ -58,3 +58,11 @@ export interface UpdateSpeechData {
 export interface UpdateVersionData {
   content: string;
 }
+
+export interface SpeechMetrics {
+  wordCount: number;
+  characterCount: number;
+  paragraphCount: number;
+  estimatedDuration: string;
+  readingTime: string;
+}

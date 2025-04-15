@@ -1,13 +1,9 @@
 import { Editor } from "@tiptap/react";
-import { Speech } from "@/types/speech";
+import { Speech, SpeechMetrics } from "@/types/speech";
 import { useUser } from "@/contexts/UserContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import {
-  getCharacterCount,
-  getEstimatedDuration,
-  getParagraphCount,
-  getWordCount,
-} from "@/helpers/speechHelpers";
+import { getSpeechMetrics } from "@/helpers/speechHelpers";
+import { useEffect, useState } from "react";
 
 interface BasicStatsProps {
   editor: Editor | null;
@@ -17,6 +13,17 @@ interface BasicStatsProps {
 export default function BasicStats({ editor, speechData }: BasicStatsProps) {
   const { theme } = useTheme();
   const { user } = useUser();
+  const [speechMetrics, setSpeechMetrics] = useState<SpeechMetrics | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (editor) {
+      setSpeechMetrics(
+        getSpeechMetrics(editor.getHTML(), user?.speaking_pace || 140)
+      );
+    }
+  }, [editor]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -30,7 +37,7 @@ export default function BasicStats({ editor, speechData }: BasicStatsProps) {
           <h3 className="text-lg font-semibold mb-2">Word Count</h3>
           <div className="space-y-1">
             <p>Planned Count: {speechData.word_count || "-"}</p>
-            <p>Estimated Count: {getWordCount(editor?.getHTML() || "")}</p>
+            <p>Estimated Count: {speechMetrics?.wordCount || ""}</p>
           </div>
         </div>
 
@@ -43,13 +50,7 @@ export default function BasicStats({ editor, speechData }: BasicStatsProps) {
           <h3 className="text-lg font-semibold mb-2">Duration</h3>
           <div className="space-y-1">
             <p>Planned Duration: {speechData.duration || "-"} min</p>
-            <p>
-              Estimated Duration:{" "}
-              {getEstimatedDuration(
-                getWordCount(editor?.getHTML() || ""),
-                user?.speaking_pace || 140
-              )}
-            </p>
+            <p>Estimated Duration: {speechMetrics?.estimatedDuration || ""}</p>
           </div>
         </div>
 
@@ -61,8 +62,9 @@ export default function BasicStats({ editor, speechData }: BasicStatsProps) {
         >
           <h3 className="text-lg font-semibold mb-2">Stats</h3>
           <div className="space-y-1">
-            <p>Characters: {getCharacterCount(editor?.getHTML() || "")}</p>
-            <p>Paragraphs: {getParagraphCount(editor?.getHTML() || "")}</p>
+            <p>Characters: {speechMetrics?.characterCount || ""}</p>
+            <p>Paragraphs: {speechMetrics?.paragraphCount || ""}</p>
+            <p>Reading Time: {speechMetrics?.readingTime || ""}</p>
           </div>
         </div>
       </div>
