@@ -65,6 +65,21 @@ export default function BasicStats({ editor, speechData }: BasicStatsProps) {
             <p>Characters: {speechMetrics?.characterCount || ""}</p>
             <p>Paragraphs: {speechMetrics?.paragraphCount || ""}</p>
             <p>Reading Time: {speechMetrics?.readingTime || ""}</p>
+            <p>Sentences: {speechMetrics?.sentenceCount || ""}</p>
+            <p>
+              Average Sentence Length:{" "}
+              {speechMetrics?.averageSentenceLength || ""}
+            </p>
+            <p>Average Word Length: {speechMetrics?.averageWordLength || ""}</p>
+            <p>Unique Words: {speechMetrics?.uniqueWordCount || ""}</p>
+            <p>
+              Longest Sentence: {speechMetrics?.longestSentenceLength || ""}
+            </p>
+            <p>
+              Shortest Sentence: {speechMetrics?.shortestSentenceLength || ""}
+            </p>
+            <p>Longest Word: {speechMetrics?.longestWordLength || ""}</p>
+            <p>Shortest Word: {speechMetrics?.shortestWordLength || ""}</p>
           </div>
         </div>
       </div>
