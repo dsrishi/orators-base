@@ -34,8 +34,19 @@ export function getCharacterCount(content: string | JSONContent | JSONContent[])
 export function getParagraphCount(content: string | JSONContent | JSONContent[]) {
   const contentString =
     typeof content === "string" ? content : JSON.stringify(content);
-  //any other way to do this other than splitting by new line?
-  console.log(contentString);
-
-  return contentString.split("<p></p>").length;
-  }
+  
+  // Create a temporary DOM element to parse the HTML
+  const tempElement = document.createElement('div');
+  tempElement.innerHTML = contentString;
+  
+  // Count all paragraph elements (both empty and non-empty)
+  const paragraphs = tempElement.querySelectorAll('p');
+  
+  // Filter out completely empty paragraphs if needed
+  const nonEmptyParagraphs = Array.from(paragraphs).filter(p => 
+    p.textContent && p.textContent.trim() !== ''
+  );
+  
+  // Return either all paragraphs or just non-empty ones
+  return nonEmptyParagraphs.length; // or paragraphs.length if you want to count empty ones too
+}
