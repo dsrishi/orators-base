@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Modal, Button, Typography, Space } from "antd";
 import {
   AudioMutedOutlined,
@@ -24,6 +24,7 @@ const SpeechRecordingModal: React.FC<SpeechRecordingModalProps> = ({
   onAddContent,
 }) => {
   const { theme } = useTheme();
+  const transcriptContainerRef = useRef<HTMLDivElement>(null);
 
   const {
     transcript,
@@ -33,7 +34,13 @@ const SpeechRecordingModal: React.FC<SpeechRecordingModalProps> = ({
     isMicrophoneAvailable,
   } = useSpeechRecognition();
 
-  // Start listening when modal opens
+  useEffect(() => {
+    if (transcriptContainerRef.current) {
+      transcriptContainerRef.current.scrollTop =
+        transcriptContainerRef.current.scrollHeight;
+    }
+  }, [transcript]);
+
   useEffect(() => {
     if (open && !listening && browserSupportsSpeechRecognition) {
       handleRecordingToggle();
@@ -144,9 +151,10 @@ const SpeechRecordingModal: React.FC<SpeechRecordingModalProps> = ({
         )}
 
         <div
+          ref={transcriptContainerRef}
           style={{
             minHeight: "200px",
-            maxHeight: "300px",
+            maxHeight: "200px",
             overflowY: "auto",
             padding: "16px",
             borderRadius: "4px",
