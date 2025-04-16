@@ -56,10 +56,12 @@ const Navbar = () => {
     >
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-1">
-            <Image src={"/logo.png"} alt="Logo" width={40} height={40} />
-            <div className="text-xl font-bold">OratorsBase</div>
-          </div>
+          <Link href="/dashboard" className="flex items-center space-x-1">
+            <div className="flex items-center space-x-1">
+              <Image src={"/logo.png"} alt="Logo" width={40} height={40} />
+              <div className="text-xl font-bold">OratorsBase</div>
+            </div>
+          </Link>
 
           <div className="flex items-center space-x-4">
             <ThemeSwitcher />
