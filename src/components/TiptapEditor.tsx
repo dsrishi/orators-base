@@ -23,14 +23,18 @@ import {
   HomeOutlined,
   LineChartOutlined,
   UploadOutlined,
+  AudioMutedOutlined,
 } from "@ant-design/icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SpeechAnalysisDrawer from "./SpeechAnalysisDrawer";
 import { Speech, SpeechVersion } from "@/types/speech";
 import SpeechInfoModal from "./SpeechInfoModal";
 import { speechService } from "@/services/speechService";
 import { useDebounce } from "@/hooks/useDebounce";
 import ComingSoonModal from "./ComingSoonModal";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 
 interface TiptapEditorProps {
   speechId: string;
@@ -50,6 +54,15 @@ export default function TiptapEditor({
   const [saving, setSaving] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [isComingSoonModalOpen, setIsComingSoonModalOpen] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+    isMicrophoneAvailable,
+  } = useSpeechRecognition();
+  const [lastTranscript, setLastTranscript] = useState("");
 
   const saveContent = async (content: string) => {
     if (!initialVersion?.id) return;
@@ -110,6 +123,86 @@ export default function TiptapEditor({
       setSpeechData(data.speech);
     }
   };
+
+  // Create a debounced function to update editor content
+  const debouncedTranscriptUpdate = useDebounce((text: string, pos: number) => {
+    if (editor && text.trim()) {
+      editor
+        .chain()
+        .focus()
+        .insertContentAt(pos, text + " ")
+        .run();
+      setLastTranscript("");
+    }
+  }, 1000); // 1 second delay
+
+  // Update editor content when transcript changes
+  useEffect(() => {
+    if (transcript && editor && listening) {
+      const pos = editor.view.state.selection.anchor;
+      const newTranscript = transcript.slice(lastTranscript.length);
+
+      if (newTranscript.trim()) {
+        setLastTranscript(transcript);
+        debouncedTranscriptUpdate(newTranscript, pos);
+      }
+    }
+  }, [transcript, editor, listening, lastTranscript]);
+
+  // Clean up transcript when stopping recording
+  useEffect(() => {
+    if (!listening && lastTranscript) {
+      setLastTranscript("");
+      resetTranscript();
+    }
+  }, [listening]);
+
+  const handleRecordingToggle = () => {
+    if (!browserSupportsSpeechRecognition) {
+      messageApi.error({
+        content: "Your browser doesn't support speech recognition.",
+        duration: 3,
+      });
+      return;
+    }
+
+    if (isRecording) {
+      SpeechRecognition.stopListening();
+      setIsRecording(false);
+      messageApi.success({
+        content: "Recording stopped",
+        duration: 1,
+      });
+    } else {
+      // Start continuous listening with interim results
+      SpeechRecognition.startListening({
+        continuous: true,
+        interimResults: true, // This enables real-time results
+      });
+      setIsRecording(true);
+      messageApi.success({
+        content: "Recording started",
+        duration: 1,
+      });
+    }
+  };
+
+  // Add browser support check for speech recognition
+  useEffect(() => {
+    if (!browserSupportsSpeechRecognition) {
+      messageApi.warning({
+        content:
+          "Speech recognition is not supported in this browser. Please use Chrome for best experience.",
+        duration: 5,
+      });
+    } else if (!isMicrophoneAvailable) {
+      messageApi.warning({
+        content:
+          "You have to enable the mic to use this feature. Please check your browser settings.",
+        duration: 5,
+      });
+    }
+  }, [browserSupportsSpeechRecognition, messageApi, isMicrophoneAvailable]);
 
   return (
     <>
@@ -184,6 +277,7 @@ export default function TiptapEditor({
         </div>
       </div>
       <div className="mt-40 mb-16">
+        <div>{transcript}</div>
         <div
           style={{ backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5" }}
           className="min-h-[900px] p-16 max-w-5xl mx-auto rounded"
@@ -193,9 +287,12 @@ export default function TiptapEditor({
       </div>
       <FloatButton.Group shape="circle" style={{ insetInlineEnd: 24 }}>
         <FloatButton
-          onClick={() => setIsComingSoonModalOpen(true)}
-          icon={<AudioOutlined />}
-          tooltip={<div>Record</div>}
+          icon={isRecording ? <AudioMutedOutlined /> : <AudioOutlined />}
+          tooltip={
+            <div>{isRecording ? "Stop Recording" : "Start Recording"}</div>
+          }
+          onClick={handleRecordingToggle}
+          type={isRecording ? "primary" : "default"}
         />
         <FloatButton
           onClick={() => setIsComingSoonModalOpen(true)}
@@ -203,6 +300,23 @@ export default function TiptapEditor({
           tooltip={<div>Upload</div>}
         />
       </FloatButton.Group>
+
+      {isRecording && (
+        <div
+          className="fixed bottom-24 right-24 px-4 py-2 rounded-full"
+          style={{
+            backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
+            border: "1px solid",
+            borderColor: theme === "dark" ? "#2d2d2d" : "#e5e5e5",
+            color: theme === "dark" ? "#ffffff" : "#000000",
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            Recording...
+          </div>
+        </div>
+      )}
 
       <ComingSoonModal
         open={isComingSoonModalOpen}
