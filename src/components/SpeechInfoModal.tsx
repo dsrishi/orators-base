@@ -46,6 +46,14 @@ const TONES = [
   { value: "humorous", label: "Humorous" },
 ];
 
+const PRIMARY_PURPOSES = [
+  { value: "inform", label: "Inform" },
+  { value: "persuade", label: "Persuade" },
+  { value: "entertain", label: "Entertain" },
+  { value: "inspire", label: "Inspire" },
+  { value: "other", label: "Other" },
+];
+
 const LANGUAGES = [{ value: "en", label: "English" }];
 
 export default function SpeechInfoModal({
@@ -68,7 +76,8 @@ export default function SpeechInfoModal({
         target_audience: speechData.target_audience,
         language: speechData.language,
         objective: speechData.objective,
-        purpose: speechData.purpose,
+        primary_purpose: speechData.primary_purpose,
+        word_count: speechData.word_count,
         tone: speechData.tone,
         medium: speechData.medium,
         occasion: speechData.occasion,
@@ -158,14 +167,14 @@ export default function SpeechInfoModal({
           }
           name="description"
         >
-          <TextArea rows={4} style={inputStyle} />
+          <TextArea rows={2} style={inputStyle} />
         </Form.Item>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
           <Form.Item
             label={
               <span style={{ color: theme === "dark" ? "#ffffff" : "#000000" }}>
-                Duration (minutes)
+                Duration
               </span>
             }
             name="duration"
@@ -179,8 +188,48 @@ export default function SpeechInfoModal({
               }}
               min={1}
               max={180}
-              placeholder="Enter duration in minutes"
+              addonAfter="minutes"
             />
+          </Form.Item>
+
+          <Form.Item
+            label={
+              <span style={{ color: theme === "dark" ? "#ffffff" : "#000000" }}>
+                Word Count
+              </span>
+            }
+            name="word_count"
+          >
+            <InputNumber
+              style={{
+                width: "100%",
+                background: theme === "dark" ? "#2d2d2d" : "#ffffff",
+                borderColor: theme === "dark" ? "#3d3d3d" : "#d9d9d9",
+                color: theme === "dark" ? "#ffffff" : "#000000",
+              }}
+              min={1}
+              placeholder="word count"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label={
+              <span style={{ color: theme === "dark" ? "#ffffff" : "#000000" }}>
+                Primary Purpose
+              </span>
+            }
+            name="primary_purpose"
+          >
+            <Select
+              style={selectStyle}
+              className={theme === "dark" ? "dark-select" : ""}
+            >
+              {PRIMARY_PURPOSES.map((purpose) => (
+                <Option key={purpose.value} value={purpose.value}>
+                  {purpose.label}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
 
           <Form.Item
@@ -302,17 +351,6 @@ export default function SpeechInfoModal({
             </span>
           }
           name="objective"
-        >
-          <Input style={inputStyle} />
-        </Form.Item>
-
-        <Form.Item
-          label={
-            <span style={{ color: theme === "dark" ? "#ffffff" : "#000000" }}>
-              Purpose
-            </span>
-          }
-          name="purpose"
         >
           <Input style={inputStyle} />
         </Form.Item>

@@ -11,11 +11,14 @@ import {
   Spin,
   Tabs,
   Breadcrumb,
+  DatePicker,
+  InputNumber,
 } from "antd";
 import { userService } from "@/services/userService";
 import { useTheme } from "@/contexts/ThemeContext";
 import { UpdateProfileData } from "@/types/user";
 import { HomeOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -34,6 +37,11 @@ export default function SettingsPage() {
         first_name: user.first_name || "",
         last_name: user.last_name || "",
         gender: user.gender || undefined,
+        date_of_birth: user.date_of_birth
+          ? dayjs(user.date_of_birth)
+          : undefined,
+        experience_level: user.experience_level || undefined,
+        speaking_pace: user.speaking_pace || undefined,
       });
     }
     setLoading(false);
@@ -109,14 +117,14 @@ export default function SettingsPage() {
       forceRender: true,
       children: (
         <div className="p-3">
-          <div className="text-lg font-semibold mb-3">Personal Details</div>
+          <div className="text-lg font-semibold mb-3">Personal Profile</div>
           <div className="max-w-xl">
             <Form
               form={profileForm}
               layout="vertical"
               onFinish={handleProfileUpdate}
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
                 <Form.Item
                   label="First Name"
                   name="first_name"
@@ -142,16 +150,41 @@ export default function SettingsPage() {
                 >
                   <Input />
                 </Form.Item>
+
+                <Form.Item label="Gender" name="gender">
+                  <Select>
+                    <Option value="male">Male</Option>
+                    <Option value="female">Female</Option>
+                    <Option value="other">Other</Option>
+                    <Option value="prefer_not_to_say">Prefer not to say</Option>
+                  </Select>
+                </Form.Item>
+
+                <Form.Item label="Date of Birth" name="date_of_birth">
+                  <DatePicker className="w-full" />
+                </Form.Item>
               </div>
 
-              <Form.Item label="Gender" name="gender">
-                <Select>
-                  <Option value="male">Male</Option>
-                  <Option value="female">Female</Option>
-                  <Option value="other">Other</Option>
-                  <Option value="prefer_not_to_say">Prefer not to say</Option>
-                </Select>
-              </Form.Item>
+              <div className="text-lg font-semibold mb-3">Speaker Profile</div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                <Form.Item label="Experience Level" name="experience_level">
+                  <Select>
+                    <Option value="novice">Novice</Option>
+                    <Option value="intermediate">Intermediate</Option>
+                    <Option value="advanced">Advanced</Option>
+                    <Option value="professional">Professional</Option>
+                  </Select>
+                </Form.Item>
+
+                <Form.Item label="Speaking Pace" name="speaking_pace">
+                  <InputNumber
+                    min={1}
+                    className="w-full"
+                    addonAfter="words/minute"
+                  />
+                </Form.Item>
+              </div>
 
               <Form.Item>
                 <Button

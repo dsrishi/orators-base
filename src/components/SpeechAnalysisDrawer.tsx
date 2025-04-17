@@ -1,17 +1,21 @@
 import { Drawer } from "antd";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Editor } from "@tiptap/react";
+import { Speech } from "@/types/speech";
+import BasicStats from "./analysis/BasicStats";
 
 interface SpeechAnalysisDrawerProps {
   open: boolean;
   onClose: () => void;
   editor: Editor | null;
+  speechData: Speech;
 }
 
 export default function SpeechAnalysisDrawer({
   open,
   onClose,
   editor,
+  speechData,
 }: SpeechAnalysisDrawerProps) {
   const { theme } = useTheme();
 
@@ -47,60 +51,7 @@ export default function SpeechAnalysisDrawer({
         },
       }}
     >
-      <div className="flex flex-col gap-6">
-        <div
-          className="p-6 rounded-lg"
-          style={{
-            backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5",
-          }}
-        >
-          <h3 className="text-xl font-semibold mb-4">Speech Statistics</h3>
-          <div className="space-y-3">
-            <p className="text-base">
-              Word Count: {editor?.storage?.characterCount?.words() || 0}
-            </p>
-            <p className="text-base">
-              Character Count:{" "}
-              {editor?.storage?.characterCount?.characters() || 0}
-            </p>
-            <p className="text-base">
-              Estimated Duration:{" "}
-              {Math.ceil((editor?.storage?.characterCount?.words() || 0) / 130)}{" "}
-              minutes
-            </p>
-          </div>
-        </div>
-
-        <div
-          className="p-6 rounded-lg"
-          style={{
-            backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5",
-          }}
-        >
-          <h3 className="text-xl font-semibold mb-4">Key Metrics</h3>
-          <div className="space-y-3">
-            <p className="text-base">Complexity Score: Calculating...</p>
-            <p className="text-base">Engagement Level: Analyzing...</p>
-            <p className="text-base">Clarity Index: Processing...</p>
-          </div>
-        </div>
-
-        <div
-          className="p-6 rounded-lg"
-          style={{
-            backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5",
-          }}
-        >
-          <h3 className="text-xl font-semibold mb-4">Suggestions</h3>
-          <div className="space-y-3">
-            <p className="text-base">
-              Analyzing your speech for improvements...
-            </p>
-            <p className="text-base">Checking for potential enhancements...</p>
-            <p className="text-base">Reviewing structure and flow...</p>
-          </div>
-        </div>
-      </div>
+      <BasicStats editor={editor} speechData={speechData} />
     </Drawer>
   );
 }

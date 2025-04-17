@@ -7,7 +7,8 @@ export interface Speech {
   target_audience: string;
   language: string;
   objective: string;
-  purpose: string;
+  primary_purpose: string;
+  word_count: number;
   tone: string;
   medium: string;
   occasion: string;
@@ -47,7 +48,8 @@ export interface UpdateSpeechData {
   target_audience?: string;
   language?: string;
   objective?: string;
-  purpose?: string;
+  primary_purpose?: string;
+  word_count?: number;
   tone?: string;
   medium?: string;
   occasion?: string;
@@ -55,4 +57,20 @@ export interface UpdateSpeechData {
 
 export interface UpdateVersionData {
   content: string;
+}
+
+export interface SpeechMetrics {
+  wordCount: number;
+  characterCount: number;
+  paragraphCount: number;
+  estimatedDuration: string;
+  readingTime: string;
+  sentenceCount: number;
+  averageSentenceLength: number;
+  averageWordLength: number;
+  uniqueWordCount: number;
+  longestSentenceLength: number;
+  shortestSentenceLength: number;
+  longestWordLength: number;
+  shortestWordLength: number;
 }

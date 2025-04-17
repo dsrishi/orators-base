@@ -61,6 +61,9 @@ export const userService = {
       first_name: string | null;
       last_name: string | null;
       gender: string | null;
+      date_of_birth: string | null;
+      experience_level: string | null;
+      speaking_pace: number | null;
     } | null; 
     error: ServiceError | null 
   }> {
@@ -69,7 +72,7 @@ export const userService = {
     try {
       const { data, error } = await supabase
         .from("users")
-        .select('first_name, last_name, gender')
+        .select('first_name, last_name, gender, date_of_birth, experience_level, speaking_pace')
         .eq('id', userId)
         .single();
 
