@@ -16,6 +16,9 @@ import {
   FloatButton,
   message,
   Tooltip,
+  Menu,
+  Layout,
+  Spin,
 } from "antd";
 import {
   AudioOutlined,
@@ -23,6 +26,8 @@ import {
   HomeOutlined,
   LineChartOutlined,
   UploadOutlined,
+  PlusOutlined,
+  HistoryOutlined,
 } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import SpeechAnalysisDrawer from "./SpeechAnalysisDrawer";
@@ -33,6 +38,10 @@ import { useDebounce } from "@/hooks/useDebounce";
 import ComingSoonModal from "./ComingSoonModal";
 import SpeechRecordingModal from "./SpeechRecordingModal";
 import { useSpeechRecognition } from "react-speech-recognition";
+import { useAuth } from "@/contexts/AuthContext";
+import NewVersionModal from "./NewVersionModal";
+
+const { Sider, Content } = Layout;
 
 interface TiptapEditorProps {
   speechId: string;
@@ -46,25 +55,32 @@ export default function TiptapEditor({
   versions: initialVersions,
 }: TiptapEditorProps) {
   const { theme } = useTheme();
+  const { user } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [speechData, setSpeechData] = useState<Speech>(initialSpeechData);
+  const [versions, setVersions] = useState<SpeechVersion[]>(initialVersions);
+  const [selectedVersion, setSelectedVersion] = useState<SpeechVersion>(
+    initialVersions[0]
+  );
+  const [collapsed, setCollapsed] = useState(false);
   const [saving, setSaving] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [isComingSoonModalOpen, setIsComingSoonModalOpen] = useState(false);
   const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
+  const [newVersionModalOpen, setNewVersionModalOpen] = useState(false);
 
   // Keep basic speech recognition for browser compatibility check
   const { browserSupportsSpeechRecognition, isMicrophoneAvailable } =
     useSpeechRecognition();
 
   const saveContent = async (content: string) => {
-    if (!initialVersions[0]?.id) return;
+    if (!selectedVersion?.id) return;
 
     setSaving(true);
     const { error } = await speechService.updateVersionContent(
       speechId,
-      initialVersions[0]?.id,
+      selectedVersion.id,
       { content }
     );
 
@@ -77,7 +93,7 @@ export default function TiptapEditor({
     setSaving(false);
   };
 
-  const debouncedSave = useDebounce(saveContent, 2000);
+  const debouncedSave = useDebounce(saveContent, 1000);
 
   const editorExtensions = [
     StarterKit,
@@ -94,7 +110,7 @@ export default function TiptapEditor({
 
   const editor = useEditor({
     extensions: editorExtensions,
-    content: initialVersions[0]?.content,
+    content: selectedVersion?.content,
     editorProps: {
       attributes: {
         class:
@@ -107,16 +123,82 @@ export default function TiptapEditor({
     },
   });
 
+  // Update editor content when selected version changes
+  useEffect(() => {
+    if (editor && selectedVersion) {
+      editor.commands.setContent(selectedVersion.content || "");
+    }
+  }, [editor, selectedVersion]);
+
   const handleSpeechUpdate = async () => {
     messageApi.success({
       content: "Changes saved",
       duration: 1,
     });
-    const { data, error } = await speechService.getSpeechWithVersions(speechId);
+    refreshSpeechData();
+  };
+
+  const refreshSpeechData = async () => {
+    const { data, error } = await speechService.getSpeechWithAllVersions(
+      speechId
+    );
     if (!error && data.speech) {
       setSpeechData(data.speech);
+      if (data.speech.versions) {
+        setVersions(data.speech.versions);
+
+        // Update selected version to match the currently selected one
+        const currentVersion = data.speech.versions.find(
+          (v) => v.id === selectedVersion.id
+        );
+        if (currentVersion) {
+          setSelectedVersion(currentVersion);
+        }
+      }
     }
   };
+
+  const handleCreateNewVersion = async (versionName: string) => {
+    if (!user?.id) return;
+
+    const { versionId, error } = await speechService.createNewVersion(
+      speechId,
+      {
+        versionName: versionName || `Version ${versions.length + 1}`,
+        baseVersionId: selectedVersion.id,
+        userId: user.id,
+      }
+    );
+
+    if (error) {
+      messageApi.error({
+        content: "Failed to create new version",
+        duration: 3,
+      });
+      throw error; // This will be caught by the modal
+    }
+
+    messageApi.success({
+      content: "New version created",
+      duration: 2,
+    });
+
+    await refreshSpeechData();
+
+    // Find and select the newly created version
+    const newVersions = [...versions];
+    const newVersion = newVersions.find((v) => v.id === versionId);
+    if (newVersion) {
+      setSelectedVersion(newVersion);
+    }
+
+    setNewVersionModalOpen(false);
+  };
+
+  // Add a function to sort versions by updated_at date
+  const sortedVersions = [...versions].sort((a, b) => {
+    return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+  });
 
   // Function to handle adding content from the speech modal
   const handleAddSpeechContent = (content: string) => {
@@ -188,6 +270,14 @@ export default function TiptapEditor({
                   />
                 </Tooltip>
               </div>
+              <div className="ml-1">
+                <Tooltip title="Versions">
+                  <Button
+                    icon={<HistoryOutlined />}
+                    onClick={() => setCollapsed(!collapsed)}
+                  />
+                </Tooltip>
+              </div>
             </div>
             <Divider
               type="vertical"
@@ -200,16 +290,7 @@ export default function TiptapEditor({
             <TipTapMenuBar editor={editor} />
           </div>
           <div className="flex items-center gap-2">
-            {saving && (
-              <span
-                style={{
-                  color: theme === "dark" ? "#999" : "#666",
-                  fontSize: "14px",
-                }}
-              >
-                Saving...
-              </span>
-            )}
+            {saving && <Spin size="small" />}
             <Button
               type="primary"
               icon={<LineChartOutlined />}
@@ -225,14 +306,73 @@ export default function TiptapEditor({
           </div>
         </div>
       </div>
-      <div className="mt-40 mb-16">
-        <div
-          style={{ backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5" }}
-          className="min-h-[900px] p-16 max-w-5xl mx-auto rounded"
+
+      <Layout className="mt-32 mb-16" style={{ background: "transparent" }}>
+        <Sider
+          width={250}
+          collapsible
+          collapsed={collapsed}
+          collapsedWidth="0"
+          onCollapse={(value) => setCollapsed(value)}
+          trigger={null}
+          breakpoint="lg"
+          style={{
+            backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
+            overflow: "auto",
+            height: "calc(100vh - 180px)",
+            position: "sticky",
+            top: "136px",
+            left: 0,
+          }}
         >
-          <EditorContent editor={editor} />
-        </div>
-      </div>
+          <div className="flex justify-between items-center p-3">
+            <div className="text-lg font-semibold">Versions</div>
+            <Button
+              type="text"
+              icon={<PlusOutlined />}
+              onClick={() => setNewVersionModalOpen(true)}
+            />
+          </div>
+
+          <Menu
+            mode="inline"
+            selectedKeys={[selectedVersion?.id || ""]}
+            style={{
+              backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
+              borderRight: 0,
+            }}
+            theme={theme === "dark" ? "dark" : "light"}
+            onClick={({ key }) => {
+              const version = versions.find((v) => v.id === key);
+              if (version) setSelectedVersion(version);
+            }}
+            items={[
+              ...sortedVersions.map((version) => ({
+                key: version.id,
+                label: <div>{version.version_name}</div>,
+              })),
+            ]}
+          />
+        </Sider>
+
+        <Content
+          style={{
+            padding: "0 24px",
+            marginLeft: collapsed ? 0 : 10,
+            transition: "margin-left 0.2s",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5",
+            }}
+            className="min-h-[900px] p-16 rounded max-w-[1000px] mx-auto"
+          >
+            <EditorContent editor={editor} />
+          </div>
+        </Content>
+      </Layout>
+
       <FloatButton.Group shape="circle" style={{ insetInlineEnd: 24 }}>
         <FloatButton
           icon={<AudioOutlined />}
@@ -245,6 +385,12 @@ export default function TiptapEditor({
           tooltip={<div>Upload</div>}
         />
       </FloatButton.Group>
+
+      <NewVersionModal
+        open={newVersionModalOpen}
+        onClose={() => setNewVersionModalOpen(false)}
+        onCreateVersion={handleCreateNewVersion}
+      />
 
       <SpeechRecordingModal
         open={isRecordingModalOpen}
