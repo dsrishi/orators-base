@@ -3,14 +3,13 @@
 import TiptapEditor from "@/components/TiptapEditor";
 import { useEffect, useState } from "react";
 import { speechService } from "@/services/speechService";
-import { Speech, SpeechVersion } from "@/types/speech";
+import { Speech } from "@/types/speech";
 import { Button, Empty, Spin, message } from "antd";
 import { useParams, useRouter } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function SpeechPage() {
   const [speech, setSpeech] = useState<Speech | null>(null);
-  const [version, setVersion] = useState<SpeechVersion | null>(null);
   const [loading, setLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
   const params = useParams();
@@ -21,7 +20,7 @@ export default function SpeechPage() {
   useEffect(() => {
     async function loadSpeechData() {
       try {
-        const { data, error } = await speechService.getSpeechWithVersion(
+        const { data, error } = await speechService.getSpeechWithAllVersions(
           speechId
         );
 
@@ -35,7 +34,6 @@ export default function SpeechPage() {
         }
 
         setSpeech(data.speech);
-        setVersion(data.version);
       } catch (err) {
         messageApi.error({
           content: "Failed to load speech",
@@ -60,7 +58,7 @@ export default function SpeechPage() {
     );
   }
 
-  if (!speech || !version) {
+  if (!speech) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div>
@@ -85,6 +83,31 @@ export default function SpeechPage() {
     );
   }
 
+  //if there are no speech versions available for a speech, add a button to add a version
+  if (speech?.versions?.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div>
+          <Empty description={<span className="">Speech not found</span>} />
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="w-full primary-gradient mt-3"
+            style={{
+              height: "40px",
+              fontSize: "16px",
+              border: "none",
+              boxShadow:
+                theme === "dark" ? "0 2px 8px rgba(0, 0, 0, 0.3)" : "none",
+            }}
+          >
+            Add a version
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {contextHolder}
@@ -92,7 +115,7 @@ export default function SpeechPage() {
         <TiptapEditor
           speechId={speechId}
           speechData={speech}
-          version={version}
+          versions={speech.versions || []}
         />
       </main>
     </>

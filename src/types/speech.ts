@@ -14,6 +14,7 @@ export interface Speech {
   occasion: string;
   created_at: string;
   updated_at: string;
+  versions?: SpeechVersion[];
 } 
 
 export interface SpeechVersion {

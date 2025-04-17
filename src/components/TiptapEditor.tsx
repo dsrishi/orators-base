@@ -37,13 +37,13 @@ import { useSpeechRecognition } from "react-speech-recognition";
 interface TiptapEditorProps {
   speechId: string;
   speechData: Speech;
-  version: SpeechVersion;
+  versions: SpeechVersion[];
 }
 
 export default function TiptapEditor({
   speechId,
   speechData: initialSpeechData,
-  version: initialVersion,
+  versions: initialVersions,
 }: TiptapEditorProps) {
   const { theme } = useTheme();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -59,12 +59,12 @@ export default function TiptapEditor({
     useSpeechRecognition();
 
   const saveContent = async (content: string) => {
-    if (!initialVersion?.id) return;
+    if (!initialVersions[0]?.id) return;
 
     setSaving(true);
     const { error } = await speechService.updateVersionContent(
       speechId,
-      initialVersion.id,
+      initialVersions[0]?.id,
       { content }
     );
 
@@ -94,7 +94,7 @@ export default function TiptapEditor({
 
   const editor = useEditor({
     extensions: editorExtensions,
-    content: initialVersion?.content,
+    content: initialVersions[0]?.content,
     editorProps: {
       attributes: {
         class:
@@ -112,7 +112,7 @@ export default function TiptapEditor({
       content: "Changes saved",
       duration: 1,
     });
-    const { data, error } = await speechService.getSpeechWithVersion(speechId);
+    const { data, error } = await speechService.getSpeechWithVersions(speechId);
     if (!error && data.speech) {
       setSpeechData(data.speech);
     }
