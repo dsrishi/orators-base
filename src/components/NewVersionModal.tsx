@@ -1,9 +1,6 @@
 import React, { useState } from "react";
-import { Modal, Form, Input, Typography } from "antd";
+import { Modal, Form, Input } from "antd";
 import { useTheme } from "@/contexts/ThemeContext";
-
-const { Text } = Typography;
-
 interface NewVersionModalProps {
   open: boolean;
   onClose: () => void;
@@ -53,22 +50,20 @@ const NewVersionModal: React.FC<NewVersionModalProps> = ({
         },
         footer: {
           background: theme === "dark" ? "#1e1e1e" : "#ffffff",
-          borderTop:
-            theme === "dark" ? "1px solid #2d2d2d" : "1px solid #f0f0f0",
         },
       }}
     >
+      <div className="text-xs text-gray-500 italic mb-3">
+        This will create a new version based on your current content.
+      </div>
       <Form layout="vertical">
-        <Form.Item label="Version Name" required>
+        <Form.Item label="Version Name">
           <Input
             placeholder="Enter version name"
             value={versionName}
             onChange={(e) => setVersionName(e.target.value)}
           />
         </Form.Item>
-        <Text type="secondary">
-          This will create a new version based on your current content.
-        </Text>
       </Form>
     </Modal>
   );

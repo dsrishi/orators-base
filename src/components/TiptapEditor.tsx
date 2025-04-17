@@ -251,6 +251,14 @@ export default function TiptapEditor({
     const newVersion = newVersions.find((v) => v.id === versionId);
     if (newVersion) {
       setSelectedVersion(newVersion);
+
+      // Make sure the versions panel is open to show the new version
+      setCollapsed(false);
+
+      // If editor exists, focus it to provide a seamless experience
+      if (editor) {
+        setTimeout(() => editor.commands.focus(), 100);
+      }
     }
 
     setNewVersionModalOpen(false);
@@ -384,7 +392,6 @@ export default function TiptapEditor({
           <div className="flex justify-between items-center p-3">
             <div className="text-lg font-semibold">Versions</div>
             <Button
-              type="text"
               icon={<PlusOutlined />}
               onClick={() => setNewVersionModalOpen(true)}
             />
