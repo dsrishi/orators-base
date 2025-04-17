@@ -75,6 +75,14 @@ const getAntdThemeConfig = (currentTheme: Theme): ThemeConfig => ({
       itemActiveColor: currentTheme === "dark" ? "#ffffff" : "#000000",
       itemColor: currentTheme === "dark" ? "#ffffff" : "#000000",
     },
+    Menu: {
+      itemSelectedColor: "#000000",
+      itemSelectedBg: "#eee",
+      itemHoverBg: "#eee",
+      darkItemSelectedBg: "#2d2d2d",
+      darkItemHoverBg: "#2d2d2d",
+      darkItemSelectedColor: "#ffffff",
+    },
   },
 });
 

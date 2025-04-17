@@ -84,7 +84,7 @@ export default function TiptapEditor({
     getMostRecentVersion(initialVersions) || initialVersions[0]
   );
 
-  const [collapsed, setCollapsed] = useState(initialVersions.length <= 1);
+  const [collapsed, setCollapsed] = useState(initialVersions.length > 1);
   const [saving, setSaving] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [isComingSoonModalOpen, setIsComingSoonModalOpen] = useState(false);
@@ -485,7 +485,10 @@ export default function TiptapEditor({
         </div>
       </div>
 
-      <Layout className="mt-32 mb-16" style={{ background: "transparent" }}>
+      <Layout
+        className="mb-16"
+        style={{ background: "transparent", marginTop: "120px" }}
+      >
         <Sider
           width={250}
           collapsible
@@ -495,27 +498,28 @@ export default function TiptapEditor({
           trigger={null}
           breakpoint="lg"
           style={{
-            backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
+            backgroundColor: theme === "dark" ? "#212121" : "#fafafa",
             overflow: "auto",
-            height: "calc(100vh - 180px)",
-            position: "sticky",
-            top: "136px",
+            height: "calc(100vh - 120px)",
+            position: "fixed",
             left: 0,
           }}
         >
-          <div className="flex justify-between items-center p-3">
+          <div className="flex justify-between items-center px-4 pt-6 pb-3">
             <div className="text-lg font-semibold">Versions</div>
-            <Button
-              icon={<PlusOutlined />}
-              onClick={() => setNewVersionModalOpen(true)}
-            />
+            <Tooltip title="Create New Version">
+              <Button
+                icon={<PlusOutlined />}
+                onClick={() => setNewVersionModalOpen(true)}
+              />
+            </Tooltip>
           </div>
 
           <Menu
             mode="inline"
             selectedKeys={[selectedVersion?.id || ""]}
             style={{
-              backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
+              backgroundColor: theme === "dark" ? "#212121" : "#fafafa",
               borderRight: 0,
             }}
             theme={theme === "dark" ? "dark" : "light"}
@@ -538,14 +542,16 @@ export default function TiptapEditor({
                         }
                       }}
                       onClick={(e) => e.stopPropagation()}
-                      className="bg-transparent border-b border-gray-400 outline-none px-1 py-0 w-full mr-2"
+                      className="bg-transparent border-b border-gray-400 outline-none px-1 py-0 mr-2"
                       style={{
                         color: theme === "dark" ? "#ffffff" : "#000000",
                       }}
                     />
                   ) : (
                     <>
-                      <div>{version.version_name}</div>
+                      <div className="w-32 truncate">
+                        {version.version_name}
+                      </div>
                       <div className="hidden group-hover:flex items-center space-x-1 absolute right-0 bg-inherit">
                         <Button
                           type="text"
@@ -572,8 +578,8 @@ export default function TiptapEditor({
 
         <Content
           style={{
-            padding: "0 24px",
-            marginLeft: collapsed ? 0 : 10,
+            padding: "32px 24px",
+            marginLeft: collapsed ? 0 : 250,
             transition: "margin-left 0.2s",
           }}
         >
