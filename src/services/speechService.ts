@@ -413,5 +413,51 @@ export const speechService = {
         }
       };
     }
+  },
+
+  async deleteVersion(
+    speechId: string,
+    versionId: string
+  ): Promise<{ error: ServiceError | null }> {
+    const supabase = createClient();
+    
+    try {
+      // First check if this is the only version left
+      const { data: countData, error: countError } = await supabase
+        .from("speech_versions")
+        .select('id', { count: 'exact' })
+        .eq('speech_id', speechId);
+        
+      if (countError) throw countError;
+      
+      // Don't allow deleting the last version
+      if (countData && countData.length <= 1) {
+        return {
+          error: {
+            message: 'Cannot delete the only version of a speech',
+            details: 'At least one version must remain'
+          }
+        };
+      }
+      
+      // Delete the version
+      const { error } = await supabase
+        .from("speech_versions")
+        .delete()
+        .eq('id', versionId)
+        .eq('speech_id', speechId);
+
+      if (error) throw error;
+
+      return { error: null };
+    } catch (error) {
+      console.error('Error deleting version:', error);
+      return {
+        error: {
+          message: 'Failed to delete version',
+          details: error instanceof Error ? error.message : error
+        }
+      };
+    }
   }
 }; 

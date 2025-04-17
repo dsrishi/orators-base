@@ -19,6 +19,7 @@ import {
   Menu,
   Layout,
   Spin,
+  Modal,
 } from "antd";
 import {
   AudioOutlined,
@@ -28,6 +29,7 @@ import {
   UploadOutlined,
   PlusOutlined,
   HistoryOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import { useState, useEffect, useRef } from "react";
 import SpeechAnalysisDrawer from "./SpeechAnalysisDrawer";
@@ -40,6 +42,7 @@ import SpeechRecordingModal from "./SpeechRecordingModal";
 import { useSpeechRecognition } from "react-speech-recognition";
 import { useAuth } from "@/contexts/AuthContext";
 import NewVersionModal from "./NewVersionModal";
+import ConfirmationModal from "./ConfirmationModal";
 
 const { Sider, Content } = Layout;
 
@@ -94,6 +97,14 @@ export default function TiptapEditor({
 
   // Add a ref to store unsaved content for each version
   const unsavedContentCache = useRef<Record<string, string>>({});
+
+  const [editVersionId, setEditVersionId] = useState<string | null>(null);
+  const [editVersionName, setEditVersionName] = useState("");
+  const [confirmDeleteModalVisible, setConfirmDeleteModalVisible] =
+    useState(false);
+  const [versionToDelete, setVersionToDelete] = useState<SpeechVersion | null>(
+    null
+  );
 
   const saveContent = async (content: string) => {
     if (!selectedVersion?.id) return;
@@ -299,6 +310,109 @@ export default function TiptapEditor({
     }
   }, [browserSupportsSpeechRecognition, messageApi, isMicrophoneAvailable]);
 
+  const handleEditVersionClick = (
+    e: React.MouseEvent,
+    version: SpeechVersion
+  ) => {
+    e.stopPropagation(); // Prevent menu item click
+    setEditVersionId(version.id);
+    setEditVersionName(version.version_name);
+  };
+
+  const handleVersionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditVersionName(e.target.value);
+  };
+
+  const handleVersionNameSave = async () => {
+    if (!editVersionId || !editVersionName.trim()) return;
+
+    try {
+      const { error } = await speechService.updateVersionInfo(editVersionId, {
+        versionName: editVersionName.trim(),
+      });
+
+      if (error) {
+        messageApi.error({
+          content: "Failed to update version name",
+          duration: 3,
+        });
+        return;
+      }
+
+      messageApi.success({
+        content: "Version name updated",
+        duration: 2,
+      });
+
+      // Refresh to get updated data
+      await refreshSpeechData();
+    } catch (err) {
+      messageApi.error({
+        content: "An error occurred",
+        duration: 3,
+      });
+    } finally {
+      setEditVersionId(null);
+      setEditVersionName("");
+    }
+  };
+
+  const handleDeleteVersionClick = (
+    e: React.MouseEvent,
+    version: SpeechVersion
+  ) => {
+    e.stopPropagation(); // Prevent menu item click
+    setVersionToDelete(version);
+    setConfirmDeleteModalVisible(true);
+  };
+
+  const handleDeleteVersion = async () => {
+    if (!versionToDelete) return;
+
+    try {
+      const { error } = await speechService.deleteVersion(
+        speechId,
+        versionToDelete.id
+      );
+
+      if (error) {
+        messageApi.error({
+          content: error.message || "Failed to delete version",
+          duration: 3,
+        });
+        return;
+      }
+
+      messageApi.success({
+        content: "Version deleted",
+        duration: 2,
+      });
+
+      // Refresh versions and select the most recent one
+      await refreshSpeechData();
+
+      // If we deleted the currently selected version, select the most recent one
+      if (versionToDelete.id === selectedVersion.id) {
+        const updatedVersions = versions.filter(
+          (v) => v.id !== versionToDelete.id
+        );
+        const mostRecentVersion = getMostRecentVersion(updatedVersions);
+        if (mostRecentVersion) {
+          setSelectedVersion(mostRecentVersion);
+        }
+      }
+    } catch (error) {
+      messageApi.error({
+        content: "An error occurred",
+        duration: 3,
+      });
+    } finally {
+      // Close the modal
+      setConfirmDeleteModalVisible(false);
+      setVersionToDelete(null);
+    }
+  };
+
   return (
     <>
       {contextHolder}
@@ -406,16 +520,53 @@ export default function TiptapEditor({
             }}
             theme={theme === "dark" ? "dark" : "light"}
             onClick={({ key }) => handleVersionChange(key)}
-            items={[
-              ...sortVersionsByRecent(versions).map((version) => ({
-                key: version.id,
-                label: (
-                  <div className="flex items-center justify-between">
-                    <div>{version.version_name}</div>
-                  </div>
-                ),
-              })),
-            ]}
+            items={sortVersionsByRecent(versions).map((version) => ({
+              key: version.id,
+              label: (
+                <div className="flex items-center justify-between group relative">
+                  {editVersionId === version.id ? (
+                    <input
+                      autoFocus
+                      value={editVersionName}
+                      onChange={handleVersionNameChange}
+                      onBlur={handleVersionNameSave}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleVersionNameSave();
+                        if (e.key === "Escape") {
+                          setEditVersionId(null);
+                          setEditVersionName("");
+                        }
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="bg-transparent border-b border-gray-400 outline-none px-1 py-0 w-full mr-2"
+                      style={{
+                        color: theme === "dark" ? "#ffffff" : "#000000",
+                      }}
+                    />
+                  ) : (
+                    <>
+                      <div>{version.version_name}</div>
+                      <div className="hidden group-hover:flex items-center space-x-1 absolute right-0 bg-inherit">
+                        <Button
+                          type="text"
+                          size="small"
+                          icon={<EditOutlined />}
+                          onClick={(e) => handleEditVersionClick(e, version)}
+                        />
+                        <Button
+                          type="text"
+                          size="small"
+                          danger
+                          icon={<DeleteOutlined />}
+                          onClick={(e) => handleDeleteVersionClick(e, version)}
+                          disabled={versions.length <= 1} // Prevent deleting the only version
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              ),
+            }))}
           />
         </Sider>
 
@@ -482,6 +633,17 @@ export default function TiptapEditor({
         speechId={speechId}
         speechData={speechData}
         onUpdate={handleSpeechUpdate}
+      />
+
+      <ConfirmationModal
+        title="Delete Version"
+        message={`Are you sure you want to delete "${versionToDelete?.version_name}"?`}
+        subMessage="This action cannot be undone."
+        open={confirmDeleteModalVisible}
+        onCancel={() => setConfirmDeleteModalVisible(false)}
+        onConfirm={handleDeleteVersion}
+        confirmText="Delete"
+        danger={true}
       />
     </>
   );
