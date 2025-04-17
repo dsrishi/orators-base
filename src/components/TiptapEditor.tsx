@@ -56,14 +56,32 @@ export default function TiptapEditor({
 }: TiptapEditorProps) {
   const { theme } = useTheme();
   const { user } = useAuth();
+
+  // Sort versions by updated_at before setting the initial state
+  const sortVersionsByRecent = (versions: SpeechVersion[]) => {
+    return [...versions].sort(
+      (a, b) =>
+        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+    );
+  };
+
+  // Select the most recently updated version by default
+  const getMostRecentVersion = (versions: SpeechVersion[]) => {
+    const sortedVersions = sortVersionsByRecent(versions);
+    return sortedVersions.length > 0 ? sortedVersions[0] : null;
+  };
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [speechData, setSpeechData] = useState<Speech>(initialSpeechData);
   const [versions, setVersions] = useState<SpeechVersion[]>(initialVersions);
+
+  // Set the initially selected version to the most recently updated one
   const [selectedVersion, setSelectedVersion] = useState<SpeechVersion>(
-    initialVersions[0]
+    getMostRecentVersion(initialVersions) || initialVersions[0]
   );
-  const [collapsed, setCollapsed] = useState(false);
+
+  const [collapsed, setCollapsed] = useState(initialVersions.length <= 1);
   const [saving, setSaving] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [isComingSoonModalOpen, setIsComingSoonModalOpen] = useState(false);
@@ -238,11 +256,6 @@ export default function TiptapEditor({
     setNewVersionModalOpen(false);
   };
 
-  // Add a function to sort versions by updated_at date
-  const sortedVersions = [...versions].sort((a, b) => {
-    return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
-  });
-
   // Function to handle adding content from the speech modal
   const handleAddSpeechContent = (content: string) => {
     if (editor && content.trim()) {
@@ -387,7 +400,7 @@ export default function TiptapEditor({
             theme={theme === "dark" ? "dark" : "light"}
             onClick={({ key }) => handleVersionChange(key)}
             items={[
-              ...sortedVersions.map((version) => ({
+              ...sortVersionsByRecent(versions).map((version) => ({
                 key: version.id,
                 label: (
                   <div className="flex items-center justify-between">
