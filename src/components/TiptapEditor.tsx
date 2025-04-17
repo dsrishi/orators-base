@@ -255,7 +255,7 @@ export default function TiptapEditor({
       <ComingSoonModal
         open={isComingSoonModalOpen}
         onClose={() => setIsComingSoonModalOpen(false)}
-        featureTitle="Upload/Record a speech" // Pass the name of the feature
+        featureTitle="Upload a speech"
       />
 
       <SpeechAnalysisDrawer
