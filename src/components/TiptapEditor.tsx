@@ -29,7 +29,7 @@ import {
   PlusOutlined,
   HistoryOutlined,
 } from "@ant-design/icons";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import SpeechAnalysisDrawer from "./SpeechAnalysisDrawer";
 import { Speech, SpeechVersion } from "@/types/speech";
 import SpeechInfoModal from "./SpeechInfoModal";
@@ -74,8 +74,14 @@ export default function TiptapEditor({
   const { browserSupportsSpeechRecognition, isMicrophoneAvailable } =
     useSpeechRecognition();
 
+  // Add a ref to store unsaved content for each version
+  const unsavedContentCache = useRef<Record<string, string>>({});
+
   const saveContent = async (content: string) => {
     if (!selectedVersion?.id) return;
+
+    // Store content in cache before saving
+    unsavedContentCache.current[selectedVersion.id] = content;
 
     setSaving(true);
     const { error } = await speechService.updateVersionContent(
@@ -119,25 +125,45 @@ export default function TiptapEditor({
     },
     onUpdate: ({ editor }) => {
       const content = editor.getHTML();
+
+      // Store the latest content in our cache
+      unsavedContentCache.current[selectedVersion.id] = content;
+
+      // Debounce the save to backend
       debouncedSave(content);
     },
   });
 
-  // Update editor content when selected version changes
+  // Modify version switching to handle unsaved content
+  const handleVersionChange = (versionId: string) => {
+    const version = versions.find((v) => v.id === versionId);
+    if (!version || version.id === selectedVersion.id) return;
+
+    // Cache the current content before switching
+    if (editor) {
+      const currentContent = editor.getHTML();
+      unsavedContentCache.current[selectedVersion.id] = currentContent;
+    }
+
+    // Switch to the new version
+    setSelectedVersion(version);
+  };
+
+  // Update the useEffect for switching versions to respect cached content
   useEffect(() => {
     if (editor && selectedVersion) {
-      editor.commands.setContent(selectedVersion.content || "");
+      // Check if we have unsaved content for this version
+      const cachedContent = unsavedContentCache.current[selectedVersion.id];
+
+      // Use cached content if available, otherwise use the saved content
+      const contentToUse = cachedContent || selectedVersion.content || "";
+
+      // Update the editor content
+      editor.commands.setContent(contentToUse);
     }
   }, [editor, selectedVersion]);
 
-  const handleSpeechUpdate = async () => {
-    messageApi.success({
-      content: "Changes saved",
-      duration: 1,
-    });
-    refreshSpeechData();
-  };
-
+  // Update the refreshSpeechData to handle syncing with our cache
   const refreshSpeechData = async () => {
     const { data, error } = await speechService.getSpeechWithAllVersions(
       speechId
@@ -152,10 +178,27 @@ export default function TiptapEditor({
           (v) => v.id === selectedVersion.id
         );
         if (currentVersion) {
-          setSelectedVersion(currentVersion);
+          // Only update the server content, not our editor's content
+          // This prevents refreshing from throwing away unsaved changes
+          const updatedVersion = {
+            ...currentVersion,
+            // Keep local changes if they exist
+            content:
+              unsavedContentCache.current[currentVersion.id] ||
+              currentVersion.content,
+          };
+          setSelectedVersion(updatedVersion);
         }
       }
     }
+  };
+
+  const handleSpeechUpdate = async () => {
+    messageApi.success({
+      content: "Changes saved",
+      duration: 1,
+    });
+    refreshSpeechData();
   };
 
   const handleCreateNewVersion = async (versionName: string) => {
@@ -342,14 +385,15 @@ export default function TiptapEditor({
               borderRight: 0,
             }}
             theme={theme === "dark" ? "dark" : "light"}
-            onClick={({ key }) => {
-              const version = versions.find((v) => v.id === key);
-              if (version) setSelectedVersion(version);
-            }}
+            onClick={({ key }) => handleVersionChange(key)}
             items={[
               ...sortedVersions.map((version) => ({
                 key: version.id,
-                label: <div>{version.version_name}</div>,
+                label: (
+                  <div className="flex items-center justify-between">
+                    <div>{version.version_name}</div>
+                  </div>
+                ),
               })),
             ]}
           />
