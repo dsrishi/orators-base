@@ -44,6 +44,7 @@ import { useSpeechRecognition } from "react-speech-recognition";
 import { useAuth } from "@/contexts/AuthContext";
 import NewVersionModal from "./NewVersionModal";
 import ConfirmationModal from "./ConfirmationModal";
+import { FontSize } from "@/extensions/FontSize";
 
 const { Sider, Content } = Layout;
 
@@ -144,6 +145,7 @@ export default function TiptapEditor({
       types: ["heading", "paragraph"],
     }),
     Highlight.configure({ multicolor: true }),
+    FontSize,
   ];
 
   const editor = useEditor({

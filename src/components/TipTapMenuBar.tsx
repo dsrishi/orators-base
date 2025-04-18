@@ -54,6 +54,27 @@ const HIGHLIGHT_COLORS = [
   "#ffcdd2", // Light Red
 ];
 
+// Add font size options
+const FONT_SIZES = [
+  { value: "8pt", label: "8" },
+  { value: "9pt", label: "9" },
+  { value: "10pt", label: "10" },
+  { value: "11pt", label: "11" },
+  { value: "12pt", label: "12" },
+  { value: "14pt", label: "14" },
+  { value: "16pt", label: "16" },
+  { value: "18pt", label: "18" },
+  { value: "20pt", label: "20" },
+  { value: "24pt", label: "24" },
+  { value: "28pt", label: "28" },
+  { value: "30pt", label: "32" },
+  { value: "36pt", label: "40" },
+  { value: "48pt", label: "48" },
+  { value: "56pt", label: "64" },
+  { value: "64pt", label: "64" },
+  { value: "72pt", label: "72" },
+];
+
 const TipTapMenuBar = ({ editor }: MenuBarProps) => {
   const { theme } = useTheme();
 
@@ -182,6 +203,22 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
           />
         </Tooltip>
       </Space.Compact>
+
+      <Select
+        className={selectClassName}
+        style={{ width: 100 }}
+        defaultValue="11pt"
+        onChange={(value) => {
+          editor.chain().focus().setFontSize(value).run();
+        }}
+        popupClassName={theme === "dark" ? "dark-select-dropdown" : ""}
+      >
+        {FONT_SIZES.map((size) => (
+          <Option key={size.value} value={size.value}>
+            {size.label}
+          </Option>
+        ))}
+      </Select>
 
       <Select
         className={selectClassName}
