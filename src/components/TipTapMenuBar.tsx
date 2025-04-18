@@ -17,6 +17,7 @@ import {
   UndoOutlined,
   RedoOutlined,
   UnderlineOutlined,
+  HighlightOutlined,
 } from "@ant-design/icons";
 import type { Editor } from "@tiptap/react";
 
@@ -39,6 +40,20 @@ const COLORS = [
   "#808080", // Gray
 ];
 
+const HIGHLIGHT_COLORS = [
+  "#ffeb3b", // Yellow
+  "#ff0000", // Red
+  "#4caf50", // Green
+  "#03a9f4", // Blue
+  "#e91e63", // Pink
+  "#ff9800", // Orange
+  "#9c27b0", // Purple
+  "#f5f5f5", // Light Gray
+  "#90caf9", // Light Blue
+  "#a5d6a7", // Light Green
+  "#ffcdd2", // Light Red
+];
+
 const TipTapMenuBar = ({ editor }: MenuBarProps) => {
   const { theme } = useTheme();
 
@@ -55,7 +70,7 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
   const ColorPopover = (
     <div className="flex flex-wrap gap-2 p-2 max-w-[200px]">
       {/* Add default theme color button */}
-      <Tooltip title="Default (inherit theme color)">
+      <Tooltip title="Default">
         <div
           className="w-6 h-6 rounded cursor-pointer hover:opacity-80 border border-gray-300 flex items-center justify-center"
           style={{
@@ -91,6 +106,45 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
             outlineOffset: "2px",
           }}
           onClick={() => editor.chain().focus().setColor(color).run()}
+        />
+      ))}
+    </div>
+  );
+
+  const HighlightPopover = (
+    <div className="flex flex-wrap gap-2 p-2 max-w-[200px]">
+      {/* Add default (no highlight) button */}
+      <Tooltip title="Reset">
+        <div
+          className="w-6 h-6 rounded cursor-pointer hover:opacity-80 border border-gray-300 flex items-center justify-center"
+          onClick={() => {
+            editor.chain().focus().unsetHighlight().run();
+          }}
+        >
+          <span
+            style={{
+              fontSize: "16px",
+              color: theme === "dark" ? "#ffffff" : "#000000",
+            }}
+          >
+            ✕
+          </span>
+        </div>
+      </Tooltip>
+      {HIGHLIGHT_COLORS.map((color) => (
+        <div
+          key={color}
+          className="w-6 h-6 rounded cursor-pointer hover:opacity-80 border border-gray-300"
+          style={{
+            backgroundColor: color,
+            outline: editor.isActive("highlight", { color })
+              ? "2px solid #1890ff"
+              : "none",
+            outlineOffset: "2px",
+          }}
+          onClick={() =>
+            editor.chain().focus().toggleHighlight({ color }).run()
+          }
         />
       ))}
     </div>
@@ -146,22 +200,26 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
         <Option value="Courier New">Courier New</Option>
       </Select>
 
-      <Popover
-        content={ColorPopover}
-        trigger="click"
-        placement="bottom"
-        title="Text Color"
-      >
+      <Popover content={ColorPopover} trigger="click" placement="bottom">
         <Tooltip title="Text Color">
           <Button
             icon={<FontColorsOutlined />}
             style={{
-              borderBottom: "2px solid",
-              borderBottomColor:
-                editor.getAttributes("textStyle").color ||
-                (theme === "dark" ? "#ffffff" : "#000000"),
               color:
                 editor.getAttributes("textStyle").color ||
+                (theme === "dark" ? "#ffffff" : "#000000"),
+            }}
+          />
+        </Tooltip>
+      </Popover>
+
+      <Popover content={HighlightPopover} trigger="click" placement="bottom">
+        <Tooltip title="Highlight Color">
+          <Button
+            icon={<HighlightOutlined />}
+            style={{
+              color:
+                editor.getAttributes("highlight").color ||
                 (theme === "dark" ? "#ffffff" : "#000000"),
             }}
           />

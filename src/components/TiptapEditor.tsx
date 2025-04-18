@@ -8,6 +8,7 @@ import FontFamily from "@tiptap/extension-font-family";
 import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
+import Highlight from "@tiptap/extension-highlight";
 import { useTheme } from "@/contexts/ThemeContext";
 import TipTapMenuBar from "./TipTapMenuBar";
 import {
@@ -142,6 +143,7 @@ export default function TiptapEditor({
     TextAlign.configure({
       types: ["heading", "paragraph"],
     }),
+    Highlight.configure({ multicolor: true }),
   ];
 
   const editor = useEditor({
