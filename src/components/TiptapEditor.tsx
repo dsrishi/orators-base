@@ -46,7 +46,7 @@ import SpeechRecordingModal from "./SpeechRecordingModal";
 import { useSpeechRecognition } from "react-speech-recognition";
 import { useAuth } from "@/contexts/AuthContext";
 import NewVersionModal from "./NewVersionModal";
-import ConfirmationModal from "./ConfirmationModal";
+import ConfirmationModal, { HardConfirmationModal } from "./ConfirmationModal";
 import { FontSize } from "@/extensions/FontSize";
 
 const { Sider, Content } = Layout;
@@ -110,6 +110,9 @@ export default function TiptapEditor({
   const [versionToDelete, setVersionToDelete] = useState<SpeechVersion | null>(
     null
   );
+
+  const [deleteSpeechModalVisible, setDeleteSpeechModalVisible] =
+    useState(false);
 
   const saveContent = async (content: string) => {
     if (!selectedVersion?.id) return;
@@ -426,6 +429,38 @@ export default function TiptapEditor({
     }
   };
 
+  const handleDeleteSpeech = async () => {
+    try {
+      const { error } = await speechService.deleteSpeech(speechId);
+
+      if (error) {
+        messageApi.error({
+          content:
+            typeof error === "object" && "message" in error
+              ? String(error.message)
+              : "Failed to delete speech",
+          duration: 3,
+        });
+        return;
+      }
+
+      messageApi.success({
+        content: "Speech deleted successfully",
+        duration: 2,
+      });
+
+      // Redirect to dashboard after deletion
+      window.location.href = "/dashboard";
+    } catch (error) {
+      messageApi.error({
+        content: error instanceof Error ? error.message : "An error occurred",
+        duration: 3,
+      });
+    } finally {
+      setDeleteSpeechModalVisible(false);
+    }
+  };
+
   return (
     <>
       {contextHolder}
@@ -495,6 +530,11 @@ export default function TiptapEditor({
           </div>
           <div className="flex items-center gap-2">
             {saving && <Spin size="small" />}
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => setDeleteSpeechModalVisible(true)}
+            />
             <div className=" hidden lg:block">
               <Button
                 className="primary-gradient"
@@ -682,6 +722,17 @@ export default function TiptapEditor({
         open={confirmDeleteModalVisible}
         onCancel={() => setConfirmDeleteModalVisible(false)}
         onConfirm={handleDeleteVersion}
+        confirmText="Delete"
+        danger={true}
+      />
+
+      <HardConfirmationModal
+        title="Delete Speech"
+        message={`Are you sure you want to delete "${speechData.title}"?`}
+        subMessage="This will delete the speech and all its versions. This action cannot be undone."
+        open={deleteSpeechModalVisible}
+        onCancel={() => setDeleteSpeechModalVisible(false)}
+        onConfirm={handleDeleteSpeech}
         confirmText="Delete"
         danger={true}
       />

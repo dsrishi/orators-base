@@ -459,5 +459,38 @@ export const speechService = {
         }
       };
     }
+  },
+
+  async deleteSpeech(speechId: string) {
+    const supabase = createClient();
+    
+    try {
+      // First delete all versions associated with this speech
+      const { error: versionsError } = await supabase
+        .from("speech_versions")
+        .delete()
+        .eq("speech_id", speechId);
+        
+      if (versionsError) {
+        console.error("Error deleting speech versions:", versionsError);
+        return { error: versionsError };
+      }
+      
+      // Then delete the speech itself
+      const { error } = await supabase
+        .from("speeches")
+        .delete()
+        .eq("id", speechId);
+        
+      if (error) {
+        console.error("Error deleting speech:", error);
+        return { error };
+      }
+      
+      return { error: null };
+    } catch (error) {
+      console.error("Error in deleteSpeech:", error);
+      return { error };
+    }
   }
 }; 
