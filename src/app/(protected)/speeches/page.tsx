@@ -9,7 +9,7 @@ import { speechService } from "@/services/speechService";
 import { useUser } from "@/contexts/UserContext";
 import { useRouter } from "next/navigation";
 
-export default function Dashboard() {
+export default function Speeches() {
   const [speeches, setSpeeches] = useState<Speech[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -22,9 +22,7 @@ export default function Dashboard() {
       if (!user) return;
 
       try {
-        const { data, error } = await speechService.getRecentUserSpeeches(
-          user.id
-        );
+        const { data, error } = await speechService.getUserSpeeches(user.id);
 
         if (error) {
           messageApi.error({
