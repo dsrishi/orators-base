@@ -82,10 +82,6 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
     return null;
   }
 
-  const selectStyles = {
-    width: 150,
-  };
-
   const selectClassName = theme === "dark" ? "dark-select" : "";
 
   const ColorPopover = (
@@ -206,9 +202,10 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
 
       <Select
         className={selectClassName}
-        style={{ width: 100 }}
+        style={{ width: 60 }}
         defaultValue="11pt"
         onChange={(value) => {
+          // @ts-expect-error - setFontSize is provided by our custom extension
           editor.chain().focus().setFontSize(value).run();
         }}
         popupClassName={theme === "dark" ? "dark-select-dropdown" : ""}
@@ -222,7 +219,7 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
 
       <Select
         className={selectClassName}
-        style={selectStyles}
+        style={{ width: 100 }}
         defaultValue="Arial"
         onChange={(value) => editor.chain().focus().setFontFamily(value).run()}
         prefix={
@@ -262,15 +259,6 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
           />
         </Tooltip>
       </Popover>
-
-      <Divider
-        type="vertical"
-        style={{
-          backgroundColor: theme === "dark" ? "#999" : "#aaa",
-          height: "24px",
-          margin: "auto 8px",
-        }}
-      />
 
       <Popover
         trigger="click"

@@ -21,6 +21,7 @@ import {
   Menu,
   Layout,
   Spin,
+  Popover,
 } from "antd";
 import {
   AudioOutlined,
@@ -31,6 +32,7 @@ import {
   PlusOutlined,
   HistoryOutlined,
   DeleteOutlined,
+  MoreOutlined,
 } from "@ant-design/icons";
 import { useState, useEffect, useRef } from "react";
 import SpeechAnalysisDrawer from "./SpeechAnalysisDrawer";
@@ -40,6 +42,7 @@ import { speechService } from "@/services/speechService";
 import { useDebounce } from "@/hooks/useDebounce";
 import ComingSoonModal from "./ComingSoonModal";
 import SpeechRecordingModal from "./SpeechRecordingModal";
+// @ts-expect-error - need to fix this
 import { useSpeechRecognition } from "react-speech-recognition";
 import { useAuth } from "@/contexts/AuthContext";
 import NewVersionModal from "./NewVersionModal";
@@ -475,22 +478,41 @@ export default function TiptapEditor({
                 margin: "auto 16px",
               }}
             />
-            <TipTapMenuBar editor={editor} />
+            <div className="lg:hidden">
+              <Popover
+                content={<TipTapMenuBar editor={editor} />}
+                trigger="click"
+                placement="bottom"
+              >
+                <Tooltip title="Highlight Color">
+                  <Button icon={<MoreOutlined />} />
+                </Tooltip>
+              </Popover>
+            </div>
+            <div className="hidden lg:block">
+              <TipTapMenuBar editor={editor} />
+            </div>
           </div>
           <div className="flex items-center gap-2">
             {saving && <Spin size="small" />}
-            <Button
-              type="primary"
-              icon={<LineChartOutlined />}
-              onClick={() => setDrawerOpen(true)}
-              style={{
-                border: "none",
-                boxShadow: "none",
-              }}
-              className="primary-gradient"
-            >
-              Analyse
-            </Button>
+            <div className=" hidden lg:block">
+              <Button
+                className="primary-gradient"
+                type="primary"
+                icon={<LineChartOutlined />}
+                onClick={() => setDrawerOpen(true)}
+              >
+                Analyse
+              </Button>
+            </div>
+            <div className="lg:hidden">
+              <Button
+                className="primary-gradient"
+                type="primary"
+                icon={<LineChartOutlined />}
+                onClick={() => setDrawerOpen(true)}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -514,6 +536,7 @@ export default function TiptapEditor({
             height: "calc(100vh - 120px)",
             position: "fixed",
             left: 0,
+            zIndex: 1000,
           }}
         >
           <div className="flex justify-between items-center px-4 pt-6 pb-3">
@@ -590,15 +613,15 @@ export default function TiptapEditor({
         <Content
           style={{
             padding: "32px 24px",
-            marginLeft: collapsed ? 0 : 250,
             transition: "margin-left 0.2s",
           }}
+          className={`${collapsed ? "ml-0" : "lg:ml-[250px] ml-0"}`}
         >
           <div
             style={{
               backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5",
             }}
-            className="min-h-[900px] p-16 rounded max-w-[1000px] mx-auto"
+            className="min-h-[900px] lg:p-16 md:p-12 sm:p-8 p-4 rounded max-w-[1000px] mx-auto"
           >
             <EditorContent editor={editor} />
           </div>
