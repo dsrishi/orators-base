@@ -16,6 +16,7 @@ import {
   FontSizeOutlined,
   UndoOutlined,
   RedoOutlined,
+  UnderlineOutlined,
 } from "@ant-design/icons";
 import type { Editor } from "@tiptap/react";
 
@@ -112,6 +113,13 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
             onClick={() => editor.chain().focus().toggleItalic().run()}
           />
         </Tooltip>
+        <Tooltip title="Underline">
+          <Button
+            type={editor.isActive("underline") ? "primary" : "default"}
+            icon={<UnderlineOutlined />}
+            onClick={() => editor.chain().focus().toggleUnderline().run()}
+          />
+        </Tooltip>
         <Tooltip title="Strike">
           <Button
             type={editor.isActive("strike") ? "primary" : "default"}
@@ -169,56 +177,78 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
         }}
       />
 
-      <Tooltip title="Bullet List">
+      <Popover
+        trigger="click"
+        placement="bottom"
+        content={
+          <div className="flex gap-2">
+            <Button
+              type={editor.isActive("bulletList") ? "primary" : "default"}
+              icon={<UnorderedListOutlined />}
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+            />
+            <Button
+              type={editor.isActive("orderedList") ? "primary" : "default"}
+              icon={<OrderedListOutlined />}
+              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            />
+          </div>
+        }
+      >
         <Button
-          type={editor.isActive("bulletList") ? "primary" : "default"}
-          icon={<UnorderedListOutlined />}
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-        />
-      </Tooltip>
-
-      <Tooltip title="Ordered List">
-        <Button
-          type={editor.isActive("orderedList") ? "primary" : "default"}
-          icon={<OrderedListOutlined />}
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        />
-      </Tooltip>
-
-      <Divider
-        type="vertical"
-        style={{
-          backgroundColor: theme === "dark" ? "#999" : "#aaa",
-          height: "24px",
-          margin: "auto 8px",
-        }}
-      />
-
-      <Tooltip title="Align Left">
-        <Button
-          type={editor.isActive({ textAlign: "left" }) ? "primary" : "default"}
-          icon={<AlignLeftOutlined />}
-          onClick={() => editor.chain().focus().setTextAlign("left").run()}
-        />
-      </Tooltip>
-
-      <Tooltip title="Align Center">
-        <Button
-          type={
-            editor.isActive({ textAlign: "center" }) ? "primary" : "default"
+          icon={
+            editor.isActive("orderedList") ? (
+              <OrderedListOutlined />
+            ) : (
+              <UnorderedListOutlined />
+            )
           }
-          icon={<AlignCenterOutlined />}
-          onClick={() => editor.chain().focus().setTextAlign("center").run()}
         />
-      </Tooltip>
+      </Popover>
 
-      <Tooltip title="Align Right">
+      <Popover
+        trigger="click"
+        placement="bottom"
+        content={
+          <div className="flex gap-2">
+            <Button
+              type={
+                editor.isActive({ textAlign: "left" }) ? "primary" : "default"
+              }
+              icon={<AlignLeftOutlined />}
+              onClick={() => editor.chain().focus().setTextAlign("left").run()}
+            />
+            <Button
+              type={
+                editor.isActive({ textAlign: "center" }) ? "primary" : "default"
+              }
+              icon={<AlignCenterOutlined />}
+              onClick={() =>
+                editor.chain().focus().setTextAlign("center").run()
+              }
+            />
+            <Button
+              type={
+                editor.isActive({ textAlign: "right" }) ? "primary" : "default"
+              }
+              icon={<AlignRightOutlined />}
+              onClick={() => editor.chain().focus().setTextAlign("right").run()}
+            />
+          </div>
+        }
+      >
         <Button
-          type={editor.isActive({ textAlign: "right" }) ? "primary" : "default"}
-          icon={<AlignRightOutlined />}
-          onClick={() => editor.chain().focus().setTextAlign("right").run()}
+          icon={
+            editor.isActive({ textAlign: "center" }) ? (
+              <AlignCenterOutlined />
+            ) : editor.isActive({ textAlign: "right" }) ? (
+              <AlignRightOutlined />
+            ) : (
+              <AlignLeftOutlined />
+            )
+          }
         />
-      </Tooltip>
+      </Popover>
 
       <Divider
         type="vertical"
@@ -242,15 +272,6 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
           onClick={() => editor.chain().focus().redo().run()}
         />
       </Tooltip>
-
-      <Divider
-        type="vertical"
-        style={{
-          backgroundColor: theme === "dark" ? "#999" : "#aaa",
-          height: "24px",
-          margin: "auto 8px",
-        }}
-      />
 
       <Tooltip title="Clear Formatting">
         <Button

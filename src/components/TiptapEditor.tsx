@@ -7,6 +7,7 @@ import TextStyle from "@tiptap/extension-text-style";
 import FontFamily from "@tiptap/extension-font-family";
 import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
+import Underline from "@tiptap/extension-underline";
 import { useTheme } from "@/contexts/ThemeContext";
 import TipTapMenuBar from "./TipTapMenuBar";
 import {
@@ -19,7 +20,6 @@ import {
   Menu,
   Layout,
   Spin,
-  Modal,
 } from "antd";
 import {
   AudioOutlined,
@@ -84,7 +84,7 @@ export default function TiptapEditor({
     getMostRecentVersion(initialVersions) || initialVersions[0]
   );
 
-  const [collapsed, setCollapsed] = useState(initialVersions.length > 1);
+  const [collapsed, setCollapsed] = useState(initialVersions.length <= 1);
   const [saving, setSaving] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [isComingSoonModalOpen, setIsComingSoonModalOpen] = useState(false);
@@ -135,6 +135,7 @@ export default function TiptapEditor({
     TextStyle,
     Color,
     FontFamily,
+    Underline,
     Placeholder.configure({
       placeholder: "Start writing your speech...",
     }),
@@ -191,6 +192,11 @@ export default function TiptapEditor({
       editor.commands.setContent(contentToUse);
     }
   }, [editor, selectedVersion]);
+
+  // Hide the versions if there is only one version
+  useEffect(() => {
+    setCollapsed(versions.length <= 1);
+  }, []);
 
   // Update the refreshSpeechData to handle syncing with our cache
   const refreshSpeechData = async () => {
@@ -346,9 +352,9 @@ export default function TiptapEditor({
 
       // Refresh to get updated data
       await refreshSpeechData();
-    } catch (err) {
+    } catch (error) {
       messageApi.error({
-        content: "An error occurred",
+        content: error instanceof Error ? error.message : "An error occurred",
         duration: 3,
       });
     } finally {
@@ -403,7 +409,7 @@ export default function TiptapEditor({
       }
     } catch (error) {
       messageApi.error({
-        content: "An error occurred",
+        content: error instanceof Error ? error.message : "An error occurred",
         duration: 3,
       });
     } finally {
@@ -488,6 +494,7 @@ export default function TiptapEditor({
       <Layout
         className="mb-16"
         style={{ background: "transparent", marginTop: "120px" }}
+        hasSider
       >
         <Sider
           width={250}
