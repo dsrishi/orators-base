@@ -1,7 +1,16 @@
 "use client";
 
-import { Button, Space, Empty, message, Spin, Skeleton, Card } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Space,
+  Empty,
+  message,
+  Spin,
+  Skeleton,
+  Card,
+  Breadcrumb,
+} from "antd";
+import { HomeOutlined, PlusOutlined } from "@ant-design/icons";
 import SpeechCard from "@/components/SpeechCard";
 import { useEffect, useState } from "react";
 import { Speech } from "@/types/speech";
@@ -97,7 +106,20 @@ export default function Speeches() {
       {contextHolder}
       <main className="mx-auto px-4 sm:px-6 lg:px-8 py-6 mt-16">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Speeches</h1>
+          <div>
+            <Breadcrumb
+              items={[
+                {
+                  href: "/dashboard",
+                  title: <HomeOutlined />,
+                },
+                {
+                  title: "Speeches",
+                },
+              ]}
+            />
+            <h1 className="text-2xl font-bold">Speeches</h1>
+          </div>
           <Space>
             <Button
               type="primary"

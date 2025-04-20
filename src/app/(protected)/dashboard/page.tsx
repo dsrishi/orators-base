@@ -99,7 +99,12 @@ export default function Dashboard() {
       {contextHolder}
       <main className="mx-auto px-4 sm:px-6 lg:px-8 py-6 mt-16">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Speeches</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold">Recent Speeches</h1>
+            <Button size="small" onClick={() => router.push("/speeches")}>
+              View All
+            </Button>
+          </div>
           <Space>
             <Button
               type="primary"
