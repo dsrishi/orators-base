@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Lobster } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -9,12 +9,6 @@ import { UserProvider } from "@/contexts/UserContext";
 const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-});
-
-// @eslint-disable-next-line no-unused-vars
-const lobster = Lobster({
-  weight: ["400"],
-  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
