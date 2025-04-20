@@ -16,6 +16,8 @@ import {
   FontSizeOutlined,
   UndoOutlined,
   RedoOutlined,
+  UnderlineOutlined,
+  HighlightOutlined,
 } from "@ant-design/icons";
 import type { Editor } from "@tiptap/react";
 
@@ -38,6 +40,41 @@ const COLORS = [
   "#808080", // Gray
 ];
 
+const HIGHLIGHT_COLORS = [
+  "#ffeb3b", // Yellow
+  "#ff0000", // Red
+  "#4caf50", // Green
+  "#03a9f4", // Blue
+  "#e91e63", // Pink
+  "#ff9800", // Orange
+  "#9c27b0", // Purple
+  "#f5f5f5", // Light Gray
+  "#90caf9", // Light Blue
+  "#a5d6a7", // Light Green
+  "#ffcdd2", // Light Red
+];
+
+// Add font size options
+const FONT_SIZES = [
+  { value: "8pt", label: "8" },
+  { value: "9pt", label: "9" },
+  { value: "10pt", label: "10" },
+  { value: "11pt", label: "11" },
+  { value: "12pt", label: "12" },
+  { value: "14pt", label: "14" },
+  { value: "16pt", label: "16" },
+  { value: "18pt", label: "18" },
+  { value: "20pt", label: "20" },
+  { value: "24pt", label: "24" },
+  { value: "28pt", label: "28" },
+  { value: "30pt", label: "32" },
+  { value: "36pt", label: "40" },
+  { value: "48pt", label: "48" },
+  { value: "56pt", label: "64" },
+  { value: "64pt", label: "64" },
+  { value: "72pt", label: "72" },
+];
+
 const TipTapMenuBar = ({ editor }: MenuBarProps) => {
   const { theme } = useTheme();
 
@@ -45,16 +82,12 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
     return null;
   }
 
-  const selectStyles = {
-    width: 150,
-  };
-
   const selectClassName = theme === "dark" ? "dark-select" : "";
 
   const ColorPopover = (
     <div className="flex flex-wrap gap-2 p-2 max-w-[200px]">
       {/* Add default theme color button */}
-      <Tooltip title="Default (inherit theme color)">
+      <Tooltip title="Default">
         <div
           className="w-6 h-6 rounded cursor-pointer hover:opacity-80 border border-gray-300 flex items-center justify-center"
           style={{
@@ -95,6 +128,45 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
     </div>
   );
 
+  const HighlightPopover = (
+    <div className="flex flex-wrap gap-2 p-2 max-w-[200px]">
+      {/* Add default (no highlight) button */}
+      <Tooltip title="Reset">
+        <div
+          className="w-6 h-6 rounded cursor-pointer hover:opacity-80 border border-gray-300 flex items-center justify-center"
+          onClick={() => {
+            editor.chain().focus().unsetHighlight().run();
+          }}
+        >
+          <span
+            style={{
+              fontSize: "16px",
+              color: theme === "dark" ? "#ffffff" : "#000000",
+            }}
+          >
+            ✕
+          </span>
+        </div>
+      </Tooltip>
+      {HIGHLIGHT_COLORS.map((color) => (
+        <div
+          key={color}
+          className="w-6 h-6 rounded cursor-pointer hover:opacity-80 border border-gray-300"
+          style={{
+            backgroundColor: color,
+            outline: editor.isActive("highlight", { color })
+              ? "2px solid #1890ff"
+              : "none",
+            outlineOffset: "2px",
+          }}
+          onClick={() =>
+            editor.chain().focus().toggleHighlight({ color }).run()
+          }
+        />
+      ))}
+    </div>
+  );
+
   return (
     <div className="flex flex-wrap gap-2">
       <Space.Compact>
@@ -112,6 +184,13 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
             onClick={() => editor.chain().focus().toggleItalic().run()}
           />
         </Tooltip>
+        <Tooltip title="Underline">
+          <Button
+            type={editor.isActive("underline") ? "primary" : "default"}
+            icon={<UnderlineOutlined />}
+            onClick={() => editor.chain().focus().toggleUnderline().run()}
+          />
+        </Tooltip>
         <Tooltip title="Strike">
           <Button
             type={editor.isActive("strike") ? "primary" : "default"}
@@ -123,7 +202,24 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
 
       <Select
         className={selectClassName}
-        style={selectStyles}
+        style={{ width: 60 }}
+        defaultValue="11pt"
+        onChange={(value) => {
+          // @ts-expect-error - setFontSize is provided by our custom extension
+          editor.chain().focus().setFontSize(value).run();
+        }}
+        popupClassName={theme === "dark" ? "dark-select-dropdown" : ""}
+      >
+        {FONT_SIZES.map((size) => (
+          <Option key={size.value} value={size.value}>
+            {size.label}
+          </Option>
+        ))}
+      </Select>
+
+      <Select
+        className={selectClassName}
+        style={{ width: 100 }}
         defaultValue="Arial"
         onChange={(value) => editor.chain().focus().setFontFamily(value).run()}
         prefix={
@@ -138,20 +234,11 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
         <Option value="Courier New">Courier New</Option>
       </Select>
 
-      <Popover
-        content={ColorPopover}
-        trigger="click"
-        placement="bottom"
-        title="Text Color"
-      >
+      <Popover content={ColorPopover} trigger="click" placement="bottom">
         <Tooltip title="Text Color">
           <Button
             icon={<FontColorsOutlined />}
             style={{
-              borderBottom: "2px solid",
-              borderBottomColor:
-                editor.getAttributes("textStyle").color ||
-                (theme === "dark" ? "#ffffff" : "#000000"),
               color:
                 editor.getAttributes("textStyle").color ||
                 (theme === "dark" ? "#ffffff" : "#000000"),
@@ -160,65 +247,91 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
         </Tooltip>
       </Popover>
 
-      <Divider
-        type="vertical"
-        style={{
-          backgroundColor: theme === "dark" ? "#999" : "#aaa",
-          height: "24px",
-          margin: "auto 8px",
-        }}
-      />
+      <Popover content={HighlightPopover} trigger="click" placement="bottom">
+        <Tooltip title="Highlight Color">
+          <Button
+            icon={<HighlightOutlined />}
+            style={{
+              color:
+                editor.getAttributes("highlight").color ||
+                (theme === "dark" ? "#ffffff" : "#000000"),
+            }}
+          />
+        </Tooltip>
+      </Popover>
 
-      <Tooltip title="Bullet List">
+      <Popover
+        trigger="click"
+        placement="bottom"
+        content={
+          <div className="flex gap-2">
+            <Button
+              type={editor.isActive("bulletList") ? "primary" : "default"}
+              icon={<UnorderedListOutlined />}
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+            />
+            <Button
+              type={editor.isActive("orderedList") ? "primary" : "default"}
+              icon={<OrderedListOutlined />}
+              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            />
+          </div>
+        }
+      >
         <Button
-          type={editor.isActive("bulletList") ? "primary" : "default"}
-          icon={<UnorderedListOutlined />}
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-        />
-      </Tooltip>
-
-      <Tooltip title="Ordered List">
-        <Button
-          type={editor.isActive("orderedList") ? "primary" : "default"}
-          icon={<OrderedListOutlined />}
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        />
-      </Tooltip>
-
-      <Divider
-        type="vertical"
-        style={{
-          backgroundColor: theme === "dark" ? "#999" : "#aaa",
-          height: "24px",
-          margin: "auto 8px",
-        }}
-      />
-
-      <Tooltip title="Align Left">
-        <Button
-          type={editor.isActive({ textAlign: "left" }) ? "primary" : "default"}
-          icon={<AlignLeftOutlined />}
-          onClick={() => editor.chain().focus().setTextAlign("left").run()}
-        />
-      </Tooltip>
-
-      <Tooltip title="Align Center">
-        <Button
-          type={
-            editor.isActive({ textAlign: "center" }) ? "primary" : "default"
+          icon={
+            editor.isActive("orderedList") ? (
+              <OrderedListOutlined />
+            ) : (
+              <UnorderedListOutlined />
+            )
           }
-          icon={<AlignCenterOutlined />}
-          onClick={() => editor.chain().focus().setTextAlign("center").run()}
         />
-      </Tooltip>
+      </Popover>
 
-      <Tooltip title="Align Right">
+      <Popover
+        trigger="click"
+        placement="bottom"
+        content={
+          <div className="flex gap-2">
+            <Button
+              type={
+                editor.isActive({ textAlign: "left" }) ? "primary" : "default"
+              }
+              icon={<AlignLeftOutlined />}
+              onClick={() => editor.chain().focus().setTextAlign("left").run()}
+            />
+            <Button
+              type={
+                editor.isActive({ textAlign: "center" }) ? "primary" : "default"
+              }
+              icon={<AlignCenterOutlined />}
+              onClick={() =>
+                editor.chain().focus().setTextAlign("center").run()
+              }
+            />
+            <Button
+              type={
+                editor.isActive({ textAlign: "right" }) ? "primary" : "default"
+              }
+              icon={<AlignRightOutlined />}
+              onClick={() => editor.chain().focus().setTextAlign("right").run()}
+            />
+          </div>
+        }
+      >
         <Button
-          type={editor.isActive({ textAlign: "right" }) ? "primary" : "default"}
-          icon={<AlignRightOutlined />}
-          onClick={() => editor.chain().focus().setTextAlign("right").run()}
+          icon={
+            editor.isActive({ textAlign: "center" }) ? (
+              <AlignCenterOutlined />
+            ) : editor.isActive({ textAlign: "right" }) ? (
+              <AlignRightOutlined />
+            ) : (
+              <AlignLeftOutlined />
+            )
+          }
         />
-      </Tooltip>
+      </Popover>
 
       <Divider
         type="vertical"
@@ -242,15 +355,6 @@ const TipTapMenuBar = ({ editor }: MenuBarProps) => {
           onClick={() => editor.chain().focus().redo().run()}
         />
       </Tooltip>
-
-      <Divider
-        type="vertical"
-        style={{
-          backgroundColor: theme === "dark" ? "#999" : "#aaa",
-          height: "24px",
-          margin: "auto 8px",
-        }}
-      />
 
       <Tooltip title="Clear Formatting">
         <Button

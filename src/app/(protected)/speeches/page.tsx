@@ -1,7 +1,16 @@
 "use client";
 
-import { Button, Space, Empty, message, Spin, Skeleton, Card } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Space,
+  Empty,
+  message,
+  Spin,
+  Skeleton,
+  Card,
+  Breadcrumb,
+} from "antd";
+import { HomeOutlined, PlusOutlined } from "@ant-design/icons";
 import SpeechCard from "@/components/SpeechCard";
 import { useEffect, useState } from "react";
 import { Speech } from "@/types/speech";
@@ -9,7 +18,7 @@ import { speechService } from "@/services/speechService";
 import { useUser } from "@/contexts/UserContext";
 import { useRouter } from "next/navigation";
 
-export default function Dashboard() {
+export default function Speeches() {
   const [speeches, setSpeeches] = useState<Speech[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -22,9 +31,7 @@ export default function Dashboard() {
       if (!user) return;
 
       try {
-        const { data, error } = await speechService.getRecentUserSpeeches(
-          user.id
-        );
+        const { data, error } = await speechService.getUserSpeeches(user.id);
 
         if (error) {
           messageApi.error({
@@ -99,11 +106,19 @@ export default function Dashboard() {
       {contextHolder}
       <main className="mx-auto px-4 sm:px-6 lg:px-8 py-6 mt-16">
         <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">Recent Speeches</h1>
-            <Button size="small" onClick={() => router.push("/speeches")}>
-              View All
-            </Button>
+          <div>
+            <Breadcrumb
+              items={[
+                {
+                  href: "/dashboard",
+                  title: <HomeOutlined />,
+                },
+                {
+                  title: "Speeches",
+                },
+              ]}
+            />
+            <h1 className="text-2xl font-bold">Speeches</h1>
           </div>
           <Space>
             <Button
