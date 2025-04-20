@@ -10,15 +10,18 @@ import { useState } from "react";
 import ConfirmationModal from "../ConfirmationModal";
 import { speechService } from "@/services/speechService";
 import NewVersionModal from "../NewVersionModal";
+import { useUser } from "@/contexts/UserContext";
+import { Editor } from "@tiptap/core";
 
 interface SlateVersionsProps {
   versions: SpeechVersion[];
   selectedVersion: SpeechVersion;
   setSelectedVersion: (version: SpeechVersion) => void;
   handleVersionChange: (key: string) => void;
-  handleCreateNewVersion: (versionName: string) => Promise<void>;
   refreshSpeechData: () => Promise<void>;
   speechId: string;
+  editor: Editor | null;
+  setCollapsed: (collapsed: boolean) => void;
 }
 
 export default function SlateVersions({
@@ -26,11 +29,13 @@ export default function SlateVersions({
   selectedVersion,
   setSelectedVersion,
   handleVersionChange,
-  handleCreateNewVersion,
   refreshSpeechData,
   speechId,
+  editor,
+  setCollapsed,
 }: SlateVersionsProps) {
   const { theme } = useTheme();
+  const { user } = useUser();
   const [messageApi, contextHolder] = message.useMessage();
   const [newVersionModalOpen, setNewVersionModalOpen] = useState(false);
 
@@ -67,6 +72,51 @@ export default function SlateVersions({
 
   const handleVersionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditVersionName(e.target.value);
+  };
+
+  const handleCreateNewVersion = async (versionName: string) => {
+    if (!user?.id) return;
+
+    const { versionId, error } = await speechService.createNewVersion(
+      speechId,
+      {
+        versionName: versionName || `Version ${versions.length + 1}`,
+        baseVersionId: selectedVersion.id,
+        userId: user.id,
+      }
+    );
+
+    if (error) {
+      messageApi.error({
+        content: "Failed to create new version",
+        duration: 3,
+      });
+      throw error; // This will be caught by the modal
+    }
+
+    messageApi.success({
+      content: "New version created",
+      duration: 2,
+    });
+
+    await refreshSpeechData();
+
+    // Find and select the newly created version
+    const newVersions = [...versions];
+    const newVersion = newVersions.find((v) => v.id === versionId);
+    if (newVersion) {
+      setSelectedVersion(newVersion);
+
+      // Make sure the versions panel is open to show the new version
+      setCollapsed(false);
+
+      // If editor exists, focus it to provide a seamless experience
+      if (editor) {
+        setTimeout(() => editor.commands.focus(), 100);
+      }
+    }
+
+    setNewVersionModalOpen(false);
   };
 
   const handleVersionNameSave = async () => {
