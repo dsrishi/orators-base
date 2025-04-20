@@ -24,12 +24,17 @@
     "@tiptap/pm": "^2.11.7",
     "@tiptap/react": "^2.11.7",
     "@tiptap/starter-kit": "^2.11.7",
+    "@types/slate": "^0.47.16",
+    "@types/slate-react": "^0.50.1",
     "antd": "^5.24.6",
     "dayjs": "^1.11.13",
     "next": "15.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-speech-recognition": "^4.0.0"
+    "react-speech-recognition": "^4.0.0",
+    "slate": "^0.112.0",
+    "slate-history": "^0.113.1",
+    "slate-react": "^0.112.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

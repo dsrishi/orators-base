@@ -10,17 +10,8 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import Highlight from "@tiptap/extension-highlight";
 import { useTheme } from "@/contexts/ThemeContext";
-import TipTapMenuBar from "./TipTapMenuBar";
-import {
-  Button,
-  FloatButton,
-  message,
-  Tooltip,
-  Layout,
-  Popover,
-  Spin,
-} from "antd";
-import { AudioOutlined, UploadOutlined, MoreOutlined } from "@ant-design/icons";
+import { FloatButton, message, Layout, Spin } from "antd";
+import { AudioOutlined, UploadOutlined } from "@ant-design/icons";
 import { useState, useEffect, useRef } from "react";
 import SpeechAnalysisDrawer from "./SpeechAnalysisDrawer";
 import { Speech, SpeechVersion } from "@/types/speech";
@@ -35,6 +26,7 @@ import { HardConfirmationModal } from "./ConfirmationModal";
 import { FontSize } from "@/extensions/FontSize";
 import SlateTopBar from "./slate/SlateTopBar";
 import SlateSider from "./slate/SlateSider";
+import SlateTextEditor from "./slate/SlateTextEditor";
 
 const { Sider, Content } = Layout;
 
@@ -345,36 +337,11 @@ export default function SlateEditor({
           }}
           className={`${collapsed ? "ml-0" : "lg:ml-[280px] ml-0"}`}
         >
-          <div
-            className="fixed mx-auto px-3 py-1 z-10 top-[64px]"
-            style={{
-              width: collapsed ? "100%" : "calc(100% - 280px)",
-              transition: "width 0.2s",
-            }}
-          >
-            <div className="flex items-center justify-center">
-              <div
-                className="p-3 shadow-md rounded-md"
-                style={{
-                  backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
-                }}
-              >
-                <div className="lg:hidden">
-                  <Popover
-                    content={<TipTapMenuBar editor={editor} />}
-                    trigger="click"
-                    placement="bottom"
-                  >
-                    <Tooltip title="Highlight Color">
-                      <Button icon={<MoreOutlined />} />
-                    </Tooltip>
-                  </Popover>
-                </div>
-                <div className="hidden lg:block">
-                  <TipTapMenuBar editor={editor} />
-                </div>
-              </div>
-            </div>
+          <div className="mt-16 px-3 pt-4 pb-16">
+            <SlateTextEditor
+              collapsed={collapsed}
+              content={selectedVersion?.content}
+            />
           </div>
           <div className="mt-16 px-3 pt-4 pb-16">
             <div
