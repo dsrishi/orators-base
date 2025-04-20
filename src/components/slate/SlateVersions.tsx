@@ -250,7 +250,7 @@ export default function SlateVersions({
                     }
                   }}
                   onClick={(e) => e.stopPropagation()}
-                  className="bg-transparent border-b border-gray-400 outline-none px-1 py-0 mr-2"
+                  className="bg-transparent border-gray-400 outline-none px-1 py-0 mr-2"
                   style={{
                     color: theme === "dark" ? "#ffffff" : "#000000",
                   }}

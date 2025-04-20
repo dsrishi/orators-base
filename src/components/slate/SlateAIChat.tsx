@@ -1,6 +1,9 @@
 export default function SlateAIChat() {
   return (
-    <div className="flex flex-col items-center justify-center mt-16 p-3">
+    <div
+      className="flex flex-col items-center justify-center p-3"
+      style={{ height: "calc(100vh - 110px)" }}
+    >
       <h1 className="text-lg font-bold">AI Chat</h1>
       <p className="text-center mt-2 text-gray-500">
         This feature is currently under development and will be available soon.

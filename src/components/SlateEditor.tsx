@@ -303,15 +303,15 @@ export default function SlateEditor({
       />
 
       <Layout
-        className="pb-16"
+        className="absolute w-full overflow-auto bottom-0"
         style={{
           backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5",
-          marginTop: "56px",
+          top: "56px",
         }}
         hasSider
       >
         <Sider
-          width={250}
+          width={280}
           collapsible
           collapsed={collapsed}
           collapsedWidth="0"
@@ -343,12 +343,12 @@ export default function SlateEditor({
           style={{
             transition: "margin-left 0.2s",
           }}
-          className={`${collapsed ? "ml-0" : "lg:ml-[250px] ml-0"}`}
+          className={`${collapsed ? "ml-0" : "lg:ml-[280px] ml-0"}`}
         >
           <div
             className="fixed mx-auto px-3 py-1 z-10 top-[64px]"
             style={{
-              width: collapsed ? "100%" : "calc(100% - 250px)",
+              width: collapsed ? "100%" : "calc(100% - 280px)",
               transition: "width 0.2s",
             }}
           >
@@ -376,7 +376,7 @@ export default function SlateEditor({
               </div>
             </div>
           </div>
-          <div className="mt-16 px-3 py-4">
+          <div className="mt-16 px-3 pt-4 pb-16">
             <div
               style={{
                 backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
