@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
 
 :root {
   --background: #ffffff;
@@ -30,12 +31,34 @@ body {
   font-family: "Inter", sans-serif;
 }
 
+.font-logo {
+  font-family: "Lobster", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
 .primary-gradient {
   background: linear-gradient(to right, #5f0f40, #310e68);
 }
 
-.primary-gradient:hover {
+.primary-gradient-btn {
+  background: linear-gradient(to right, #5f0f40, #310e68);
+}
+
+.primary-gradient-btn:hover {
   background: linear-gradient(to right, #7f1d5f, #4a1596) !important;
+}
+
+.transparent-btn {
+  background-color: transparent;
+  color: #aaa;
+  border: 1px solid #aaa;
+}
+
+.transparent-btn:hover {
+  background-color: transparent !important;
+  color: #ccc !important;
+  border: 1px solid #ccc !important;
 }
 
 @tailwind base;

@@ -537,7 +537,7 @@ export default function TiptapEditor({
             />
             <div className=" hidden lg:block">
               <Button
-                className="primary-gradient"
+                className="primary-gradient-btn"
                 type="primary"
                 icon={<LineChartOutlined />}
                 onClick={() => setDrawerOpen(true)}
@@ -547,7 +547,7 @@ export default function TiptapEditor({
             </div>
             <div className="lg:hidden">
               <Button
-                className="primary-gradient"
+                className="primary-gradient-btn"
                 type="primary"
                 icon={<LineChartOutlined />}
                 onClick={() => setDrawerOpen(true)}

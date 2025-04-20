@@ -162,7 +162,7 @@ export default function Login() {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  className="w-full primary-gradient"
+                  className="w-full primary-gradient-btn"
                   loading={loading}
                   style={{
                     height: "40px",

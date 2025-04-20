@@ -66,7 +66,7 @@ export default function SpeechMainPage() {
           <Button
             type="primary"
             htmlType="submit"
-            className="w-full primary-gradient mt-3"
+            className="w-full primary-gradient-btn mt-3"
             onClick={() => router.push("/dashboard")}
             style={{
               height: "40px",
@@ -92,7 +92,7 @@ export default function SpeechMainPage() {
           <Button
             type="primary"
             htmlType="submit"
-            className="w-full primary-gradient mt-3"
+            className="w-full primary-gradient-btn mt-3"
             style={{
               height: "40px",
               fontSize: "16px",
@@ -111,7 +111,7 @@ export default function SpeechMainPage() {
   return (
     <>
       {contextHolder}
-      <main className="mt-16">
+      <main>
         <SlateEditor
           speechId={speechId}
           speechData={speech}

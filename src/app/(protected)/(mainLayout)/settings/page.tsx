@@ -195,7 +195,7 @@ export default function SettingsPage() {
                     border: "none",
                     boxShadow: "none",
                   }}
-                  className="primary-gradient"
+                  className="primary-gradient-btn"
                 >
                   Save Profile
                 </Button>
@@ -281,7 +281,7 @@ export default function SettingsPage() {
                     border: "none",
                     boxShadow: "none",
                   }}
-                  className="primary-gradient"
+                  className="primary-gradient-btn"
                 >
                   Update Password
                 </Button>

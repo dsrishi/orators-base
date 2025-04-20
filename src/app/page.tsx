@@ -47,7 +47,7 @@ export default function Home() {
             <Button
               type="primary"
               htmlType="submit"
-              className="w-full primary-gradient"
+              className="w-full primary-gradient-btn"
               onClick={() => router.push("/login")}
               style={{
                 height: "40px",

@@ -303,8 +303,11 @@ export default function SlateEditor({
       />
 
       <Layout
-        className="mb-16"
-        style={{ background: "transparent", marginTop: "64px" }}
+        className="pb-16"
+        style={{
+          backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5",
+          marginTop: "56px",
+        }}
         hasSider
       >
         <Sider
@@ -316,9 +319,9 @@ export default function SlateEditor({
           trigger={null}
           breakpoint="lg"
           style={{
-            backgroundColor: theme === "dark" ? "#212121" : "#fafafa",
+            backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
             overflow: "auto",
-            height: "calc(100vh - 64px)",
+            height: "calc(100vh - 56px)",
             position: "fixed",
             left: 0,
             zIndex: 15,
@@ -343,7 +346,7 @@ export default function SlateEditor({
           className={`${collapsed ? "ml-0" : "lg:ml-[250px] ml-0"}`}
         >
           <div
-            className="fixed mx-auto p-3 z-10 top-[64px]"
+            className="fixed mx-auto px-3 py-1 z-10 top-[64px]"
             style={{
               width: collapsed ? "100%" : "calc(100% - 250px)",
               transition: "width 0.2s",
@@ -376,7 +379,7 @@ export default function SlateEditor({
           <div className="mt-16 px-3 py-4">
             <div
               style={{
-                backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5",
+                backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
               }}
               className="min-h-[900px] lg:p-16 md:p-12 sm:p-8 p-4 rounded max-w-[1000px] mx-auto"
             >

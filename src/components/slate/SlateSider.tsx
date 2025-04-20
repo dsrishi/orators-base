@@ -1,6 +1,15 @@
 import { Editor } from "@tiptap/core";
 import { SpeechVersion } from "@/types/speech";
 import SlateVersions from "./SlateVersions";
+import { useState } from "react";
+import {
+  HistoryOutlined,
+  MessageOutlined,
+  SnippetsOutlined,
+} from "@ant-design/icons";
+import { useTheme } from "@/contexts/ThemeContext";
+import SlateAIChat from "./SlateAIChat";
+import SlateTemplates from "./SlateTemplates";
 
 interface SlateSiderProps {
   versions: SpeechVersion[];
@@ -13,6 +22,8 @@ interface SlateSiderProps {
   setCollapsed: (collapsed: boolean) => void;
 }
 
+type Tab = "versions" | "chat" | "templates";
+
 export default function SlateSider({
   versions,
   selectedVersion,
@@ -23,18 +34,70 @@ export default function SlateSider({
   editor,
   setCollapsed,
 }: SlateSiderProps) {
+  const { theme } = useTheme();
+  const [activeTab, setActiveTab] = useState<Tab>("versions");
+
+  const tabs = [
+    {
+      id: "versions" as Tab,
+      icon: <HistoryOutlined />,
+      label: "Versions",
+    },
+    {
+      id: "chat" as Tab,
+      icon: <MessageOutlined />,
+      label: "AI Chat",
+    },
+    {
+      id: "templates" as Tab,
+      icon: <SnippetsOutlined />,
+      label: "Templates",
+    },
+  ];
+
   return (
     <div>
-      <SlateVersions
-        versions={versions}
-        selectedVersion={selectedVersion}
-        setSelectedVersion={setSelectedVersion}
-        handleVersionChange={handleVersionChange}
-        refreshSpeechData={refreshSpeechData}
-        speechId={speechId}
-        editor={editor}
-        setCollapsed={setCollapsed}
-      />
+      <div
+        style={{
+          backgroundColor: theme === "dark" ? "#1f1f1f" : "#ffffff",
+          borderBottom:
+            theme === "dark" ? "solid 1px #2d2d2d" : "solid 1px #e5e5e5",
+        }}
+      >
+        <div className="flex justify-around">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 p-3 text-center cursor-pointer ${
+                activeTab === tab.id
+                  ? "border-b-2 border-purple-500"
+                  : "text-gray-500 dark:text-gray-400"
+              }`}
+              title={tab.label}
+            >
+              {tab.icon}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-auto">
+        {activeTab === "versions" && (
+          <SlateVersions
+            versions={versions}
+            selectedVersion={selectedVersion}
+            setSelectedVersion={setSelectedVersion}
+            handleVersionChange={handleVersionChange}
+            refreshSpeechData={refreshSpeechData}
+            speechId={speechId}
+            editor={editor}
+            setCollapsed={setCollapsed}
+          />
+        )}
+        {activeTab === "chat" && <SlateAIChat />}
+        {activeTab === "templates" && <SlateTemplates />}
+      </div>
     </div>
   );
 }

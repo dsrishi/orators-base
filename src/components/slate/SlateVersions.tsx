@@ -212,10 +212,11 @@ export default function SlateVersions({
   return (
     <>
       {contextHolder}
-      <div className="flex justify-between items-center px-4 pt-6 pb-3">
-        <div className="text-lg font-semibold">Versions</div>
+      <div className="flex justify-between items-center px-4 pt-3 pb-3">
+        <div className="text-base font-semibold">Versions</div>
         <Tooltip title="Create New Version">
           <Button
+            size="small"
             icon={<PlusOutlined />}
             onClick={() => setNewVersionModalOpen(true)}
           />
@@ -226,7 +227,7 @@ export default function SlateVersions({
         mode="inline"
         selectedKeys={[selectedVersion?.id || ""]}
         style={{
-          backgroundColor: theme === "dark" ? "#212121" : "#fafafa",
+          backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
           borderRight: 0,
         }}
         theme={theme === "dark" ? "dark" : "light"}
