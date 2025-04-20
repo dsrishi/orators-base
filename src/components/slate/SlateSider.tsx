@@ -61,7 +61,7 @@ export default function SlateSider({
         style={{
           backgroundColor: theme === "dark" ? "#1f1f1f" : "#ffffff",
           borderBottom:
-            theme === "dark" ? "solid 1px #2d2d2d" : "solid 1px #e5e5e5",
+            theme === "dark" ? "solid 0.5px #2d2d2d" : "solid 0.5px #e5e5e5",
         }}
       >
         <div className="flex justify-around">
