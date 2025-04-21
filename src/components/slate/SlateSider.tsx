@@ -1,4 +1,3 @@
-import { Editor } from "@tiptap/core";
 import { SpeechVersion } from "@/types/speech";
 import SlateVersions from "./SlateVersions";
 import { useState } from "react";
@@ -18,7 +17,6 @@ interface SlateSiderProps {
   handleVersionChange: (key: string) => void;
   refreshSpeechData: () => Promise<void>;
   speechId: string;
-  editor: Editor | null;
   setCollapsed: (collapsed: boolean) => void;
 }
 
@@ -31,7 +29,6 @@ export default function SlateSider({
   handleVersionChange,
   refreshSpeechData,
   speechId,
-  editor,
   setCollapsed,
 }: SlateSiderProps) {
   const { theme } = useTheme();
@@ -91,7 +88,6 @@ export default function SlateSider({
             handleVersionChange={handleVersionChange}
             refreshSpeechData={refreshSpeechData}
             speechId={speechId}
-            editor={editor}
             setCollapsed={setCollapsed}
           />
         )}

@@ -1,32 +1,21 @@
 "use client";
 
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import { Color } from "@tiptap/extension-color";
-import TextStyle from "@tiptap/extension-text-style";
-import FontFamily from "@tiptap/extension-font-family";
-import TextAlign from "@tiptap/extension-text-align";
-import Placeholder from "@tiptap/extension-placeholder";
-import Underline from "@tiptap/extension-underline";
-import Highlight from "@tiptap/extension-highlight";
 import { useTheme } from "@/contexts/ThemeContext";
 import { FloatButton, message, Layout, Spin } from "antd";
 import { AudioOutlined, UploadOutlined } from "@ant-design/icons";
 import { useState, useEffect, useRef } from "react";
-import SpeechAnalysisDrawer from "./SpeechAnalysisDrawer";
 import { Speech, SpeechVersion } from "@/types/speech";
 import SpeechInfoModal from "./SpeechInfoModal";
 import { speechService } from "@/services/speechService";
 import { useDebounce } from "@/hooks/useDebounce";
 import ComingSoonModal from "./ComingSoonModal";
-import SpeechRecordingModal from "./SpeechRecordingModal";
 // @ts-expect-error - need to fix this
 import { useSpeechRecognition } from "react-speech-recognition";
 import { HardConfirmationModal } from "./ConfirmationModal";
-import { FontSize } from "@/extensions/FontSize";
 import SlateTopBar from "./slate/SlateTopBar";
 import SlateSider from "./slate/SlateSider";
 import SlateTextEditor from "./slate/SlateTextEditor";
+import SlateAnalyseDrawer from "./slate/SlateAnalyseDrawer";
 
 const { Sider, Content } = Layout;
 
@@ -107,70 +96,17 @@ export default function SlateEditor({
 
   const debouncedSave = useDebounce(saveContent, 1000);
 
-  const editorExtensions = [
-    StarterKit,
-    TextStyle,
-    Color,
-    FontFamily,
-    Underline,
-    Placeholder.configure({
-      placeholder: "Start writing your speech...",
-    }),
-    TextAlign.configure({
-      types: ["heading", "paragraph"],
-    }),
-    Highlight.configure({ multicolor: true }),
-    FontSize,
-  ];
-
-  const editor = useEditor({
-    extensions: editorExtensions,
-    content: selectedVersion?.content,
-    editorProps: {
-      attributes: {
-        class:
-          "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none",
-      },
-    },
-    onUpdate: ({ editor }) => {
-      const content = editor.getHTML();
-
-      // Store the latest content in our cache
-      unsavedContentCache.current[selectedVersion.id] = content;
-
-      // Debounce the save to backend
-      debouncedSave(content);
-    },
-  });
-
   // Modify version switching to handle unsaved content
   const handleVersionChange = (versionId: string) => {
     const version = versions.find((v) => v.id === versionId);
     if (!version || version.id === selectedVersion.id) return;
 
     // Cache the current content before switching
-    if (editor) {
-      const currentContent = editor.getHTML();
-      unsavedContentCache.current[selectedVersion.id] = currentContent;
-    }
+    unsavedContentCache.current[selectedVersion.id] = selectedVersion.content;
 
     // Switch to the new version
     setSelectedVersion(version);
   };
-
-  // Update the useEffect for switching versions to respect cached content
-  useEffect(() => {
-    if (editor && selectedVersion) {
-      // Check if we have unsaved content for this version
-      const cachedContent = unsavedContentCache.current[selectedVersion.id];
-
-      // Use cached content if available, otherwise use the saved content
-      const contentToUse = cachedContent || selectedVersion.content || "";
-
-      // Update the editor content
-      editor.commands.setContent(contentToUse);
-    }
-  }, [editor, selectedVersion]);
 
   // Hide the versions if there is only one version
   useEffect(() => {
@@ -213,24 +149,6 @@ export default function SlateEditor({
       duration: 1,
     });
     refreshSpeechData();
-  };
-
-  // Function to handle adding content from the speech modal
-  const handleAddSpeechContent = (content: string) => {
-    if (editor && content.trim()) {
-      // Add the content at the current cursor position
-      const pos = editor.view.state.selection.anchor;
-      editor.chain().focus().insertContentAt(pos, content).run();
-
-      // Save changes
-      const editorContent = editor.getHTML();
-      debouncedSave(editorContent);
-
-      messageApi.success({
-        content: "Speech content added",
-        duration: 2,
-      });
-    }
   };
 
   // Add browser support check for speech recognition
@@ -326,7 +244,6 @@ export default function SlateEditor({
             handleVersionChange={handleVersionChange}
             refreshSpeechData={refreshSpeechData}
             speechId={speechId}
-            editor={editor}
             setCollapsed={setCollapsed}
           />
         </Sider>
@@ -339,19 +256,13 @@ export default function SlateEditor({
         >
           <div className="mt-16 px-3 pt-4 pb-16">
             <SlateTextEditor
+              key={selectedVersion?.id}
               collapsed={collapsed}
               content={selectedVersion?.content}
+              onSave={debouncedSave}
+              isRecordingModalOpen={isRecordingModalOpen}
+              setIsRecordingModalOpen={setIsRecordingModalOpen}
             />
-          </div>
-          <div className="mt-16 px-3 pt-4 pb-16">
-            <div
-              style={{
-                backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
-              }}
-              className="min-h-[900px] lg:p-16 md:p-12 sm:p-8 p-4 rounded max-w-[1000px] mx-auto"
-            >
-              <EditorContent editor={editor} />
-            </div>
           </div>
         </Content>
         {saving && (
@@ -376,22 +287,15 @@ export default function SlateEditor({
         />
       </FloatButton.Group>
 
-      <SpeechRecordingModal
-        open={isRecordingModalOpen}
-        onClose={() => setIsRecordingModalOpen(false)}
-        onAddContent={handleAddSpeechContent}
-      />
-
       <ComingSoonModal
         open={isComingSoonModalOpen}
         onClose={() => setIsComingSoonModalOpen(false)}
         featureTitle="Upload a speech"
       />
 
-      <SpeechAnalysisDrawer
+      <SlateAnalyseDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        editor={editor}
         speechData={speechData}
         key={drawerOpen ? "open-drawer" : "closed-drawer"}
       />

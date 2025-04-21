@@ -11,7 +11,6 @@ import ConfirmationModal from "../ConfirmationModal";
 import { speechService } from "@/services/speechService";
 import NewVersionModal from "../NewVersionModal";
 import { useUser } from "@/contexts/UserContext";
-import { Editor } from "@tiptap/core";
 
 interface SlateVersionsProps {
   versions: SpeechVersion[];
@@ -20,7 +19,6 @@ interface SlateVersionsProps {
   handleVersionChange: (key: string) => void;
   refreshSpeechData: () => Promise<void>;
   speechId: string;
-  editor: Editor | null;
   setCollapsed: (collapsed: boolean) => void;
 }
 
@@ -31,7 +29,6 @@ export default function SlateVersions({
   handleVersionChange,
   refreshSpeechData,
   speechId,
-  editor,
   setCollapsed,
 }: SlateVersionsProps) {
   const { theme } = useTheme();
@@ -109,11 +106,6 @@ export default function SlateVersions({
 
       // Make sure the versions panel is open to show the new version
       setCollapsed(false);
-
-      // If editor exists, focus it to provide a seamless experience
-      if (editor) {
-        setTimeout(() => editor.commands.focus(), 100);
-      }
     }
 
     setNewVersionModalOpen(false);

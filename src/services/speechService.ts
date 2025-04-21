@@ -135,6 +135,13 @@ export const speechService = {
       }
       if (!speechData) throw new Error('Failed to create speech');
 
+      const content = JSON.stringify([
+        {
+          type: "paragraph",
+          children: [{ text: "" }],
+        },
+      ]);
+
       // Create initial version
       const { error: versionError } = await supabase
         .from("speech_versions")
@@ -142,7 +149,7 @@ export const speechService = {
           speech_id: speechData.id, // This will be a proper UUID now
           version_number: 1,
           version_name: "Initial Version",
-          content: "",
+          content: content,
           created_by: data.userId,
           updated_by: data.userId
         });
