@@ -254,7 +254,7 @@ export default function SlateEditor({
           }}
           className={`${collapsed ? "ml-0" : "lg:ml-[280px] ml-0"}`}
         >
-          <div className="mt-16 px-3 pt-4 pb-16">
+          <div className="mt-16 px-3 pt-2 pb-16">
             <SlateTextEditor
               key={selectedVersion?.id}
               collapsed={collapsed}

@@ -4,12 +4,12 @@ import { createEditor, Descendant, Editor } from "slate";
 import { Slate, Editable, withReact } from "slate-react";
 import { withHistory } from "slate-history";
 import { RenderElementProps } from "slate-react";
+import { useTheme } from "@/contexts/ThemeContext";
+import SlateEditorMenu from "./SlateEditorMenu";
+import { Transforms } from "slate";
+import { Range } from "slate";
+import SpeechRecordingModal from "../SpeechRecordingModal";
 
-// Define the TypeScript types (same as before)
-type CustomElement = {
-  type: "paragraph" | "heading-one" | "heading-two";
-  children: CustomText[];
-};
 type CustomText = {
   text: string;
   bold?: boolean;
@@ -25,40 +25,37 @@ type SlateTextEditorProps = {
   setIsRecordingModalOpen: (open: boolean) => void;
 };
 
-declare module "slate" {
-  interface CustomTypes {
-    Editor: BaseEditor & ReactEditor & HistoryEditor;
-    Element: CustomElement;
-    Text: CustomText;
-  }
-}
-
-import { BaseEditor } from "slate";
-import { ReactEditor } from "slate-react";
-import { HistoryEditor } from "slate-history";
-import { useTheme } from "@/contexts/ThemeContext";
-import SlateEditorMenu from "./SlateEditorMenu";
-import { Transforms } from "slate";
-import { Range } from "slate";
-import SpeechRecordingModal from "../SpeechRecordingModal";
-
 // Custom element renderer
 const Element = ({ attributes, children, element }: RenderElementProps) => {
+  const style = element.align
+    ? { textAlign: element.align as "left" | "center" | "right" }
+    : {};
+
   switch (element.type) {
     case "heading-one":
       return (
-        <h1 {...attributes} className="text-2xl font-bold">
+        <h1 {...attributes} style={style} className="text-2xl font-bold">
           {children}
         </h1>
       );
     case "heading-two":
       return (
-        <h2 {...attributes} className="text-xl font-bold">
+        <h2 {...attributes} style={style} className="text-xl font-bold">
           {children}
         </h2>
       );
+    case "heading-three":
+      return (
+        <h3 {...attributes} style={style} className="text-lg font-bold">
+          {children}
+        </h3>
+      );
     default:
-      return <p {...attributes}>{children}</p>;
+      return (
+        <p {...attributes} style={style}>
+          {children}
+        </p>
+      );
   }
 };
 
