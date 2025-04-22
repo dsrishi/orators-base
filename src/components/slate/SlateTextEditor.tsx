@@ -1,7 +1,7 @@
 // components/SlateEditor.tsx (enhanced version)
-import React, { useEffect, useMemo, useState } from "react";
-import { createEditor, Descendant, Editor } from "slate";
-import { Slate, Editable, withReact } from "slate-react";
+import React, { useMemo } from "react";
+import { createEditor, Editor } from "slate";
+import { Editable, withReact } from "slate-react";
 import { withHistory } from "slate-history";
 import { RenderElementProps } from "slate-react";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -17,137 +17,148 @@ type CustomText = {
   underline?: boolean;
   highlight?: boolean;
   highlightColor?: string;
+  structure?: string;
   color?: string;
 };
 
 type SlateTextEditorProps = {
   collapsed: boolean;
-  content: string;
-  onSave?: (content: string) => void;
   isRecordingModalOpen: boolean;
   setIsRecordingModalOpen: (open: boolean) => void;
-};
-
-// Custom element renderer
-const Element = ({ attributes, children, element }: RenderElementProps) => {
-  const style = element.align
-    ? { textAlign: element.align as "left" | "center" | "right" }
-    : {};
-
-  switch (element.type) {
-    case "heading-one":
-      return (
-        <h1 {...attributes} style={style} className="text-2xl font-bold">
-          {children}
-        </h1>
-      );
-    case "heading-two":
-      return (
-        <h2 {...attributes} style={style} className="text-xl font-bold">
-          {children}
-        </h2>
-      );
-    case "heading-three":
-      return (
-        <h3 {...attributes} style={style} className="text-lg font-bold">
-          {children}
-        </h3>
-      );
-    case "ordered-list":
-      return (
-        <ol {...attributes} style={style}>
-          {children}
-        </ol>
-      );
-    case "bullet-list":
-      return (
-        <ul {...attributes} style={style}>
-          {children}
-        </ul>
-      );
-    case "list-item":
-      return <li {...attributes}>{children}</li>;
-    default:
-      return (
-        <p {...attributes} style={style}>
-          {children}
-        </p>
-      );
-  }
-};
-
-// Custom leaf renderer
-const Leaf = ({
-  attributes,
-  children,
-  leaf,
-}: {
-  attributes: React.HTMLAttributes<HTMLSpanElement> & {
-    "data-slate-leaf": boolean;
-  };
-  children: React.ReactNode;
-  leaf: CustomText;
-}) => {
-  let renderedChildren = children;
-
-  if (leaf.bold) {
-    renderedChildren = <strong>{renderedChildren}</strong>;
-  }
-
-  if (leaf.italic) {
-    renderedChildren = <em>{renderedChildren}</em>;
-  }
-
-  if (leaf.underline) {
-    renderedChildren = <u>{renderedChildren}</u>;
-  }
-
-  if (leaf.highlight) {
-    renderedChildren = (
-      <mark style={{ backgroundColor: leaf.highlightColor || "#ffff00" }}>
-        {renderedChildren}
-      </mark>
-    );
-  }
-
-  if (leaf.color) {
-    renderedChildren = (
-      <span style={{ color: leaf.color }}>{renderedChildren}</span>
-    );
-  }
-
-  return <span {...attributes}>{renderedChildren}</span>;
+  structuredViewOpen: boolean;
 };
 
 const SlateEditor: React.FC<SlateTextEditorProps> = ({
   collapsed,
-  content,
-  onSave,
   isRecordingModalOpen,
   setIsRecordingModalOpen,
+  structuredViewOpen,
 }) => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const { theme } = useTheme();
 
-  const [value, setValue] = useState<Descendant[]>(JSON.parse(content));
-  const [canSave, setCanSave] = useState(false);
+  // Custom element renderer
+  const Element = ({ attributes, children, element }: RenderElementProps) => {
+    const style = element.align
+      ? { textAlign: element.align as "left" | "center" | "right" }
+      : {};
 
-  const handleSave = () => {
-    const contentString = JSON.stringify(value);
-    if (onSave) {
-      onSave(contentString);
+    switch (element.type) {
+      case "heading-one":
+        return (
+          <h1 {...attributes} style={style} className="text-2xl font-bold">
+            {children}
+          </h1>
+        );
+      case "heading-two":
+        return (
+          <h2 {...attributes} style={style} className="text-xl font-bold">
+            {children}
+          </h2>
+        );
+      case "heading-three":
+        return (
+          <h3 {...attributes} style={style} className="text-lg font-bold">
+            {children}
+          </h3>
+        );
+      case "ordered-list":
+        return (
+          <ol {...attributes} style={style}>
+            {children}
+          </ol>
+        );
+      case "bullet-list":
+        return (
+          <ul {...attributes} style={style}>
+            {children}
+          </ul>
+        );
+      case "list-item":
+        return <li {...attributes}>{children}</li>;
+      default:
+        return (
+          <p {...attributes} style={style}>
+            {children}
+          </p>
+        );
     }
-    // Optionally also save to localStorage as a backup
-    localStorage.setItem("slate-content", contentString);
   };
 
-  useEffect(() => {
-    if (canSave) {
-      handleSave();
+  const getStructureColor = (structure: string) => {
+    if (structure === "opening") {
+      return "#ccc";
+    } else if (structure === "closing") {
+      return "#444";
     } else {
-      setCanSave(true);
+      return "transparent";
     }
-  }, [value]);
+  };
+
+  // Custom leaf renderer
+  const Leaf = ({
+    attributes,
+    children,
+    leaf,
+  }: {
+    attributes: React.HTMLAttributes<HTMLSpanElement> & {
+      "data-slate-leaf": boolean;
+    };
+    children: React.ReactNode;
+    leaf: CustomText;
+  }) => {
+    let renderedChildren = children;
+
+    if (leaf.bold) {
+      renderedChildren = <strong>{renderedChildren}</strong>;
+    }
+
+    if (leaf.italic) {
+      renderedChildren = <em>{renderedChildren}</em>;
+    }
+
+    if (leaf.underline) {
+      renderedChildren = <u>{renderedChildren}</u>;
+    }
+
+    if (leaf.highlight) {
+      renderedChildren = (
+        <mark style={{ backgroundColor: leaf.highlightColor || "#ffff00" }}>
+          {renderedChildren}
+        </mark>
+      );
+    }
+
+    if (leaf.color) {
+      renderedChildren = (
+        <span style={{ color: leaf.color }}>{renderedChildren}</span>
+      );
+    }
+
+    if (leaf.structure) {
+      renderedChildren = (
+        <span
+          id="structure"
+          style={{
+            backgroundColor: structuredViewOpen
+              ? getStructureColor(leaf.structure)
+              : "transparent",
+            display: structuredViewOpen ? "block" : "inline",
+            padding: structuredViewOpen ? "8px" : "0px",
+          }}
+        >
+          {structuredViewOpen && (
+            <span className="text-xs text-gray-500">
+              {leaf.structure === "opening" ? "Opening" : "Closing"}
+            </span>
+          )}
+          <span>{renderedChildren}</span>
+        </span>
+      );
+    }
+
+    return <span {...attributes}>{renderedChildren}</span>;
+  };
 
   // Function to handle adding content from the speech modal
   const handleAddSpeechContent = (content: string) => {
@@ -156,7 +167,6 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
       const currentSelection = editor.selection;
 
       if (currentSelection) {
-        console.log("selection");
         // Restore selection if needed
         Transforms.select(editor, currentSelection);
 
@@ -180,30 +190,24 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
   return (
     <>
       <div>
-        <Slate
-          editor={editor}
-          initialValue={value}
-          onChange={(newValue) => setValue(newValue)}
+        <SlateEditorMenu collapsed={collapsed} />
+        <div
+          className="lg:p-16 md:p-12 sm:p-8 p-4 rounded max-w-[1000px] mx-auto slate"
+          style={{
+            backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
+          }}
         >
-          <SlateEditorMenu collapsed={collapsed} />
-          <div
-            className="lg:p-16 md:p-12 sm:p-8 p-4 rounded max-w-[1000px] mx-auto slate"
+          <Editable
             style={{
-              backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
+              minHeight: "900px",
+              outline: "none",
             }}
-          >
-            <Editable
-              style={{
-                minHeight: "900px",
-                outline: "none",
-              }}
-              placeholder="Start writing your speech here..."
-              renderElement={(props) => <Element {...props} />}
-              renderLeaf={(props) => <Leaf {...props} />}
-              readOnly={false}
-            />
-          </div>
-        </Slate>
+            placeholder="Start writing your speech here..."
+            renderElement={(props) => <Element {...props} />}
+            renderLeaf={(props) => <Leaf {...props} />}
+            readOnly={false}
+          />
+        </div>
       </div>
 
       <SpeechRecordingModal

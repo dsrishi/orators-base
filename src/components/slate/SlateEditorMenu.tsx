@@ -18,6 +18,7 @@ import {
   FontColorsOutlined,
   HighlightOutlined,
   MenuOutlined,
+  GroupOutlined,
 } from "@ant-design/icons";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -48,6 +49,7 @@ type CustomText = {
   highlight?: boolean;
   highlightColor?: string;
   color?: string;
+  structure?: string;
 };
 
 type BlockFormat =
@@ -67,7 +69,8 @@ type MarkFormat =
   | "underline"
   | "highlight"
   | "color"
-  | "highlightColor";
+  | "highlightColor"
+  | "structure";
 type Format = BlockFormat | MarkFormat;
 
 declare module "slate" {
@@ -251,8 +254,6 @@ const isMarkActive = (editor: Editor, format: MarkFormat) => {
 const toggleList = (editor: Editor, format: "ordered-list" | "bullet-list") => {
   const isActive = isBlockActive(editor, format);
 
-  console.log(format);
-
   Transforms.unwrapNodes(editor, {
     match: (n): n is CustomElement =>
       !Editor.isEditor(n) &&
@@ -275,6 +276,14 @@ const toggleList = (editor: Editor, format: "ordered-list" | "bullet-list") => {
   if (!isActive) {
     const block = { type: format, children: [] };
     Transforms.wrapNodes(editor, block);
+  }
+};
+
+const toggleStructure = (editor: Editor, structure: string) => {
+  if (structure === "remove") {
+    Editor.removeMark(editor, "structure");
+  } else {
+    Editor.addMark(editor, "structure", structure);
   }
 };
 
@@ -479,6 +488,20 @@ export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
       </div>
     );
   };
+
+  const StructurePopoverContent = () => {
+    return (
+      <div className="flex items-center justify-center gap-2">
+        <Button onClick={() => toggleStructure(editor, "opening")}>
+          Opening
+        </Button>
+        <Button onClick={() => toggleStructure(editor, "closing")}>
+          Closing
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <div
       className="fixed mx-auto px-3 py-1 z-10 top-[64px]"
@@ -588,6 +611,16 @@ export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
               }}
               disabled={!editor.history.redos.length}
             />
+
+            <Divider type="vertical" />
+
+            <Popover
+              content={<StructurePopoverContent />}
+              trigger="click"
+              placement="bottom"
+            >
+              <Button icon={<GroupOutlined />} />
+            </Popover>
           </div>
         </div>
       </div>

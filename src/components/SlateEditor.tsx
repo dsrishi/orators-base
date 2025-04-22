@@ -3,7 +3,7 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { FloatButton, message, Layout, Spin } from "antd";
 import { AudioOutlined, UploadOutlined } from "@ant-design/icons";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Speech, SpeechVersion } from "@/types/speech";
 import SpeechInfoModal from "./SpeechInfoModal";
 import { speechService } from "@/services/speechService";
@@ -16,7 +16,9 @@ import SlateTopBar from "./slate/SlateTopBar";
 import SlateSider from "./slate/SlateSider";
 import SlateTextEditor from "./slate/SlateTextEditor";
 import SlateAnalyseDrawer from "./slate/SlateAnalyseDrawer";
-
+import { Slate, withReact } from "slate-react";
+import { withHistory } from "slate-history";
+import { createEditor, Descendant } from "slate";
 const { Sider, Content } = Layout;
 
 interface SlateEditorProps {
@@ -61,6 +63,13 @@ export default function SlateEditor({
   const [messageApi, contextHolder] = message.useMessage();
   const [isComingSoonModalOpen, setIsComingSoonModalOpen] = useState(false);
   const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
+  const [structuredViewOpen, setStructuredViewOpen] = useState(false);
+  const [value, setValue] = useState<Descendant[]>(
+    JSON.parse(selectedVersion?.content)
+  );
+  const [canSave, setCanSave] = useState(false);
+
+  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
 
   // Keep basic speech recognition for browser compatibility check
   const { browserSupportsSpeechRecognition, isMicrophoneAvailable } =
@@ -106,12 +115,21 @@ export default function SlateEditor({
 
     // Switch to the new version
     setSelectedVersion(version);
+    setValue(JSON.parse(version.content));
   };
 
   // Hide the versions if there is only one version
   useEffect(() => {
     setCollapsed(versions.length <= 1);
   }, []);
+
+  useEffect(() => {
+    if (canSave) {
+      debouncedSave(JSON.stringify(value));
+    } else {
+      setCanSave(true);
+    }
+  }, [value]);
 
   // Update the refreshSpeechData to handle syncing with our cache
   const refreshSpeechData = async () => {
@@ -203,121 +221,128 @@ export default function SlateEditor({
   return (
     <>
       {contextHolder}
-      <SlateTopBar
-        setCollapsed={setCollapsed}
-        collapsed={collapsed}
-        setSpeechInfoModalOpen={setInfoModalOpen}
-        setSpeechAnalysisDrawerOpen={setDrawerOpen}
-        setDeleteSpeechModalVisible={setDeleteSpeechModalVisible}
-        speechData={speechData}
-      />
-
-      <Layout
-        className="absolute w-full overflow-auto bottom-0"
-        style={{
-          backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5",
-          top: "56px",
-        }}
-        hasSider
+      <Slate
+        key={selectedVersion?.id}
+        editor={editor}
+        initialValue={value}
+        onChange={(newValue) => setValue(newValue)}
       >
-        <Sider
-          width={280}
-          collapsible
+        <SlateTopBar
+          setCollapsed={setCollapsed}
           collapsed={collapsed}
-          collapsedWidth="0"
-          onCollapse={(value) => setCollapsed(value)}
-          trigger={null}
-          breakpoint="lg"
-          style={{
-            backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
-            overflow: "auto",
-            height: "calc(100vh - 56px)",
-            position: "fixed",
-            left: 0,
-            zIndex: 15,
-          }}
-        >
-          <SlateSider
-            versions={versions}
-            selectedVersion={selectedVersion}
-            setSelectedVersion={setSelectedVersion}
-            handleVersionChange={handleVersionChange}
-            refreshSpeechData={refreshSpeechData}
-            speechId={speechId}
-            setCollapsed={setCollapsed}
-          />
-        </Sider>
+          setSpeechInfoModalOpen={setInfoModalOpen}
+          setSpeechAnalysisDrawerOpen={setDrawerOpen}
+          setDeleteSpeechModalVisible={setDeleteSpeechModalVisible}
+          speechData={speechData}
+        />
 
-        <Content
+        <Layout
+          className="absolute w-full overflow-auto bottom-0"
           style={{
-            transition: "margin-left 0.2s",
+            backgroundColor: theme === "dark" ? "#2d2d2d" : "#f5f5f5",
+            top: "56px",
           }}
-          className={`${collapsed ? "ml-0" : "lg:ml-[280px] ml-0"}`}
+          hasSider
         >
-          <div className="mt-16 px-3 pt-2 pb-16">
-            <SlateTextEditor
-              key={selectedVersion?.id}
-              collapsed={collapsed}
-              content={selectedVersion?.content}
-              onSave={debouncedSave}
-              isRecordingModalOpen={isRecordingModalOpen}
-              setIsRecordingModalOpen={setIsRecordingModalOpen}
+          <Sider
+            width={280}
+            collapsible
+            collapsed={collapsed}
+            collapsedWidth="0"
+            onCollapse={(value) => setCollapsed(value)}
+            trigger={null}
+            breakpoint="lg"
+            style={{
+              backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
+              overflow: "auto",
+              height: "calc(100vh - 56px)",
+              position: "fixed",
+              left: 0,
+              zIndex: 15,
+            }}
+          >
+            <SlateSider
+              versions={versions}
+              selectedVersion={selectedVersion}
+              setSelectedVersion={setSelectedVersion}
+              handleVersionChange={handleVersionChange}
+              refreshSpeechData={refreshSpeechData}
+              speechId={speechId}
+              setCollapsed={setCollapsed}
+              structuredViewOpen={structuredViewOpen}
+              setStructuredViewOpen={setStructuredViewOpen}
             />
-          </div>
-        </Content>
-        {saving && (
-          <div className="fixed bottom-0 left-0 right-0 p-4 z-20">
-            <div className="flex items-center justify-center">
-              <Spin size="small" />
+          </Sider>
+
+          <Content
+            style={{
+              transition: "margin-left 0.2s",
+            }}
+            className={`${collapsed ? "ml-0" : "lg:ml-[280px] ml-0"}`}
+          >
+            <div className="mt-16 px-3 pt-2 pb-16">
+              <SlateTextEditor
+                collapsed={collapsed}
+                isRecordingModalOpen={isRecordingModalOpen}
+                setIsRecordingModalOpen={setIsRecordingModalOpen}
+                structuredViewOpen={structuredViewOpen}
+              />
             </div>
-          </div>
-        )}
-      </Layout>
+          </Content>
+          {saving && (
+            <div className="fixed bottom-0 left-0 right-0 p-4 z-20">
+              <div className="flex items-center justify-center">
+                <Spin size="small" />
+              </div>
+            </div>
+          )}
+        </Layout>
 
-      <FloatButton.Group shape="circle" style={{ insetInlineEnd: 24 }}>
-        <FloatButton
-          icon={<AudioOutlined />}
-          tooltip={<div>Record Speech</div>}
-          onClick={() => setIsRecordingModalOpen(true)}
+        <FloatButton.Group shape="circle" style={{ insetInlineEnd: 24 }}>
+          <FloatButton
+            icon={<AudioOutlined />}
+            tooltip={<div>Record Speech</div>}
+            onClick={() => setIsRecordingModalOpen(true)}
+          />
+          <FloatButton
+            onClick={() => setIsComingSoonModalOpen(true)}
+            icon={<UploadOutlined />}
+            tooltip={<div>Upload</div>}
+          />
+        </FloatButton.Group>
+
+        <ComingSoonModal
+          open={isComingSoonModalOpen}
+          onClose={() => setIsComingSoonModalOpen(false)}
+          featureTitle="Upload a speech"
         />
-        <FloatButton
-          onClick={() => setIsComingSoonModalOpen(true)}
-          icon={<UploadOutlined />}
-          tooltip={<div>Upload</div>}
+
+        <SlateAnalyseDrawer
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          speechData={speechData}
+          key={drawerOpen ? "open-drawer" : "closed-drawer"}
         />
-      </FloatButton.Group>
 
-      <ComingSoonModal
-        open={isComingSoonModalOpen}
-        onClose={() => setIsComingSoonModalOpen(false)}
-        featureTitle="Upload a speech"
-      />
+        <SpeechInfoModal
+          open={infoModalOpen}
+          onClose={() => setInfoModalOpen(false)}
+          speechId={speechId}
+          speechData={speechData}
+          onUpdate={handleSpeechUpdate}
+        />
 
-      <SlateAnalyseDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        speechData={speechData}
-        key={drawerOpen ? "open-drawer" : "closed-drawer"}
-      />
-
-      <SpeechInfoModal
-        open={infoModalOpen}
-        onClose={() => setInfoModalOpen(false)}
-        speechId={speechId}
-        speechData={speechData}
-        onUpdate={handleSpeechUpdate}
-      />
-
-      <HardConfirmationModal
-        title="Delete Speech"
-        message={`Are you sure you want to delete "${speechData.title}"?`}
-        subMessage="This will delete the speech and all its versions. This action cannot be undone."
-        open={deleteSpeechModalVisible}
-        onCancel={() => setDeleteSpeechModalVisible(false)}
-        onConfirm={handleDeleteSpeech}
-        confirmText="Delete"
-        danger={true}
-      />
+        <HardConfirmationModal
+          title="Delete Speech"
+          message={`Are you sure you want to delete "${speechData.title}"?`}
+          subMessage="This will delete the speech and all its versions. This action cannot be undone."
+          open={deleteSpeechModalVisible}
+          onCancel={() => setDeleteSpeechModalVisible(false)}
+          onConfirm={handleDeleteSpeech}
+          confirmText="Delete"
+          danger={true}
+        />
+      </Slate>
     </>
   );
 }

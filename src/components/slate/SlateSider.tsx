@@ -2,6 +2,7 @@ import { SpeechVersion } from "@/types/speech";
 import SlateVersions from "./SlateVersions";
 import { useState } from "react";
 import {
+  EditOutlined,
   HistoryOutlined,
   MessageOutlined,
   SnippetsOutlined,
@@ -9,6 +10,7 @@ import {
 import { useTheme } from "@/contexts/ThemeContext";
 import SlateAIChat from "./SlateAIChat";
 import SlateTemplates from "./SlateTemplates";
+import SlateSiderMenu from "./SlateSiderMenu";
 
 interface SlateSiderProps {
   versions: SpeechVersion[];
@@ -18,9 +20,11 @@ interface SlateSiderProps {
   refreshSpeechData: () => Promise<void>;
   speechId: string;
   setCollapsed: (collapsed: boolean) => void;
+  structuredViewOpen: boolean;
+  setStructuredViewOpen: (open: boolean) => void;
 }
 
-type Tab = "versions" | "chat" | "templates";
+type Tab = "versions" | "chat" | "templates" | "editor";
 
 export default function SlateSider({
   versions,
@@ -30,6 +34,8 @@ export default function SlateSider({
   refreshSpeechData,
   speechId,
   setCollapsed,
+  structuredViewOpen,
+  setStructuredViewOpen,
 }: SlateSiderProps) {
   const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState<Tab>("versions");
@@ -49,6 +55,11 @@ export default function SlateSider({
       id: "templates" as Tab,
       icon: <SnippetsOutlined />,
       label: "Templates",
+    },
+    {
+      id: "editor" as Tab,
+      icon: <EditOutlined />,
+      label: "Editor",
     },
   ];
 
@@ -93,6 +104,12 @@ export default function SlateSider({
         )}
         {activeTab === "chat" && <SlateAIChat />}
         {activeTab === "templates" && <SlateTemplates />}
+        {activeTab === "editor" && (
+          <SlateSiderMenu
+            structuredViewOpen={structuredViewOpen}
+            setStructuredViewOpen={setStructuredViewOpen}
+          />
+        )}
       </div>
     </div>
   );
