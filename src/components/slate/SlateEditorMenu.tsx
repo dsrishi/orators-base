@@ -46,6 +46,7 @@ type CustomText = {
   underline?: boolean;
   strikethrough?: boolean;
   highlight?: boolean;
+  highlightColor?: string;
   color?: string;
 };
 
@@ -60,7 +61,13 @@ type BlockFormat =
   | "align-justify"
   | "ordered-list"
   | "bullet-list";
-type MarkFormat = "bold" | "italic" | "underline" | "highlight" | "color";
+type MarkFormat =
+  | "bold"
+  | "italic"
+  | "underline"
+  | "highlight"
+  | "color"
+  | "highlightColor";
 type Format = BlockFormat | MarkFormat;
 
 declare module "slate" {
@@ -271,6 +278,82 @@ const toggleList = (editor: Editor, format: "ordered-list" | "bullet-list") => {
   }
 };
 
+const toggleHighlightColor = (editor: Editor, color: string) => {
+  const isActive = isMarkActive(editor, "highlight");
+  const currentColor = Editor.marks(editor)?.highlightColor;
+
+  if (color === "default") {
+    Editor.removeMark(editor, "highlightColor");
+    if (!isActive) {
+      Editor.addMark(editor, "highlight", true);
+    }
+  } else if (isActive && currentColor === color) {
+    Editor.removeMark(editor, "highlight");
+    Editor.removeMark(editor, "highlightColor");
+  } else {
+    Editor.addMark(editor, "highlight", true);
+    Editor.addMark(editor, "highlightColor", color);
+  }
+};
+
+const getHighlightColorMark = (editor: Editor) => {
+  const marks = Editor.marks(editor);
+  return marks?.highlightColor || "";
+};
+
+const HighlightColorPopoverContent = () => {
+  const editor = useSlate();
+  const currentColor = getHighlightColorMark(editor);
+  const isHighlightActive = isMarkActive(editor, "highlight");
+
+  const HIGHLIGHT_COLORS = [
+    "#ffff00", // Yellow (default)
+    "#90ee90", // Light green
+    "#add8e6", // Light blue
+    "#ffb6c1", // Light pink
+    "#d8bfd8", // Thistle
+    "#ffa500", // Orange
+    "#ff7f50", // Coral
+    "#00ffff", // Cyan
+  ];
+
+  return (
+    <>
+      <div className="flex flex-wrap gap-2 p-2 max-w-[200px]">
+        {/* Remove highlight button */}
+        <Tooltip title="Remove Highlight">
+          <div
+            className="w-6 h-6 rounded cursor-pointer hover:opacity-80 border border-gray-300 flex items-center justify-center"
+            onClick={() => {
+              Editor.removeMark(editor, "highlight");
+              Editor.removeMark(editor, "highlightColor");
+            }}
+          >
+            X
+          </div>
+        </Tooltip>
+
+        {/* Other color options */}
+        {HIGHLIGHT_COLORS.map((color) => (
+          <div
+            key={color}
+            className="w-6 h-6 rounded cursor-pointer hover:opacity-80 border border-gray-300"
+            style={{
+              backgroundColor: color,
+              outlineOffset: "2px",
+              outline:
+                isHighlightActive && currentColor === color
+                  ? "2px solid oklch(62.7% 0.265 303.9)"
+                  : "none",
+            }}
+            onClick={() => toggleHighlightColor(editor, color)}
+          />
+        ))}
+      </div>
+    </>
+  );
+};
+
 const toggleColor = (editor: Editor, color: string) => {
   const isActive = isMarkActive(editor, "color");
   const currentColor = Editor.marks(editor)?.color;
@@ -414,7 +497,6 @@ export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
             <FormatButton format="bold" icon={<BoldOutlined />} />
             <FormatButton format="italic" icon={<ItalicOutlined />} />
             <FormatButton format="underline" icon={<UnderlineOutlined />} />
-            <FormatButton format="highlight" icon={<HighlightOutlined />} />
 
             <Divider type="vertical" />
 
@@ -437,6 +519,22 @@ export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
                   <FontColorsOutlined
                     style={{
                       color: getColorMark(editor) || "",
+                    }}
+                  />
+                }
+              />
+            </Popover>
+
+            <Popover
+              content={<HighlightColorPopoverContent />}
+              trigger="click"
+              placement="bottom"
+            >
+              <Button
+                icon={
+                  <HighlightOutlined
+                    style={{
+                      color: getHighlightColorMark(editor) || "",
                     }}
                   />
                 }

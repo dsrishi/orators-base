@@ -16,6 +16,7 @@ type CustomText = {
   italic?: boolean;
   underline?: boolean;
   highlight?: boolean;
+  highlightColor?: string;
   color?: string;
 };
 
@@ -102,7 +103,11 @@ const Leaf = ({
   }
 
   if (leaf.highlight) {
-    renderedChildren = <mark>{renderedChildren}</mark>;
+    renderedChildren = (
+      <mark style={{ backgroundColor: leaf.highlightColor || "#ffff00" }}>
+        {renderedChildren}
+      </mark>
+    );
   }
 
   if (leaf.color) {
