@@ -241,8 +241,6 @@ const toggleColor = (editor: Editor, color: string) => {
   const isActive = isMarkActive(editor, "color");
   const currentColor = Editor.marks(editor)?.color;
 
-  console.log(currentColor);
-
   if (color === "default") {
     console.log("default");
 
@@ -414,14 +412,13 @@ export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
               placement="bottom"
             >
               <Button
-                icon={<FontColorsOutlined />}
-                style={{
-                  backgroundColor: isMarkActive(editor, "color")
-                    ? theme === "dark"
-                      ? "#4f4f4f"
-                      : "#ece6f8"
-                    : "",
-                }}
+                icon={
+                  <FontColorsOutlined
+                    style={{
+                      color: getColorMark(editor) || "",
+                    }}
+                  />
+                }
               />
             </Popover>
 

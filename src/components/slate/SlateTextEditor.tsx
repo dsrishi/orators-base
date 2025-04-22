@@ -163,7 +163,6 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
         // Insert the fetched text
         Transforms.insertText(editor, content);
       } else {
-        console.log("no selection");
         // Find the last text node's path
         // Set selection to document end if no selection exists
         const end = Editor.end(editor, []);
