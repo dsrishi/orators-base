@@ -279,14 +279,6 @@ const toggleList = (editor: Editor, format: "ordered-list" | "bullet-list") => {
   }
 };
 
-const toggleStructure = (editor: Editor, structure: string) => {
-  if (structure === "remove") {
-    Editor.removeMark(editor, "structure");
-  } else {
-    Editor.addMark(editor, "structure", structure);
-  }
-};
-
 const toggleHighlightColor = (editor: Editor, color: string) => {
   const isActive = isMarkActive(editor, "highlight");
   const currentColor = Editor.marks(editor)?.highlightColor;
@@ -430,7 +422,13 @@ const ColorPopoverContent = () => {
   );
 };
 
-export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
+export default function SlateEditorMenu({
+  collapsed,
+  setCollapsed,
+}: {
+  collapsed: boolean;
+  setCollapsed: (collapsed: boolean) => void;
+}) {
   const { theme } = useTheme();
   const editor = useSlate();
 
@@ -485,19 +483,6 @@ export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
           icon={<OrderedListOutlined />}
           isBlock={true}
         />
-      </div>
-    );
-  };
-
-  const StructurePopoverContent = () => {
-    return (
-      <div className="flex items-center justify-center gap-2">
-        <Button onClick={() => toggleStructure(editor, "opening")}>
-          Opening
-        </Button>
-        <Button onClick={() => toggleStructure(editor, "closing")}>
-          Closing
-        </Button>
       </div>
     );
   };
@@ -613,14 +598,10 @@ export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
             />
 
             <Divider type="vertical" />
-
-            <Popover
-              content={<StructurePopoverContent />}
-              trigger="click"
-              placement="bottom"
-            >
-              <Button icon={<GroupOutlined />} />
-            </Popover>
+            <Button
+              icon={<GroupOutlined />}
+              onClick={() => collapsed && setCollapsed(false)}
+            />
           </div>
         </div>
       </div>

@@ -23,6 +23,7 @@ type CustomText = {
 
 type SlateTextEditorProps = {
   collapsed: boolean;
+  setCollapsed: (collapsed: boolean) => void;
   isRecordingModalOpen: boolean;
   setIsRecordingModalOpen: (open: boolean) => void;
   structuredViewOpen: boolean;
@@ -30,6 +31,7 @@ type SlateTextEditorProps = {
 
 const SlateEditor: React.FC<SlateTextEditorProps> = ({
   collapsed,
+  setCollapsed,
   isRecordingModalOpen,
   setIsRecordingModalOpen,
   structuredViewOpen,
@@ -190,7 +192,7 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
   return (
     <>
       <div>
-        <SlateEditorMenu collapsed={collapsed} />
+        <SlateEditorMenu collapsed={collapsed} setCollapsed={setCollapsed} />
         <div
           className="lg:p-16 md:p-12 sm:p-8 p-4 rounded max-w-[1000px] mx-auto slate"
           style={{

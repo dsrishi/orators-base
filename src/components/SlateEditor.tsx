@@ -283,6 +283,7 @@ export default function SlateEditor({
             <div className="mt-16 px-3 pt-2 pb-16">
               <SlateTextEditor
                 collapsed={collapsed}
+                setCollapsed={setCollapsed}
                 isRecordingModalOpen={isRecordingModalOpen}
                 setIsRecordingModalOpen={setIsRecordingModalOpen}
                 structuredViewOpen={structuredViewOpen}
