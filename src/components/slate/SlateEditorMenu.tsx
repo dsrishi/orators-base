@@ -16,6 +16,8 @@ import {
   UndoOutlined,
   RedoOutlined,
   FontColorsOutlined,
+  HighlightOutlined,
+  MenuOutlined,
 } from "@ant-design/icons";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -29,6 +31,7 @@ type CustomElement = {
     | "align-left"
     | "align-center"
     | "align-right"
+    | "align-justify"
     | "ordered-list"
     | "bullet-list"
     | "list-item";
@@ -54,6 +57,7 @@ type BlockFormat =
   | "align-left"
   | "align-center"
   | "align-right"
+  | "align-justify"
   | "ordered-list"
   | "bullet-list";
 type MarkFormat = "bold" | "italic" | "underline" | "highlight" | "color";
@@ -76,6 +80,7 @@ const isBlockFormat = (format: Format): format is BlockFormat => {
     "align-left",
     "align-center",
     "align-right",
+    "align-justify",
     "ordered-list",
     "bullet-list",
   ].includes(format);
@@ -156,7 +161,11 @@ const toggleBlock = (editor: Editor, format: BlockFormat) => {
 
 const toggleAlign = (editor: Editor, format: BlockFormat) => {
   // Extract the alignment value from the format
-  const alignValue = format.split("-")[1] as "left" | "center" | "right";
+  const alignValue = format.split("-")[1] as
+    | "left"
+    | "center"
+    | "right"
+    | "justify";
 
   // Check if this alignment is already active
   const isActive = isAlignActive(editor, alignValue);
@@ -205,7 +214,11 @@ const toggleMark = (editor: Editor, format: MarkFormat) => {
 const isBlockActive = (editor: Editor, format: BlockFormat) => {
   // If it's an alignment format, use isAlignActive instead
   if (format.startsWith("align-")) {
-    const alignValue = format.split("-")[1] as "left" | "center" | "right";
+    const alignValue = format.split("-")[1] as
+      | "left"
+      | "center"
+      | "right"
+      | "justify";
     return isAlignActive(editor, alignValue);
   }
 
@@ -263,8 +276,6 @@ const toggleColor = (editor: Editor, color: string) => {
   const currentColor = Editor.marks(editor)?.color;
 
   if (color === "default") {
-    console.log("default");
-
     Editor.removeMark(editor, "color");
   } else if (isActive && currentColor === color) {
     Editor.removeMark(editor, "color");
@@ -349,6 +360,11 @@ export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
           icon={<AlignRightOutlined />}
           isBlock={true}
         />
+        <FormatButton
+          format="align-justify"
+          icon={<MenuOutlined />}
+          isBlock={true}
+        />
       </div>
     );
   };
@@ -398,6 +414,7 @@ export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
             <FormatButton format="bold" icon={<BoldOutlined />} />
             <FormatButton format="italic" icon={<ItalicOutlined />} />
             <FormatButton format="underline" icon={<UnderlineOutlined />} />
+            <FormatButton format="highlight" icon={<HighlightOutlined />} />
 
             <Divider type="vertical" />
 
@@ -408,23 +425,6 @@ export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
               placement="bottom"
             >
               <Button icon={<FontSizeOutlined />} />
-            </Popover>
-            <Popover
-              content={<AlignPopoverContent />}
-              trigger="click"
-              placement="bottom"
-            >
-              <Button
-                icon={
-                  isBlockActive(editor, "align-right") ? (
-                    <AlignRightOutlined />
-                  ) : isBlockActive(editor, "align-center") ? (
-                    <AlignCenterOutlined />
-                  ) : (
-                    <AlignLeftOutlined />
-                  )
-                }
-              />
             </Popover>
 
             <Popover
@@ -449,6 +449,26 @@ export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
               placement="bottom"
             >
               <Button icon={<UnorderedListOutlined />} />
+            </Popover>
+
+            <Popover
+              content={<AlignPopoverContent />}
+              trigger="click"
+              placement="bottom"
+            >
+              <Button
+                icon={
+                  isBlockActive(editor, "align-right") ? (
+                    <AlignRightOutlined />
+                  ) : isBlockActive(editor, "align-center") ? (
+                    <AlignCenterOutlined />
+                  ) : isBlockActive(editor, "align-justify") ? (
+                    <MenuOutlined />
+                  ) : (
+                    <AlignLeftOutlined />
+                  )
+                }
+              />
             </Popover>
 
             <Divider type="vertical" />
