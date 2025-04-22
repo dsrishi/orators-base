@@ -155,19 +155,18 @@ const toggleBlock = (editor: Editor, format: BlockFormat) => {
 };
 
 const toggleAlign = (editor: Editor, format: BlockFormat) => {
-  const isActive = isBlockActive(editor, format);
+  // Extract the alignment value from the format
+  const alignValue = format.split("-")[1] as "left" | "center" | "right";
 
-  Transforms.unwrapNodes(editor, {
-    match: (n): n is CustomElement =>
-      !Editor.isEditor(n) &&
-      SlateElement.isElement(n) &&
-      ["align-left", "align-center", "align-right"].includes(n.type as string),
-    split: true,
-  });
+  // Check if this alignment is already active
+  const isActive = isAlignActive(editor, alignValue);
 
+  // Apply the alignment as a property rather than changing the block type
   Transforms.setNodes<CustomElement>(
     editor,
-    { type: isActive ? "paragraph" : format },
+    {
+      align: isActive ? undefined : alignValue,
+    },
     {
       match: (n): n is CustomElement =>
         !Editor.isEditor(n) &&
@@ -175,6 +174,22 @@ const toggleAlign = (editor: Editor, format: BlockFormat) => {
         Editor.isBlock(editor, n),
     }
   );
+};
+
+// Add a function to check if an alignment is active
+const isAlignActive = (editor: Editor, align: string) => {
+  const { selection } = editor;
+  if (!selection) return false;
+
+  const [match] = Editor.nodes(editor, {
+    at: Editor.unhangRange(editor, selection),
+    match: (n): n is CustomElement =>
+      !Editor.isEditor(n) &&
+      SlateElement.isElement(n) &&
+      (n as CustomElement).align === align,
+  });
+
+  return !!match;
 };
 
 const toggleMark = (editor: Editor, format: MarkFormat) => {
@@ -188,6 +203,12 @@ const toggleMark = (editor: Editor, format: MarkFormat) => {
 };
 
 const isBlockActive = (editor: Editor, format: BlockFormat) => {
+  // If it's an alignment format, use isAlignActive instead
+  if (format.startsWith("align-")) {
+    const alignValue = format.split("-")[1] as "left" | "center" | "right";
+    return isAlignActive(editor, alignValue);
+  }
+
   const { selection } = editor;
   if (!selection) return false;
 
