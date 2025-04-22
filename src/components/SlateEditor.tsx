@@ -329,6 +329,7 @@ export default function SlateEditor({
           open={drawerOpen}
           onClose={() => setDrawerOpen(false)}
           speechData={speechData}
+          content={value}
           key={drawerOpen ? "open-drawer" : "closed-drawer"}
         />
 

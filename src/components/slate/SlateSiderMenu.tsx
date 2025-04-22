@@ -14,7 +14,7 @@ export default function SlateSiderMenu({
   const editor = useSlate();
 
   const toggleStructure = (editor: Editor, structure: string) => {
-    if (structure === "remove") {
+    if (structure === "clear") {
       Editor.removeMark(editor, "structure");
     } else {
       Editor.addMark(editor, "structure", structure);
@@ -35,20 +35,42 @@ export default function SlateSiderMenu({
       </div>
       <div className="px-4">
         <div className="text-sm text-gray-500 mb-3">Basic Structures</div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 mb-4">
           <Button
+            type="text"
+            style={{ backgroundColor: "oklch(92.5% 0.084 155.995)" }}
             disabled={!structuredViewOpen}
             onClick={() => toggleStructure(editor, "opening")}
           >
             Opening
           </Button>
           <Button
+            type="text"
+            style={{ backgroundColor: "oklch(93.6% 0.032 17.717)" }}
             disabled={!structuredViewOpen}
             onClick={() => toggleStructure(editor, "conclusion")}
           >
             Conclusion
           </Button>
           <Button
+            type="text"
+            style={{ backgroundColor: "oklch(97.3% 0.071 103.193)" }}
+            disabled={!structuredViewOpen}
+            onClick={() => toggleStructure(editor, "body")}
+          >
+            Body
+          </Button>
+          <Button
+            type="text"
+            style={{ backgroundColor: "oklch(94.6% 0.033 307.174)" }}
+            disabled={!structuredViewOpen}
+            onClick={() => toggleStructure(editor, "transitions")}
+          >
+            Transitions
+          </Button>
+          <Button
+            type="text"
+            style={{ backgroundColor: "oklch(93.2% 0.032 255.585)" }}
             disabled={!structuredViewOpen}
             onClick={() => toggleStructure(editor, "greeting")}
           >
@@ -56,18 +78,11 @@ export default function SlateSiderMenu({
           </Button>
           <Button
             disabled={!structuredViewOpen}
-            onClick={() => toggleStructure(editor, "body")}
+            onClick={() => toggleStructure(editor, "clear")}
           >
-            Body
+            Clear
           </Button>
         </div>
-        <Button
-          className="w-full mb-4 mt-2"
-          disabled={!structuredViewOpen}
-          onClick={() => toggleStructure(editor, "remove")}
-        >
-          Remove
-        </Button>
 
         <div className="text-sm text-gray-500 mb-3">Elements</div>
         <div className="grid grid-cols-2 gap-2 mb-4">

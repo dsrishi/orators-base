@@ -93,9 +93,15 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
 
   const getStructureColor = (structure: string) => {
     if (structure === "opening") {
-      return "#ccc";
-    } else if (structure === "closing") {
-      return "#444";
+      return "oklch(92.5% 0.084 155.995)";
+    } else if (structure === "conclusion") {
+      return "oklch(93.6% 0.032 17.717)";
+    } else if (structure === "body") {
+      return "oklch(97.3% 0.071 103.193)";
+    } else if (structure === "transitions") {
+      return "oklch(94.6% 0.033 307.174)";
+    } else if (structure === "greeting") {
+      return "oklch(93.2% 0.032 255.585)";
     } else {
       return "transparent";
     }
@@ -153,11 +159,6 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
             padding: structuredViewOpen ? "8px" : "0px",
           }}
         >
-          {structuredViewOpen && (
-            <span className="text-xs text-gray-500">
-              {leaf.structure === "opening" ? "Opening" : "Closing"}
-            </span>
-          )}
           <span>{renderedChildren}</span>
         </span>
       );

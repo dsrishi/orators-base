@@ -1,17 +1,20 @@
 import { Drawer } from "antd";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Speech } from "@/types/speech";
+import { Descendant } from "slate";
 
 interface SlateAnalyseDrawerProps {
   open: boolean;
   onClose: () => void;
   speechData: Speech;
+  content: Descendant[];
 }
 
 export default function SlateAnalyseDrawer({
   open,
   onClose,
   speechData,
+  content,
 }: SlateAnalyseDrawerProps) {
   const { theme } = useTheme();
 
