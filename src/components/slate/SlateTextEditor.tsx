@@ -15,6 +15,8 @@ type CustomText = {
   bold?: boolean;
   italic?: boolean;
   underline?: boolean;
+  highlight?: boolean;
+  color?: string;
 };
 
 type SlateTextEditorProps = {
@@ -50,6 +52,20 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
           {children}
         </h3>
       );
+    case "ordered-list":
+      return (
+        <ol {...attributes} style={style}>
+          {children}
+        </ol>
+      );
+    case "bullet-list":
+      return (
+        <ul {...attributes} style={style}>
+          {children}
+        </ul>
+      );
+    case "list-item":
+      return <li {...attributes}>{children}</li>;
     default:
       return (
         <p {...attributes} style={style}>
@@ -83,6 +99,16 @@ const Leaf = ({
 
   if (leaf.underline) {
     renderedChildren = <u>{renderedChildren}</u>;
+  }
+
+  if (leaf.highlight) {
+    renderedChildren = <mark>{renderedChildren}</mark>;
+  }
+
+  if (leaf.color) {
+    renderedChildren = (
+      <span style={{ color: leaf.color }}>{renderedChildren}</span>
+    );
   }
 
   return <span {...attributes}>{renderedChildren}</span>;
@@ -157,7 +183,7 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
         >
           <SlateEditorMenu collapsed={collapsed} />
           <div
-            className="lg:p-16 md:p-12 sm:p-8 p-4 rounded max-w-[1000px] mx-auto"
+            className="lg:p-16 md:p-12 sm:p-8 p-4 rounded max-w-[1000px] mx-auto slate"
             style={{
               backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
             }}

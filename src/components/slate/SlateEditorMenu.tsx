@@ -2,7 +2,7 @@ import React from "react";
 import { Editor, Transforms, Element as SlateElement, BaseEditor } from "slate";
 import { useSlate } from "slate-react";
 import { HistoryEditor } from "slate-history";
-import { Button, Divider, Popover } from "antd";
+import { Button, Divider, Popover, Tooltip } from "antd";
 import {
   BoldOutlined,
   ItalicOutlined,
@@ -11,6 +11,11 @@ import {
   AlignCenterOutlined,
   AlignRightOutlined,
   FontSizeOutlined,
+  OrderedListOutlined,
+  UnorderedListOutlined,
+  UndoOutlined,
+  RedoOutlined,
+  FontColorsOutlined,
 } from "@ant-design/icons";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -23,7 +28,10 @@ type CustomElement = {
     | "heading-three"
     | "align-left"
     | "align-center"
-    | "align-right";
+    | "align-right"
+    | "ordered-list"
+    | "bullet-list"
+    | "list-item";
   children: CustomText[];
   align?: string;
 };
@@ -34,6 +42,8 @@ type CustomText = {
   italic?: boolean;
   underline?: boolean;
   strikethrough?: boolean;
+  highlight?: boolean;
+  color?: string;
 };
 
 type BlockFormat =
@@ -43,8 +53,10 @@ type BlockFormat =
   | "paragraph"
   | "align-left"
   | "align-center"
-  | "align-right";
-type MarkFormat = "bold" | "italic" | "underline";
+  | "align-right"
+  | "ordered-list"
+  | "bullet-list";
+type MarkFormat = "bold" | "italic" | "underline" | "highlight" | "color";
 type Format = BlockFormat | MarkFormat;
 
 declare module "slate" {
@@ -64,6 +76,8 @@ const isBlockFormat = (format: Format): format is BlockFormat => {
     "align-left",
     "align-center",
     "align-right",
+    "ordered-list",
+    "bullet-list",
   ].includes(format);
 };
 
@@ -71,6 +85,8 @@ const handleFormatClick = (editor: Editor, format: Format) => {
   if (isBlockFormat(format)) {
     if (format.startsWith("align-")) {
       toggleAlign(editor, format);
+    } else if (format === "ordered-list" || format === "bullet-list") {
+      toggleList(editor, format);
     } else {
       toggleBlock(editor, format);
     }
@@ -191,6 +207,107 @@ const isMarkActive = (editor: Editor, format: MarkFormat) => {
   return marks ? marks[format] === true : false;
 };
 
+const toggleList = (editor: Editor, format: "ordered-list" | "bullet-list") => {
+  const isActive = isBlockActive(editor, format);
+
+  console.log(format);
+
+  Transforms.unwrapNodes(editor, {
+    match: (n): n is CustomElement =>
+      !Editor.isEditor(n) &&
+      SlateElement.isElement(n) &&
+      ["ordered-list", "bullet-list"].includes(n.type as string),
+    split: true,
+  });
+
+  Transforms.setNodes<CustomElement>(
+    editor,
+    { type: isActive ? "paragraph" : "list-item" },
+    {
+      match: (n): n is CustomElement =>
+        !Editor.isEditor(n) &&
+        SlateElement.isElement(n) &&
+        Editor.isBlock(editor, n),
+    }
+  );
+
+  if (!isActive) {
+    const block = { type: format, children: [] };
+    Transforms.wrapNodes(editor, block);
+  }
+};
+
+const toggleColor = (editor: Editor, color: string) => {
+  const isActive = isMarkActive(editor, "color");
+  const currentColor = Editor.marks(editor)?.color;
+
+  console.log(currentColor);
+
+  if (color === "default") {
+    console.log("default");
+
+    Editor.removeMark(editor, "color");
+  } else if (isActive && currentColor === color) {
+    Editor.removeMark(editor, "color");
+  } else {
+    Editor.addMark(editor, "color", color);
+  }
+};
+
+const getColorMark = (editor: Editor) => {
+  const marks = Editor.marks(editor);
+  return marks?.color || "#000000";
+};
+
+const ColorPopoverContent = () => {
+  const editor = useSlate();
+  const currentColor = getColorMark(editor);
+
+  const COLORS = [
+    "#000000", // Black
+    "#ffffff", // White
+    "#ff0000", // Red
+    "#00ff00", // Green
+    "#0000ff", // Blue
+    "#ffff00", // Yellow
+    "#00ffff", // Cyan
+    "#ff00ff", // Magenta
+    "#c0c0c0", // Silver
+    "#808080", // Gray
+  ];
+
+  return (
+    <>
+      <div className="flex flex-wrap gap-2 p-2 max-w-[200px]">
+        {/* Add default theme color button */}
+        <Tooltip title="Default">
+          <div
+            className="w-6 h-6 rounded cursor-pointer hover:opacity-80 border border-gray-300 flex items-center justify-center"
+            onClick={() => toggleColor(editor, "default")}
+          >
+            X
+          </div>
+        </Tooltip>
+        {COLORS.map((color) => (
+          <div
+            key={color}
+            className="w-6 h-6 rounded cursor-pointer hover:opacity-80 border border-gray-300"
+            style={{
+              backgroundColor: color,
+              outlineOffset: "2px",
+              outline:
+                currentColor === color
+                  ? "2px solid oklch(62.7% 0.265 303.9)"
+                  : "none",
+            }}
+            onClick={() => toggleColor(editor, color)}
+          />
+        ))}
+      </div>
+    </>
+  );
+};
+
 export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
   const { theme } = useTheme();
   const editor = useSlate();
@@ -228,6 +345,22 @@ export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
     );
   };
 
+  const ListPopoverContent = () => {
+    return (
+      <div className="flex items-center justify-center gap-2">
+        <FormatButton
+          format="bullet-list"
+          icon={<UnorderedListOutlined />}
+          isBlock={true}
+        />
+        <FormatButton
+          format="ordered-list"
+          icon={<OrderedListOutlined />}
+          isBlock={true}
+        />
+      </div>
+    );
+  };
   return (
     <div
       className="fixed mx-auto px-3 py-1 z-10 top-[64px]"
@@ -239,9 +372,7 @@ export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
       <div className="flex items-center justify-center">
         <div
           className="p-2 shadow-md rounded-md"
-          style={{
-            backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
-          }}
+          style={{ backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff" }}
         >
           <div className="flex items-center justify-center gap-2">
             {/* Text formatting controls */}
@@ -276,6 +407,51 @@ export default function SlateEditorMenu({ collapsed }: { collapsed: boolean }) {
                 }
               />
             </Popover>
+
+            <Popover
+              content={<ColorPopoverContent />}
+              trigger="click"
+              placement="bottom"
+            >
+              <Button
+                icon={<FontColorsOutlined />}
+                style={{
+                  backgroundColor: isMarkActive(editor, "color")
+                    ? theme === "dark"
+                      ? "#4f4f4f"
+                      : "#ece6f8"
+                    : "",
+                }}
+              />
+            </Popover>
+
+            <Popover
+              content={<ListPopoverContent />}
+              trigger="click"
+              placement="bottom"
+            >
+              <Button icon={<UnorderedListOutlined />} />
+            </Popover>
+
+            <Divider type="vertical" />
+
+            {/* Undo/Redo */}
+            <Button
+              icon={<UndoOutlined />}
+              onClick={(event) => {
+                event.preventDefault();
+                editor.undo();
+              }}
+              disabled={!editor.history.undos.length}
+            />
+            <Button
+              icon={<RedoOutlined />}
+              onClick={(event) => {
+                event.preventDefault();
+                editor.redo();
+              }}
+              disabled={!editor.history.redos.length}
+            />
           </div>
         </div>
       </div>
