@@ -83,10 +83,6 @@ export function getSpeechMetrics(
   }, words[0]);
   const shortestWordLength = shortestWord.length;
   
-  
-  
-  
-  
   return {
     wordCount,
     characterCount,

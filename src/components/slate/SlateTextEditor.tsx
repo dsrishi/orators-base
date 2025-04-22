@@ -155,11 +155,9 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
             backgroundColor: structuredViewOpen
               ? getStructureColor(leaf.structure)
               : "transparent",
-            display: structuredViewOpen ? "block" : "inline",
-            padding: structuredViewOpen ? "8px" : "0px",
           }}
         >
-          <span>{renderedChildren}</span>
+          {renderedChildren}
         </span>
       );
     }

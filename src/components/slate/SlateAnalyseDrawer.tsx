@@ -2,6 +2,8 @@ import { Drawer } from "antd";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Speech } from "@/types/speech";
 import { Descendant } from "slate";
+import SlateBasicStats from "../analysis/SlateBasicStats";
+import StructuresStats from "../analysis/StructuresStats";
 
 interface SlateAnalyseDrawerProps {
   open: boolean;
@@ -20,7 +22,7 @@ export default function SlateAnalyseDrawer({
 
   return (
     <Drawer
-      title="Speech Analysis"
+      title={`Speech Analysis for ${speechData.title}`}
       placement="right"
       width={900}
       onClose={onClose}
@@ -50,7 +52,8 @@ export default function SlateAnalyseDrawer({
         },
       }}
     >
-      {speechData.title}
+      <SlateBasicStats content={content} speechData={speechData} />
+      <StructuresStats content={content} speechData={speechData} />
     </Drawer>
   );
 }
