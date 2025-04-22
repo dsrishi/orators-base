@@ -27,6 +27,8 @@ interface SlateEditorProps {
   versions: SpeechVersion[];
 }
 
+type Tab = "versions" | "chat" | "templates" | "editor";
+
 export default function SlateEditor({
   speechId,
   speechData: initialSpeechData,
@@ -59,6 +61,7 @@ export default function SlateEditor({
   );
 
   const [collapsed, setCollapsed] = useState(initialVersions.length <= 1);
+  const [collapsedMenu, setCollapsedMenu] = useState<Tab>("versions");
   const [saving, setSaving] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [isComingSoonModalOpen, setIsComingSoonModalOpen] = useState(false);
@@ -268,7 +271,10 @@ export default function SlateEditor({
               handleVersionChange={handleVersionChange}
               refreshSpeechData={refreshSpeechData}
               speechId={speechId}
+              collapsed={collapsed}
               setCollapsed={setCollapsed}
+              collapsedMenu={collapsedMenu}
+              setCollapsedMenu={setCollapsedMenu}
               structuredViewOpen={structuredViewOpen}
               setStructuredViewOpen={setStructuredViewOpen}
             />
@@ -287,6 +293,7 @@ export default function SlateEditor({
                 isRecordingModalOpen={isRecordingModalOpen}
                 setIsRecordingModalOpen={setIsRecordingModalOpen}
                 structuredViewOpen={structuredViewOpen}
+                setCollapsedMenu={setCollapsedMenu}
               />
             </div>
           </Content>

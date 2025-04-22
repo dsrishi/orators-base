@@ -422,12 +422,16 @@ const ColorPopoverContent = () => {
   );
 };
 
+type Tab = "versions" | "chat" | "templates" | "editor";
+
 export default function SlateEditorMenu({
   collapsed,
   setCollapsed,
+  setCollapsedMenu,
 }: {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
+  setCollapsedMenu: (collapsed: Tab) => void;
 }) {
   const { theme } = useTheme();
   const editor = useSlate();
@@ -485,6 +489,13 @@ export default function SlateEditorMenu({
         />
       </div>
     );
+  };
+
+  const handleEditorClick = () => {
+    if (collapsed) {
+      setCollapsed(false);
+    }
+    setCollapsedMenu("editor");
   };
 
   return (
@@ -598,10 +609,7 @@ export default function SlateEditorMenu({
             />
 
             <Divider type="vertical" />
-            <Button
-              icon={<GroupOutlined />}
-              onClick={() => collapsed && setCollapsed(false)}
-            />
+            <Button icon={<GroupOutlined />} onClick={handleEditorClick} />
           </div>
         </div>
       </div>

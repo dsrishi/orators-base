@@ -27,7 +27,10 @@ type SlateTextEditorProps = {
   isRecordingModalOpen: boolean;
   setIsRecordingModalOpen: (open: boolean) => void;
   structuredViewOpen: boolean;
+  setCollapsedMenu: (collapsed: Tab) => void;
 };
+
+type Tab = "versions" | "chat" | "templates" | "editor";
 
 const SlateEditor: React.FC<SlateTextEditorProps> = ({
   collapsed,
@@ -35,6 +38,7 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
   isRecordingModalOpen,
   setIsRecordingModalOpen,
   structuredViewOpen,
+  setCollapsedMenu,
 }) => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const { theme } = useTheme();
@@ -192,7 +196,11 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
   return (
     <>
       <div>
-        <SlateEditorMenu collapsed={collapsed} setCollapsed={setCollapsed} />
+        <SlateEditorMenu
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          setCollapsedMenu={setCollapsedMenu}
+        />
         <div
           className="lg:p-16 md:p-12 sm:p-8 p-4 rounded max-w-[1000px] mx-auto slate"
           style={{
