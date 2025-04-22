@@ -35,28 +35,50 @@ export default function SlateSiderMenu({
       </div>
       <div className="px-4">
         <div className="text-sm text-gray-500 mb-3">Basic Structures</div>
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          <Button onClick={() => toggleStructure(editor, "opening")}>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            disabled={!structuredViewOpen}
+            onClick={() => toggleStructure(editor, "opening")}
+          >
             Opening
           </Button>
-          <Button onClick={() => toggleStructure(editor, "greeting")}>
+          <Button
+            disabled={!structuredViewOpen}
+            onClick={() => toggleStructure(editor, "conclusion")}
+          >
+            Conclusion
+          </Button>
+          <Button
+            disabled={!structuredViewOpen}
+            onClick={() => toggleStructure(editor, "greeting")}
+          >
             Greeting
           </Button>
-          <Button onClick={() => toggleStructure(editor, "body")}>Body</Button>
-          <Button onClick={() => toggleStructure(editor, "closing")}>
-            Closing
+          <Button
+            disabled={!structuredViewOpen}
+            onClick={() => toggleStructure(editor, "body")}
+          >
+            Body
           </Button>
         </div>
+        <Button
+          className="w-full mb-4 mt-2"
+          disabled={!structuredViewOpen}
+          onClick={() => toggleStructure(editor, "remove")}
+        >
+          Remove
+        </Button>
+
         <div className="text-sm text-gray-500 mb-3">Elements</div>
         <div className="grid grid-cols-2 gap-2 mb-4">
-          <Button>Joke</Button>
-          <Button>Story</Button>
-          <Button>Fact</Button>
-          <Button>Statistic</Button>
-          <Button>Quote</Button>
-          <Button>Question</Button>
-          <Button>Answer</Button>
-          <Button>Conclusion</Button>
+          <Button disabled={!structuredViewOpen}>Joke</Button>
+          <Button disabled={!structuredViewOpen}>Story</Button>
+          <Button disabled={!structuredViewOpen}>Fact</Button>
+          <Button disabled={!structuredViewOpen}>Statistic</Button>
+          <Button disabled={!structuredViewOpen}>Quote</Button>
+          <Button disabled={!structuredViewOpen}>Question</Button>
+          <Button disabled={!structuredViewOpen}>Answer</Button>
+          <Button disabled={!structuredViewOpen}>Conclusion</Button>
         </div>
       </div>
     </div>
