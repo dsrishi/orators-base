@@ -4,7 +4,6 @@ import { Speech } from "@/types/speech";
 import { Descendant } from "slate";
 import SlateBasicStats from "../analysis/SlateBasicStats";
 import StructuresStats from "../analysis/StructuresStats";
-
 interface SlateAnalyseDrawerProps {
   open: boolean;
   onClose: () => void;

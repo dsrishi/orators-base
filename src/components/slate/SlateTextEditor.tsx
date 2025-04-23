@@ -150,14 +150,13 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
     if (leaf.structure) {
       renderedChildren = (
         <span
-          id="structure"
           style={{
             backgroundColor: structuredViewOpen
               ? getStructureColor(leaf.structure)
               : "transparent",
           }}
         >
-          {renderedChildren}
+          <span>{renderedChildren}</span>
         </span>
       );
     }
