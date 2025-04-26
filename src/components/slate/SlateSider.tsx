@@ -2,11 +2,9 @@ import { SpeechFile } from "@/types/speech";
 import {
   EditOutlined,
   FolderOutlined,
-  MessageOutlined,
   SnippetsOutlined,
 } from "@ant-design/icons";
 import { useTheme } from "@/contexts/ThemeContext";
-import SlateAIChat from "./SlateAIChat";
 import SlateTemplates from "./SlateTemplates";
 import SlateSiderMenu from "./SlateSiderMenu";
 import SlateFiles from "./SlateFiles";
@@ -24,9 +22,11 @@ interface SlateSiderProps {
   setStructuredViewOpen: (open: boolean) => void;
   collapsedMenu: Tab;
   setCollapsedMenu: (collapsed: Tab) => void;
+  pauseViewOpen: boolean;
+  setPauseViewOpen: (open: boolean) => void;
 }
 
-type Tab = "files" | "chat" | "templates" | "editor";
+type Tab = "files" | "templates" | "editor";
 
 export default function SlateSider({
   files,
@@ -41,6 +41,8 @@ export default function SlateSider({
   setStructuredViewOpen,
   collapsedMenu,
   setCollapsedMenu,
+  pauseViewOpen,
+  setPauseViewOpen,
 }: SlateSiderProps) {
   const { theme } = useTheme();
 
@@ -51,19 +53,14 @@ export default function SlateSider({
       label: "Files",
     },
     {
-      id: "chat" as Tab,
-      icon: <MessageOutlined />,
-      label: "AI Chat",
+      id: "editor" as Tab,
+      icon: <EditOutlined />,
+      label: "Editor",
     },
     {
       id: "templates" as Tab,
       icon: <SnippetsOutlined />,
       label: "Templates",
-    },
-    {
-      id: "editor" as Tab,
-      icon: <EditOutlined />,
-      label: "Editor",
     },
   ];
 
@@ -112,14 +109,15 @@ export default function SlateSider({
                 setCollapsed={setCollapsed}
               />
             )}
-            {collapsedMenu === "chat" && <SlateAIChat />}
-            {collapsedMenu === "templates" && <SlateTemplates />}
             {collapsedMenu === "editor" && (
               <SlateSiderMenu
                 structuredViewOpen={structuredViewOpen}
                 setStructuredViewOpen={setStructuredViewOpen}
+                pauseViewOpen={pauseViewOpen}
+                setPauseViewOpen={setPauseViewOpen}
               />
             )}
+            {collapsedMenu === "templates" && <SlateTemplates />}
           </div>
         </>
       )}

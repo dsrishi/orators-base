@@ -5,11 +5,15 @@ import { useSlate } from "slate-react";
 interface SlateSiderMenuProps {
   structuredViewOpen: boolean;
   setStructuredViewOpen: (open: boolean) => void;
+  pauseViewOpen: boolean;
+  setPauseViewOpen: (open: boolean) => void;
 }
 
 export default function SlateSiderMenu({
   structuredViewOpen,
   setStructuredViewOpen,
+  pauseViewOpen,
+  setPauseViewOpen,
 }: SlateSiderMenuProps) {
   const editor = useSlate();
 
@@ -21,20 +25,26 @@ export default function SlateSiderMenu({
     }
   };
 
+  const togglePause = (editor: Editor, seconds: number) => {
+    Editor.addMark(editor, "pause", seconds);
+  };
+
   return (
     <div>
-      <div className="flex items-center justify-between px-4 pt-3 pb-3">
-        <div className="text-base font-semibold">Structures</div>
-        <Tooltip title="Create New File">
-          <Switch
-            defaultChecked={structuredViewOpen}
-            onChange={() => setStructuredViewOpen(!structuredViewOpen)}
-            size="small"
-          />
-        </Tooltip>
+      <div className="px-4 pt-3 pb-3">
+        <div className="text-base font-semibold">Elements</div>
       </div>
       <div className="px-4">
-        <div className="text-sm text-gray-500 mb-3">Basic Structures</div>
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-sm text-gray-500">Structures</div>
+          <Tooltip title="Create New File">
+            <Switch
+              defaultChecked={structuredViewOpen}
+              onChange={() => setStructuredViewOpen(!structuredViewOpen)}
+              size="small"
+            />
+          </Tooltip>
+        </div>
         <div className="grid grid-cols-2 gap-2 mb-4">
           <Button
             type="text"
@@ -81,6 +91,31 @@ export default function SlateSiderMenu({
             onClick={() => toggleStructure(editor, "clear")}
           >
             Clear
+          </Button>
+        </div>
+
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-sm text-gray-500">Pauses</div>
+          <Tooltip title="Create New File">
+            <Switch
+              defaultChecked={pauseViewOpen}
+              onChange={() => setPauseViewOpen(!pauseViewOpen)}
+              size="small"
+            />
+          </Tooltip>
+        </div>
+        <div className="grid grid-cols-2 gap-2 mb-4">
+          <Button
+            onClick={() => togglePause(editor, 1)}
+            disabled={!pauseViewOpen}
+          >
+            Short Pause
+          </Button>
+          <Button
+            onClick={() => togglePause(editor, 3)}
+            disabled={!pauseViewOpen}
+          >
+            Long Pause
           </Button>
         </div>
 

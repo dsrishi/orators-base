@@ -18,6 +18,7 @@ type CustomText = {
   highlight?: boolean;
   highlightColor?: string;
   structure?: string;
+  pause?: string;
   color?: string;
 };
 
@@ -28,9 +29,10 @@ type SlateTextEditorProps = {
   setIsRecordingModalOpen: (open: boolean) => void;
   structuredViewOpen: boolean;
   setCollapsedMenu: (collapsed: Tab) => void;
+  pauseViewOpen: boolean;
 };
 
-type Tab = "files" | "chat" | "templates" | "editor";
+type Tab = "files" | "templates" | "editor";
 
 const SlateEditor: React.FC<SlateTextEditorProps> = ({
   collapsed,
@@ -39,6 +41,7 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
   setIsRecordingModalOpen,
   structuredViewOpen,
   setCollapsedMenu,
+  pauseViewOpen,
 }) => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), []);
   const { theme } = useTheme();
@@ -82,6 +85,12 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
         );
       case "list-item":
         return <li {...attributes}>{children}</li>;
+      case "pause":
+        return (
+          <span {...attributes} style={style}>
+            {children}
+          </span>
+        );
       default:
         return (
           <p {...attributes} style={style}>
@@ -157,6 +166,20 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
           }}
         >
           <span>{renderedChildren}</span>
+        </span>
+      );
+    }
+
+    if (leaf.pause) {
+      renderedChildren = (
+        <span
+          style={{
+            display: pauseViewOpen ? "inline" : "none",
+            backgroundColor: "#000000",
+            color: "#ffffff",
+          }}
+        >
+          <span>Pause-{leaf.pause}</span>
         </span>
       );
     }

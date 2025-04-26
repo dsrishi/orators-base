@@ -35,7 +35,8 @@ type CustomElement = {
     | "align-justify"
     | "ordered-list"
     | "bullet-list"
-    | "list-item";
+    | "list-item"
+    | "pause";
   children: CustomText[];
   align?: string;
 };
@@ -422,7 +423,7 @@ const ColorPopoverContent = () => {
   );
 };
 
-type Tab = "files" | "chat" | "templates" | "editor";
+type Tab = "files" | "templates" | "editor";
 
 export default function SlateEditorMenu({
   collapsed,

@@ -27,7 +27,7 @@ interface SlateEditorProps {
   files: SpeechFile[];
 }
 
-type Tab = "files" | "chat" | "templates" | "editor";
+type Tab = "files" | "templates" | "editor";
 
 export default function SlateEditor({
   speechId,
@@ -67,6 +67,7 @@ export default function SlateEditor({
   const [isComingSoonModalOpen, setIsComingSoonModalOpen] = useState(false);
   const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
   const [structuredViewOpen, setStructuredViewOpen] = useState(false);
+  const [pauseViewOpen, setPauseViewOpen] = useState(false);
   const [value, setValue] = useState<Descendant[]>(
     JSON.parse(selectedFile?.content)
   );
@@ -275,6 +276,8 @@ export default function SlateEditor({
               setCollapsedMenu={setCollapsedMenu}
               structuredViewOpen={structuredViewOpen}
               setStructuredViewOpen={setStructuredViewOpen}
+              pauseViewOpen={pauseViewOpen}
+              setPauseViewOpen={setPauseViewOpen}
             />
           </Sider>
 
@@ -292,6 +295,7 @@ export default function SlateEditor({
                 setIsRecordingModalOpen={setIsRecordingModalOpen}
                 structuredViewOpen={structuredViewOpen}
                 setCollapsedMenu={setCollapsedMenu}
+                pauseViewOpen={pauseViewOpen}
               />
             </div>
           </Content>
