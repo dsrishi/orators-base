@@ -1,13 +1,14 @@
 // components/SlateEditor.tsx (enhanced file)
 import React, { useMemo } from "react";
 import { createEditor, Editor, Transforms } from "slate";
-import { Editable, withReact } from "slate-react";
+import { Editable, withReact, useSlateStatic, ReactEditor } from "slate-react";
 import { withHistory } from "slate-history";
 import { RenderElementProps } from "slate-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import SlateEditorMenu from "./SlateEditorMenu";
 import { Range } from "slate";
 import SpeechRecordingModal from "../SpeechRecordingModal";
+import { CloseCircleFilled } from "@ant-design/icons";
 
 type CustomText = {
   text: string;
@@ -50,6 +51,8 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
     const style = element.align
       ? { textAlign: element.align as "left" | "center" | "right" }
       : {};
+
+    const editor = useSlateStatic(); // Get the editor instance
 
     switch (element.type) {
       case "heading-one":
@@ -94,12 +97,35 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
               background: "#000",
               color: "#fff",
               borderRadius: "4px",
-              padding: "0 6px",
+              padding: "0 4px",
               fontSize: "0.9em",
               verticalAlign: "middle",
+              cursor: "pointer",
             }}
           >
             Pause-{element.seconds || 1}s
+            <span
+              style={{
+                marginLeft: "2px",
+                cursor: "pointer",
+                color: "#aaa",
+              }}
+              onClick={(event) => {
+                event.preventDefault();
+                try {
+                  const path = ReactEditor.findPath(
+                    editor as unknown as ReactEditor,
+                    element
+                  );
+                  Transforms.removeNodes(editor, { at: path });
+                } catch {
+                  console.warn("Could not remove pause element");
+                }
+              }}
+              title="Click to remove pause"
+            >
+              <CloseCircleFilled />
+            </span>
           </span>
         );
       default:
