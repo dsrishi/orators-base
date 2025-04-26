@@ -8,7 +8,6 @@ import { getStatsFromHtml } from "@/helpers/statsHelpers";
 import { extractSpeechAsHtml } from "@/helpers/speech/extractSpeechAsHtml";
 import { useUser } from "@/contexts/UserContext";
 import { extractSpeechByStructureAsHtml } from "@/helpers/speech/extractSpeechByStructureAsHtml";
-import StructureStats from "./structure/StructureStats";
 
 interface SlateStructureStatsProps {
   content: Descendant[];
@@ -187,10 +186,6 @@ const SlateStructureStats = ({
             />
           </div>
         </Col>
-        <StructureStats content={content} structure="Total" />
-        <StructureStats content={content} structure="Opening" />
-        <StructureStats content={content} structure="Body" />
-        <StructureStats content={content} structure="Conclusion" />
       </Row>
     </>
   );

@@ -3,6 +3,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Speech } from "@/types/speech";
 import { Descendant } from "slate";
 import SlateStructureStats from "../analysis/SlateStructureStats";
+import SlateStructureStatTable from "../analysis/structure/StructureStatTable";
 interface SlateAnalyseDrawerProps {
   open: boolean;
   onClose: () => void;
@@ -51,6 +52,7 @@ export default function SlateAnalyseDrawer({
       }}
     >
       <SlateStructureStats content={content} speechData={speechData} />
+      <SlateStructureStatTable content={content} />
     </Drawer>
   );
 }

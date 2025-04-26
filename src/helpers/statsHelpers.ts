@@ -10,23 +10,26 @@ export const getStatsFromHtml = (content: string, wordsPerMinute: number) => {
     sentenceCount > 0 ? wordCount / sentenceCount : 0
   );
 
-  //a function to calculate no of paragraphs ignoring html tags, new lines and headings and lists
-  const paragraphCount = content.replace(/<[^>]*>/g, "").split("\n").length;
-  //round off to whole number
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(content, "text/html"); // Get all paragraph elements
+  const paragraphs = doc.querySelectorAll("p"); // Filter out empty paragraphs and count the rest
+  const paragraphCount = Array.from(paragraphs).filter(
+    (p) => p.textContent && p.textContent.trim().length > 0
+  ).length;
+
   const averageParagraphLength = Math.round(
     paragraphCount > 0 ? wordCount / paragraphCount : 0
   );
 
-   // Calculate duration
-   const minutes = Math.floor(wordCount / wordsPerMinute);
-   const seconds = Math.floor(
-     ((wordCount % wordsPerMinute) * 60) / wordsPerMinute
-   );
-   const estimatedDuration =
-     minutes > 0 ? `${minutes} min ${seconds} sec` : `${seconds} sec`;
+  // Calculate duration
+  const minutes = Math.floor(wordCount / wordsPerMinute);
+  const seconds = Math.floor(
+    ((wordCount % wordsPerMinute) * 60) / wordsPerMinute
+  );
+  const estimatedDuration =
+    minutes > 0 ? `${minutes} min ${seconds} sec` : `${seconds} sec`;
 
   const estimatedDurationInSeconds = minutes * 60 + seconds;
-
 
   // Calculate reading time (slightly faster than speaking)
   const readingWordsPerMinute = wordsPerMinute * 1.3; // Reading is typically faster than speaking
