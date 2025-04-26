@@ -1,5 +1,5 @@
 import { Button, Switch, Tooltip } from "antd";
-import { Editor } from "slate";
+import { Editor, Transforms } from "slate";
 import { useSlate } from "slate-react";
 
 interface SlateSiderMenuProps {
@@ -8,6 +8,37 @@ interface SlateSiderMenuProps {
   pauseViewOpen: boolean;
   setPauseViewOpen: (open: boolean) => void;
 }
+
+type CustomText = {
+  text: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  highlight?: boolean;
+  highlightColor?: string;
+  structure?: string;
+  pause?: string;
+  color?: string;
+};
+
+type CustomElement = {
+  type:
+    | "paragraph"
+    | "heading-one"
+    | "heading-two"
+    | "heading-three"
+    | "align-left"
+    | "align-center"
+    | "align-right"
+    | "align-justify"
+    | "ordered-list"
+    | "bullet-list"
+    | "list-item"
+    | "pause";
+  children: CustomText[];
+  align?: string;
+  seconds?: number;
+};
 
 export default function SlateSiderMenu({
   structuredViewOpen,
@@ -27,6 +58,15 @@ export default function SlateSiderMenu({
 
   const togglePause = (editor: Editor, seconds: number) => {
     Editor.addMark(editor, "pause", seconds);
+  };
+
+  const insertPause = (seconds: number) => {
+    const pauseElement: CustomElement = {
+      type: "pause",
+      seconds,
+      children: [{ text: "" }],
+    };
+    Transforms.insertNodes(editor, pauseElement);
   };
 
   return (
@@ -116,6 +156,9 @@ export default function SlateSiderMenu({
             disabled={!pauseViewOpen}
           >
             Long Pause
+          </Button>
+          <Button onClick={() => insertPause(3)} disabled={!pauseViewOpen}>
+            Pause
           </Button>
         </div>
 

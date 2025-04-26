@@ -39,6 +39,7 @@ type CustomElement = {
     | "pause";
   children: CustomText[];
   align?: string;
+  seconds?: number;
 };
 
 type CustomText = {

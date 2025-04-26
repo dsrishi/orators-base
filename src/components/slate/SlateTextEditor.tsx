@@ -1,12 +1,11 @@
 // components/SlateEditor.tsx (enhanced file)
 import React, { useMemo } from "react";
-import { createEditor, Editor } from "slate";
+import { createEditor, Editor, Transforms } from "slate";
 import { Editable, withReact } from "slate-react";
 import { withHistory } from "slate-history";
 import { RenderElementProps } from "slate-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import SlateEditorMenu from "./SlateEditorMenu";
-import { Transforms } from "slate";
 import { Range } from "slate";
 import SpeechRecordingModal from "../SpeechRecordingModal";
 
@@ -87,8 +86,20 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
         return <li {...attributes}>{children}</li>;
       case "pause":
         return (
-          <span {...attributes} style={style}>
-            {children}
+          <span
+            {...attributes}
+            contentEditable={false}
+            style={{
+              display: pauseViewOpen ? "inline" : "none",
+              background: "#000",
+              color: "#fff",
+              borderRadius: "4px",
+              padding: "0 6px",
+              fontSize: "0.9em",
+              verticalAlign: "middle",
+            }}
+          >
+            Pause-{element.seconds || 1}s
           </span>
         );
       default:
@@ -166,20 +177,6 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
           }}
         >
           <span>{renderedChildren}</span>
-        </span>
-      );
-    }
-
-    if (leaf.pause) {
-      renderedChildren = (
-        <span
-          style={{
-            display: pauseViewOpen ? "inline" : "none",
-            backgroundColor: "#000000",
-            color: "#ffffff",
-          }}
-        >
-          <span>Pause-{leaf.pause}</span>
         </span>
       );
     }
