@@ -20,7 +20,7 @@ export default function SpeechMainPage() {
   useEffect(() => {
     async function loadSpeechData() {
       try {
-        const { data, error } = await speechService.getSpeechWithAllVersions(
+        const { data, error } = await speechService.getSpeechWithAllFiles(
           speechId
         );
 
@@ -83,12 +83,12 @@ export default function SpeechMainPage() {
     );
   }
 
-  //if there are no speech versions available for a speech, add a button to add a version
-  if (speech?.versions?.length === 0) {
+  //if there are no speech files available for a speech, add a button to add a file
+  if (speech?.files?.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div>
-          <Empty description={<span className="">No versions found</span>} />
+          <Empty description={<span className="">No files found</span>} />
           <Button
             type="primary"
             htmlType="submit"
@@ -101,7 +101,7 @@ export default function SpeechMainPage() {
                 theme === "dark" ? "0 2px 8px rgba(0, 0, 0, 0.3)" : "none",
             }}
           >
-            Add a version
+            Add a file
           </Button>
         </div>
       </div>
@@ -115,7 +115,7 @@ export default function SpeechMainPage() {
         <SlateEditor
           speechId={speechId}
           speechData={speech}
-          versions={speech.versions || []}
+          files={speech.files || []}
         />
       </main>
     </>

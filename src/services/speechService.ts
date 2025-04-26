@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
-import { Speech, SpeechVersion, ServiceError, CreateSpeechData, UpdateSpeechData, UpdateVersionData } from '@/types/speech';
+import { Speech, SpeechFile, ServiceError, CreateSpeechData, UpdateSpeechData, UpdateFileData } from '@/types/speech';
 
 
 export const speechService = {
@@ -142,21 +142,21 @@ export const speechService = {
         },
       ]);
 
-      // Create initial version
-      const { error: versionError } = await supabase
-        .from("speech_versions")
+      // Create initial file
+      const { error: fileError } = await supabase
+        .from("speech_files")
         .insert({
           speech_id: speechData.id, // This will be a proper UUID now
-          version_number: 1,
-          version_name: "Initial Version",
+          file_number: 1,
+          file_name: "Initial File",
           content: content,
           created_by: data.userId,
           updated_by: data.userId
         });
 
-      if (versionError) {
-        console.error('Version creation error:', versionError);
-        throw versionError;
+      if (fileError) {
+        console.error('File creation error:', fileError);
+        throw fileError;
       }
 
       return {
@@ -176,10 +176,10 @@ export const speechService = {
     }
   },
 
-  async getSpeechWithVersions(speechId: string): Promise<{
+  async getSpeechWithFiles(speechId: string): Promise<{
     data: {
       speech: Speech | null;
-      version: SpeechVersion | null;
+      file: SpeechFile | null;
     };
     error: ServiceError | null;
   }> {
@@ -211,20 +211,20 @@ export const speechService = {
 
       if (speechError) throw speechError;
 
-      // Fetch version 1 content
-      const { data: versionData, error: versionError } = await supabase
-        .from("speech_versions")
-        .select('id, speech_id, version_number, version_name, content, created_by, updated_by, created_at, updated_at')
+      // Fetch file 1 content
+      const { data: fileData, error: fileError } = await supabase
+        .from("speech_files")
+        .select('id, speech_id, file_number, file_name, content, created_by, updated_by, created_at, updated_at')
         .eq('speech_id', speechId)
-        .eq('version_number', 1)
+        .eq('file_number', 1)
         .single();
 
-      if (versionError) throw versionError;
+      if (fileError) throw fileError;
 
       return {
         data: {
           speech: speechData,
-          version: versionData,
+          file: fileData,
         },
         error: null
       };
@@ -232,7 +232,7 @@ export const speechService = {
     } catch (error) {
       console.error('Error fetching speech:', error);
       return {
-        data: { speech: null, version: null },
+        data: { speech: null, file: null },
         error: {
           message: 'Failed to fetch speech data',
           details: error instanceof Error ? error.message : error
@@ -270,40 +270,40 @@ export const speechService = {
     }
   },
 
-  async updateVersionContent(
+  async updateFileContent(
     speechId: string,
-    versionId: string,
-    data: UpdateVersionData
+    fileId: string,
+    data: UpdateFileData
   ): Promise<{ error: ServiceError | null }> {
     const supabase = createClient();
     
     try {
       const { error } = await supabase
-        .from("speech_versions")
+        .from("speech_files")
         .update({
           content: data.content,
           updated_at: new Date().toISOString()
         })
-        .eq('id', versionId)
+        .eq('id', fileId)
         .eq('speech_id', speechId);
 
       if (error) throw error;
 
       return { error: null };
     } catch (error) {
-      console.error('Error updating version content:', error);
+      console.error('Error updating file content:', error);
       return {
         error: {
-          message: 'Failed to update version content',
+          message: 'Failed to update file content',
           details: error instanceof Error ? error.message : error
         }
       };
     }
   },
 
-  async getSpeechWithAllVersions(speechId: string): Promise<{
+  async getSpeechWithAllFiles(speechId: string): Promise<{
     data: {
-      speech: (Speech & { versions: SpeechVersion[] }) | null;
+      speech: (Speech & { files: SpeechFile[] }) | null;
     };
     error: ServiceError | null;
   }> {
@@ -329,11 +329,11 @@ export const speechService = {
           occasion,
           created_at,
           updated_at,
-          versions:speech_versions(
+          files:speech_files(
             id, 
             speech_id, 
-            version_number, 
-            version_name, 
+            file_number, 
+            file_name, 
             content, 
             created_by, 
             updated_by, 
@@ -354,72 +354,72 @@ export const speechService = {
       };
       
     } catch (error) {
-      console.error('Error fetching speech with versions:', error);
+      console.error('Error fetching speech with files:', error);
       return {
         data: { speech: null },
         error: {
-          message: 'Failed to fetch speech data with versions',
+          message: 'Failed to fetch speech data with files',
           details: error instanceof Error ? error.message : error
         }
       };
     }
   },
 
-  async createNewVersion(
+  async createNewFile(
     speechId: string, 
     data: { 
-      versionName: string; 
+      fileName: string; 
       content?: string; 
       userId: string;
-      baseVersionId?: string;
+      baseFileId?: string;
     }
   ): Promise<{ 
-    versionId: string | null; 
+    fileId: string | null; 
     error: ServiceError | null 
   }> {
     const supabase = createClient();
     
     try {
-      // First, get the highest version number for this speech
-      const { data: maxVersionData, error: maxVersionError } = await supabase
-        .from("speech_versions")
-        .select('version_number')
+      // First, get the highest file number for this speech
+      const { data: maxFileData, error: maxFileError } = await supabase
+        .from("speech_files")
+        .select('file_number')
         .eq('speech_id', speechId)
-        .order('version_number', { ascending: false })
+        .order('file_number', { ascending: false })
         .limit(1)
         .single();
 
-      if (maxVersionError && maxVersionError.code !== 'PGRST116') { // PGRST116 is "no rows returned" - which is fine for first version
-        throw maxVersionError;
+      if (maxFileError && maxFileError.code !== 'PGRST116') { // PGRST116 is "no rows returned" - which is fine for first file
+        throw maxFileError;
       }
 
-      const nextVersionNumber = maxVersionData ? maxVersionData.version_number + 1 : 1;
+      const nextFileNumber = maxFileData ? maxFileData.file_number + 1 : 1;
       
-      // If baseVersionId is provided, get that version's content
+      // If baseFileId is provided, get that file's content
       let initialContent = data.content || "";
       
-      if (data.baseVersionId) {
-        const { data: baseVersionData, error: baseVersionError } = await supabase
-          .from("speech_versions")
+      if (data.baseFileId) {
+        const { data: baseFileData, error: baseFileError } = await supabase
+          .from("speech_files")
           .select('content')
-          .eq('id', data.baseVersionId)
+          .eq('id', data.baseFileId)
           .single();
           
-        if (baseVersionError) {
-          console.warn('Error fetching base version content:', baseVersionError);
+        if (baseFileError) {
+          console.warn('Error fetching base file content:', baseFileError);
           // Continue with default content
-        } else if (baseVersionData) {
-          initialContent = baseVersionData.content;
+        } else if (baseFileData) {
+          initialContent = baseFileData.content;
         }
       }
 
-      // Create new version
-      const { data: newVersionData, error: createError } = await supabase
-        .from("speech_versions")
+      // Create new file
+      const { data: newFileData, error: createError } = await supabase
+        .from("speech_files")
         .insert({
           speech_id: speechId,
-          version_number: nextVersionNumber,
-          version_name: data.versionName || `Version ${nextVersionNumber}`,
+          file_number: nextFileNumber,
+          file_name: data.fileName || `File ${nextFileNumber}`,
           content: initialContent,
           created_by: data.userId,
           updated_by: data.userId
@@ -430,91 +430,91 @@ export const speechService = {
       if (createError) throw createError;
 
       return {
-        versionId: newVersionData?.id || null,
+        fileId: newFileData?.id || null,
         error: null
       };
 
     } catch (error) {
-      console.error('Error creating new version:', error);
+      console.error('Error creating new file:', error);
       return {
-        versionId: null,
+        fileId: null,
         error: {
-          message: 'Failed to create new speech version',
+          message: 'Failed to create new speech file',
           details: error instanceof Error ? error.message : error
         }
       };
     }
   },
 
-  async updateVersionInfo(
-    versionId: string,
-    data: { versionName?: string }
+  async updateFileInfo(
+    fileId: string,
+    data: { fileName?: string }
   ): Promise<{ error: ServiceError | null }> {
     const supabase = createClient();
     
     try {
       const { error } = await supabase
-        .from("speech_versions")
+        .from("speech_files")
         .update({
-          version_name: data.versionName,
+          file_name: data.fileName,
           updated_at: new Date().toISOString()
         })
-        .eq('id', versionId);
+        .eq('id', fileId);
 
       if (error) throw error;
 
       return { error: null };
     } catch (error) {
-      console.error('Error updating version info:', error);
+      console.error('Error updating file info:', error);
       return {
         error: {
-          message: 'Failed to update version information',
+          message: 'Failed to update file information',
           details: error instanceof Error ? error.message : error
         }
       };
     }
   },
 
-  async deleteVersion(
+  async deleteFile(
     speechId: string,
-    versionId: string
+    fileId: string
   ): Promise<{ error: ServiceError | null }> {
     const supabase = createClient();
     
     try {
-      // First check if this is the only version left
+      // First check if this is the only file left
       const { data: countData, error: countError } = await supabase
-        .from("speech_versions")
+        .from("speech_files")
         .select('id', { count: 'exact' })
         .eq('speech_id', speechId);
         
       if (countError) throw countError;
       
-      // Don't allow deleting the last version
+      // Don't allow deleting the last file
       if (countData && countData.length <= 1) {
         return {
           error: {
-            message: 'Cannot delete the only version of a speech',
-            details: 'At least one version must remain'
+            message: 'Cannot delete the only file of a speech',
+            details: 'At least one file must remain'
           }
         };
       }
       
-      // Delete the version
+      // Delete the file
       const { error } = await supabase
-        .from("speech_versions")
+        .from("speech_files")
         .delete()
-        .eq('id', versionId)
+        .eq('id', fileId)
         .eq('speech_id', speechId);
 
       if (error) throw error;
 
       return { error: null };
     } catch (error) {
-      console.error('Error deleting version:', error);
+      console.error('Error deleting file:', error);
       return {
         error: {
-          message: 'Failed to delete version',
+          message: 'Failed to delete file',
           details: error instanceof Error ? error.message : error
         }
       };
@@ -525,15 +525,15 @@ export const speechService = {
     const supabase = createClient();
     
     try {
-      // First delete all versions associated with this speech
-      const { error: versionsError } = await supabase
-        .from("speech_versions")
+      // First delete all files associated with this speech
+      const { error: filesError } = await supabase
+        .from("speech_files")
         .delete()
         .eq("speech_id", speechId);
         
-      if (versionsError) {
-        console.error("Error deleting speech versions:", versionsError);
-        return { error: versionsError };
+      if (filesError) {
+        console.error("Error deleting speech files:", filesError);
+        return { error: filesError };
       }
       
       // Then delete the speech itself

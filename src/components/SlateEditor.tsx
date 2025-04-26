@@ -4,7 +4,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { FloatButton, message, Layout, Spin } from "antd";
 import { AudioOutlined, UploadOutlined } from "@ant-design/icons";
 import { useState, useEffect, useRef, useMemo } from "react";
-import { Speech, SpeechVersion } from "@/types/speech";
+import { Speech, SpeechFile } from "@/types/speech";
 import SpeechInfoModal from "./SpeechInfoModal";
 import { speechService } from "@/services/speechService";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -24,51 +24,51 @@ const { Sider, Content } = Layout;
 interface SlateEditorProps {
   speechId: string;
   speechData: Speech;
-  versions: SpeechVersion[];
+  files: SpeechFile[];
 }
 
-type Tab = "versions" | "chat" | "templates" | "editor";
+type Tab = "files" | "chat" | "templates" | "editor";
 
 export default function SlateEditor({
   speechId,
   speechData: initialSpeechData,
-  versions: initialVersions,
+  files: initialFiles,
 }: SlateEditorProps) {
   const { theme } = useTheme();
 
-  // Sort versions by updated_at before setting the initial state
-  const sortVersionsByRecent = (versions: SpeechVersion[]) => {
-    return [...versions].sort(
+  // Sort files by updated_at before setting the initial state
+  const sortFilesByRecent = (files: SpeechFile[]) => {
+    return [...files].sort(
       (a, b) =>
         new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
     );
   };
 
-  // Select the most recently updated version by default
-  const getMostRecentVersion = (versions: SpeechVersion[]) => {
-    const sortedVersions = sortVersionsByRecent(versions);
-    return sortedVersions.length > 0 ? sortedVersions[0] : null;
+  // Select the most recently updated file by default
+  const getMostRecentFile = (files: SpeechFile[]) => {
+    const sortedFiles = sortFilesByRecent(files);
+    return sortedFiles.length > 0 ? sortedFiles[0] : null;
   };
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [speechData, setSpeechData] = useState<Speech>(initialSpeechData);
-  const [versions, setVersions] = useState<SpeechVersion[]>(initialVersions);
+  const [files, setFiles] = useState<SpeechFile[]>(initialFiles);
 
-  // Set the initially selected version to the most recently updated one
-  const [selectedVersion, setSelectedVersion] = useState<SpeechVersion>(
-    getMostRecentVersion(initialVersions) || initialVersions[0]
+  // Set the initially selected file to the most recently updated one
+  const [selectedFile, setSelectedFile] = useState<SpeechFile>(
+    getMostRecentFile(initialFiles) || initialFiles[0]
   );
 
-  const [collapsed, setCollapsed] = useState(initialVersions.length <= 1);
-  const [collapsedMenu, setCollapsedMenu] = useState<Tab>("versions");
+  const [collapsed, setCollapsed] = useState(initialFiles.length <= 1);
+  const [collapsedMenu, setCollapsedMenu] = useState<Tab>("files");
   const [saving, setSaving] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [isComingSoonModalOpen, setIsComingSoonModalOpen] = useState(false);
   const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
   const [structuredViewOpen, setStructuredViewOpen] = useState(false);
   const [value, setValue] = useState<Descendant[]>(
-    JSON.parse(selectedVersion?.content)
+    JSON.parse(selectedFile?.content)
   );
   const [canSave, setCanSave] = useState(false);
 
@@ -78,22 +78,22 @@ export default function SlateEditor({
   const { browserSupportsSpeechRecognition, isMicrophoneAvailable } =
     useSpeechRecognition();
 
-  // Add a ref to store unsaved content for each version
+  // Add a ref to store unsaved content for each file
   const unsavedContentCache = useRef<Record<string, string>>({});
 
   const [deleteSpeechModalVisible, setDeleteSpeechModalVisible] =
     useState(false);
 
   const saveContent = async (content: string) => {
-    if (!selectedVersion?.id) return;
+    if (!selectedFile?.id) return;
 
     // Store content in cache before saving
-    unsavedContentCache.current[selectedVersion.id] = content;
+    unsavedContentCache.current[selectedFile.id] = content;
 
     setSaving(true);
-    const { error } = await speechService.updateVersionContent(
+    const { error } = await speechService.updateFileContent(
       speechId,
-      selectedVersion.id,
+      selectedFile.id,
       { content }
     );
 
@@ -108,22 +108,22 @@ export default function SlateEditor({
 
   const debouncedSave = useDebounce(saveContent, 1000);
 
-  // Modify version switching to handle unsaved content
-  const handleVersionChange = (versionId: string) => {
-    const version = versions.find((v) => v.id === versionId);
-    if (!version || version.id === selectedVersion.id) return;
+  // Modify file switching to handle unsaved content
+  const handleFileChange = (fileId: string) => {
+    const file = files.find((f) => f.id === fileId);
+    if (!file || file.id === selectedFile.id) return;
 
     // Cache the current content before switching
-    unsavedContentCache.current[selectedVersion.id] = selectedVersion.content;
+    unsavedContentCache.current[selectedFile.id] = selectedFile.content;
 
-    // Switch to the new version
-    setSelectedVersion(version);
-    setValue(JSON.parse(version.content));
+    // Switch to the new file
+    setSelectedFile(file);
+    setValue(JSON.parse(file.content));
   };
 
-  // Hide the versions if there is only one version
+  // Hide the files if there is only one file
   useEffect(() => {
-    setCollapsed(versions.length <= 1);
+    setCollapsed(files.length <= 1);
   }, []);
 
   useEffect(() => {
@@ -136,29 +136,27 @@ export default function SlateEditor({
 
   // Update the refreshSpeechData to handle syncing with our cache
   const refreshSpeechData = async () => {
-    const { data, error } = await speechService.getSpeechWithAllVersions(
-      speechId
-    );
+    const { data, error } = await speechService.getSpeechWithAllFiles(speechId);
     if (!error && data.speech) {
       setSpeechData(data.speech);
-      if (data.speech.versions) {
-        setVersions(data.speech.versions);
+      if (data.speech.files) {
+        setFiles(data.speech.files);
 
-        // Update selected version to match the currently selected one
-        const currentVersion = data.speech.versions.find(
-          (v) => v.id === selectedVersion.id
+        // Update selected file to match the currently selected one
+        const currentFile = data.speech.files.find(
+          (f) => f.id === selectedFile.id
         );
-        if (currentVersion) {
+        if (currentFile) {
           // Only update the server content, not our editor's content
           // This prevents refreshing from throwing away unsaved changes
-          const updatedVersion = {
-            ...currentVersion,
+          const updatedFile = {
+            ...currentFile,
             // Keep local changes if they exist
             content:
-              unsavedContentCache.current[currentVersion.id] ||
-              currentVersion.content,
+              unsavedContentCache.current[currentFile.id] ||
+              currentFile.content,
           };
-          setSelectedVersion(updatedVersion);
+          setSelectedFile(updatedFile);
         }
       }
     }
@@ -225,7 +223,7 @@ export default function SlateEditor({
     <>
       {contextHolder}
       <Slate
-        key={selectedVersion?.id}
+        key={selectedFile?.id}
         editor={editor}
         initialValue={value}
         onChange={(newValue) => setValue(newValue)}
@@ -265,10 +263,10 @@ export default function SlateEditor({
             }}
           >
             <SlateSider
-              versions={versions}
-              selectedVersion={selectedVersion}
-              setSelectedVersion={setSelectedVersion}
-              handleVersionChange={handleVersionChange}
+              files={files}
+              selectedFile={selectedFile}
+              setSelectedFile={setSelectedFile}
+              handleFileChange={handleFileChange}
               refreshSpeechData={refreshSpeechData}
               speechId={speechId}
               collapsed={collapsed}
@@ -344,7 +342,7 @@ export default function SlateEditor({
         <HardConfirmationModal
           title="Delete Speech"
           message={`Are you sure you want to delete "${speechData.title}"?`}
-          subMessage="This will delete the speech and all its versions. This action cannot be undone."
+          subMessage="This will delete the speech and all its files. This action cannot be undone."
           open={deleteSpeechModalVisible}
           onCancel={() => setDeleteSpeechModalVisible(false)}
           onConfirm={handleDeleteSpeech}

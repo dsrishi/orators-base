@@ -1,4 +1,4 @@
-// components/SlateEditor.tsx (enhanced version)
+// components/SlateEditor.tsx (enhanced file)
 import React, { useMemo } from "react";
 import { createEditor, Editor } from "slate";
 import { Editable, withReact } from "slate-react";
@@ -30,7 +30,7 @@ type SlateTextEditorProps = {
   setCollapsedMenu: (collapsed: Tab) => void;
 };
 
-type Tab = "versions" | "chat" | "templates" | "editor";
+type Tab = "files" | "chat" | "templates" | "editor";
 
 const SlateEditor: React.FC<SlateTextEditorProps> = ({
   collapsed,

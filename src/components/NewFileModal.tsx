@@ -1,42 +1,42 @@
 import React, { useState } from "react";
 import { Modal, Form, Input } from "antd";
 import { useTheme } from "@/contexts/ThemeContext";
-interface NewVersionModalProps {
+interface NewFilesModalProps {
   open: boolean;
   onClose: () => void;
-  onCreateVersion: (versionName: string) => Promise<void>;
+  onCreateFile: (fileName: string) => Promise<void>;
 }
 
-const NewVersionModal: React.FC<NewVersionModalProps> = ({
+const NewFileModal: React.FC<NewFilesModalProps> = ({
   open,
   onClose,
-  onCreateVersion,
+  onCreateFile,
 }) => {
   const { theme } = useTheme();
-  const [versionName, setVersionName] = useState("");
+  const [fileName, setFileName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleCreateVersion = async () => {
+  const handleCreateFile = async () => {
     setLoading(true);
     try {
-      await onCreateVersion(versionName);
-      setVersionName("");
+      await onCreateFile(fileName);
+      setFileName("");
     } finally {
       setLoading(false);
     }
   };
 
   const handleCancel = () => {
-    setVersionName("");
+    setFileName("");
     onClose();
   };
 
   return (
     <Modal
-      title="Create New Version"
+      title="Create New File"
       open={open}
       onCancel={handleCancel}
-      onOk={handleCreateVersion}
+      onOk={handleCreateFile}
       okText="Create"
       confirmLoading={loading}
       styles={{
@@ -54,14 +54,14 @@ const NewVersionModal: React.FC<NewVersionModalProps> = ({
       }}
     >
       <div className="text-xs text-gray-500 italic mb-3">
-        This will create a new version based on your current content.
+        This will create a new file based on your current content.
       </div>
       <Form layout="vertical">
-        <Form.Item label="Version Name">
+        <Form.Item label="File Name">
           <Input
-            placeholder="Enter version name"
-            value={versionName}
-            onChange={(e) => setVersionName(e.target.value)}
+            placeholder="Enter file name"
+            value={fileName}
+            onChange={(e) => setFileName(e.target.value)}
           />
         </Form.Item>
       </Form>
@@ -69,4 +69,4 @@ const NewVersionModal: React.FC<NewVersionModalProps> = ({
   );
 };
 
-export default NewVersionModal;
+export default NewFileModal;

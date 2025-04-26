@@ -14,14 +14,14 @@ export interface Speech {
   occasion: string;
   created_at: string;
   updated_at: string;
-  versions?: SpeechVersion[];
+  files?: SpeechFile[];
 } 
 
-export interface SpeechVersion {
+export interface SpeechFile {
   id: string;
   speech_id: string;
-  version_number: number;
-  version_name: string;
+  file_number: number;
+  file_name: string;
   content: string;
   created_by: string;
   updated_by: string;
@@ -56,7 +56,7 @@ export interface UpdateSpeechData {
   occasion?: string;
 }
 
-export interface UpdateVersionData {
+export interface UpdateFileData {
   content: string;
 }
 

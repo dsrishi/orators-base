@@ -25,7 +25,7 @@ export default function SlateSiderMenu({
     <div>
       <div className="flex items-center justify-between px-4 pt-3 pb-3">
         <div className="text-base font-semibold">Structures</div>
-        <Tooltip title="Create New Version">
+        <Tooltip title="Create New File">
           <Switch
             defaultChecked={structuredViewOpen}
             onChange={() => setStructuredViewOpen(!structuredViewOpen)}

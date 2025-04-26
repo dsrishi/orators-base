@@ -422,7 +422,7 @@ const ColorPopoverContent = () => {
   );
 };
 
-type Tab = "versions" | "chat" | "templates" | "editor";
+type Tab = "files" | "chat" | "templates" | "editor";
 
 export default function SlateEditorMenu({
   collapsed,

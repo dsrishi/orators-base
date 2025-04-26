@@ -1,8 +1,7 @@
-import { SpeechVersion } from "@/types/speech";
-import SlateVersions from "./SlateVersions";
+import { SpeechFile } from "@/types/speech";
 import {
   EditOutlined,
-  HistoryOutlined,
+  FolderOutlined,
   MessageOutlined,
   SnippetsOutlined,
 } from "@ant-design/icons";
@@ -10,12 +9,13 @@ import { useTheme } from "@/contexts/ThemeContext";
 import SlateAIChat from "./SlateAIChat";
 import SlateTemplates from "./SlateTemplates";
 import SlateSiderMenu from "./SlateSiderMenu";
+import SlateFiles from "./SlateFiles";
 
 interface SlateSiderProps {
-  versions: SpeechVersion[];
-  selectedVersion: SpeechVersion;
-  setSelectedVersion: (version: SpeechVersion) => void;
-  handleVersionChange: (key: string) => void;
+  files: SpeechFile[];
+  selectedFile: SpeechFile;
+  setSelectedFile: (file: SpeechFile) => void;
+  handleFileChange: (key: string) => void;
   refreshSpeechData: () => Promise<void>;
   speechId: string;
   collapsed: boolean;
@@ -26,13 +26,13 @@ interface SlateSiderProps {
   setCollapsedMenu: (collapsed: Tab) => void;
 }
 
-type Tab = "versions" | "chat" | "templates" | "editor";
+type Tab = "files" | "chat" | "templates" | "editor";
 
 export default function SlateSider({
-  versions,
-  selectedVersion,
-  setSelectedVersion,
-  handleVersionChange,
+  files,
+  selectedFile,
+  setSelectedFile,
+  handleFileChange,
   refreshSpeechData,
   speechId,
   collapsed,
@@ -46,9 +46,9 @@ export default function SlateSider({
 
   const tabs = [
     {
-      id: "versions" as Tab,
-      icon: <HistoryOutlined />,
-      label: "Versions",
+      id: "files" as Tab,
+      icon: <FolderOutlined />,
+      label: "Files",
     },
     {
       id: "chat" as Tab,
@@ -101,12 +101,12 @@ export default function SlateSider({
           </div>
 
           <div className="flex-1 overflow-auto">
-            {collapsedMenu === "versions" && (
-              <SlateVersions
-                versions={versions}
-                selectedVersion={selectedVersion}
-                setSelectedVersion={setSelectedVersion}
-                handleVersionChange={handleVersionChange}
+            {collapsedMenu === "files" && (
+              <SlateFiles
+                files={files}
+                selectedFile={selectedFile}
+                setSelectedFile={setSelectedFile}
+                handleFileChange={handleFileChange}
                 refreshSpeechData={refreshSpeechData}
                 speechId={speechId}
                 setCollapsed={setCollapsed}
