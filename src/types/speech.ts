@@ -75,3 +75,15 @@ export interface SpeechMetrics {
   longestWordLength: number;
   shortestWordLength: number;
 }
+
+export interface SpeechStats {
+  characterCount: number;
+  wordCount: number;
+  averageWordLength: number;
+  sentenceCount: number;
+  averageSentenceLength: number;
+  paragraphCount: number;
+  averageParagraphLength: number;
+  estimatedDuration: string;
+  readingTime: string;
+}

@@ -40,14 +40,7 @@ export default function SpeechCard({
 
   return (
     <Link href={`/speech/${id}`}>
-      <Card
-        hoverable
-        style={{
-          backgroundColor: theme === "dark" ? "#2d2d2d" : "#ffffff",
-          borderColor: theme === "dark" ? "#3d3d3d" : "#e5e5e5",
-        }}
-        className="h-full"
-      >
+      <Card hoverable>
         <div className="flex flex-col h-full">
           <div className="flex justify-between items-center mb-2">
             <Title

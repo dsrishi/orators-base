@@ -4,6 +4,7 @@ import { Speech } from "@/types/speech";
 import { Descendant } from "slate";
 import SlateBasicStats from "../analysis/SlateBasicStats";
 import StructuresStats from "../analysis/StructuresStats";
+import SlateStructureStats from "../analysis/SlateStructureStats";
 interface SlateAnalyseDrawerProps {
   open: boolean;
   onClose: () => void;
@@ -51,8 +52,9 @@ export default function SlateAnalyseDrawer({
         },
       }}
     >
-      <SlateBasicStats content={content} speechData={speechData} />
-      <StructuresStats content={content} speechData={speechData} />
+      <SlateStructureStats content={content} speechData={speechData} />
+      {/* <SlateBasicStats content={content} speechData={speechData} />
+      <StructuresStats content={content} speechData={speechData} /> */}
     </Drawer>
   );
 }
