@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { Modal, Form, Input } from "antd";
-import { useTheme } from "@/contexts/ThemeContext";
+import { Modal, Form, Input, Radio } from "antd";
 interface NewFilesModalProps {
   open: boolean;
   onClose: () => void;
-  onCreateFile: (fileName: string) => Promise<void>;
+  onCreateFile: (fileName: string, emptyContent: boolean) => Promise<void>;
 }
 
 const NewFileModal: React.FC<NewFilesModalProps> = ({
@@ -12,14 +11,14 @@ const NewFileModal: React.FC<NewFilesModalProps> = ({
   onClose,
   onCreateFile,
 }) => {
-  const { theme } = useTheme();
   const [fileName, setFileName] = useState("");
+  const [emptyContent, setEmptyContent] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleCreateFile = async () => {
     setLoading(true);
     try {
-      await onCreateFile(fileName);
+      await onCreateFile(fileName, emptyContent);
       setFileName("");
     } finally {
       setLoading(false);
@@ -39,23 +38,7 @@ const NewFileModal: React.FC<NewFilesModalProps> = ({
       onOk={handleCreateFile}
       okText="Create"
       confirmLoading={loading}
-      styles={{
-        header: {
-          background: theme === "dark" ? "#1e1e1e" : "#ffffff",
-          color: theme === "dark" ? "#ffffff" : "#000000",
-        },
-        content: {
-          background: theme === "dark" ? "#1e1e1e" : "#ffffff",
-          color: theme === "dark" ? "#ffffff" : "#000000",
-        },
-        footer: {
-          background: theme === "dark" ? "#1e1e1e" : "#ffffff",
-        },
-      }}
     >
-      <div className="text-xs text-gray-500 italic mb-3">
-        This will create a new file based on your current content.
-      </div>
       <Form layout="vertical">
         <Form.Item label="File Name">
           <Input
@@ -63,6 +46,22 @@ const NewFileModal: React.FC<NewFilesModalProps> = ({
             value={fileName}
             onChange={(e) => setFileName(e.target.value)}
           />
+        </Form.Item>
+        <Form.Item
+          label="File Content"
+          extra={
+            emptyContent
+              ? "Create an empty file."
+              : "Create a new file duplicating the current file."
+          }
+        >
+          <Radio.Group
+            value={emptyContent}
+            onChange={(e) => setEmptyContent(e.target.value)}
+          >
+            <Radio value={false}>Current File</Radio>
+            <Radio value={true}>Empty</Radio>
+          </Radio.Group>
         </Form.Item>
       </Form>
     </Modal>

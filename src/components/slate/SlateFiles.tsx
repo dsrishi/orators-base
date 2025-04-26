@@ -66,12 +66,15 @@ export default function SlateFiles({
     setEditFileName(e.target.value);
   };
 
-  const handleCreateNewFile = async (fileName: string) => {
+  const handleCreateNewFile = async (
+    fileName: string,
+    emptyContent: boolean
+  ) => {
     if (!user?.id) return;
 
     const { fileId, error } = await speechService.createNewFile(speechId, {
       fileName: fileName || `File ${files.length + 1}`,
-      baseFileId: selectedFile.id,
+      baseFileId: emptyContent ? "" : selectedFile.id,
       userId: user.id,
     });
 

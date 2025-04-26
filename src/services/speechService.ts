@@ -394,9 +394,16 @@ export const speechService = {
       }
 
       const nextFileNumber = maxFileData ? maxFileData.file_number + 1 : 1;
+
+      const emptyContent = JSON.stringify([
+        {
+          type: "paragraph",
+          children: [{ text: "" }],
+        },
+      ]);
       
       // If baseFileId is provided, get that file's content
-      let initialContent = data.content || "";
+      let initialContent = data.content || emptyContent;
       
       if (data.baseFileId) {
         const { data: baseFileData, error: baseFileError } = await supabase
