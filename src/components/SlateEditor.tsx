@@ -61,6 +61,7 @@ export default function SlateEditor({
   );
 
   const [collapsed, setCollapsed] = useState(false);
+  const [chatCollapsed, setChatCollapsed] = useState(false);
   const [collapsedMenu, setCollapsedMenu] = useState<Tab>("files");
   const [saving, setSaving] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
@@ -142,6 +143,7 @@ export default function SlateEditor({
       setCollapsed(files.length <= 1);
       setCollapsedMenu("files");
     }
+    setChatCollapsed(true);
   }, []);
 
   useEffect(() => {
@@ -253,6 +255,8 @@ export default function SlateEditor({
           setSpeechAnalysisDrawerOpen={setDrawerOpen}
           setDeleteSpeechModalVisible={setDeleteSpeechModalVisible}
           speechData={speechData}
+          chatCollapsed={chatCollapsed}
+          setChatCollapsed={setChatCollapsed}
         />
 
         <Layout
@@ -298,16 +302,40 @@ export default function SlateEditor({
             />
           </Sider>
 
+          <Sider
+            width={280}
+            collapsible
+            collapsed={chatCollapsed}
+            collapsedWidth="0"
+            onCollapse={(value) => setChatCollapsed(value)}
+            trigger={null}
+            breakpoint="lg"
+            style={{
+              backgroundColor: theme === "dark" ? "#1e1e1e" : "#ffffff",
+              overflow: "auto",
+              height: "calc(100vh - 56px)",
+              position: "fixed",
+              left: 0,
+              zIndex: 15,
+            }}
+          >
+            AI Chat
+          </Sider>
+
           <Content
             style={{
               transition: "margin-left 0.2s",
             }}
-            className={`${collapsed ? "ml-0" : "lg:ml-[280px] ml-0"}`}
+            className={`${
+              !collapsed || !chatCollapsed ? "lg:ml-[280px] ml-0" : "ml-0"
+            }`}
           >
             <div className="mt-16 px-3 pt-2 pb-16">
               <SlateTextEditor
                 collapsed={collapsed}
                 setCollapsed={setCollapsed}
+                chatCollapsed={chatCollapsed}
+                setChatCollapsed={setChatCollapsed}
                 isRecordingModalOpen={isRecordingModalOpen}
                 setIsRecordingModalOpen={setIsRecordingModalOpen}
                 structuredViewOpen={structuredViewOpen}

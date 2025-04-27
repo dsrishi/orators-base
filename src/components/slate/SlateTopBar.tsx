@@ -5,6 +5,7 @@ import {
   EditOutlined,
   LineChartOutlined,
   MenuOutlined,
+  MessageOutlined,
   MoreOutlined,
   ShareAltOutlined,
   SoundOutlined,
@@ -20,6 +21,8 @@ interface SlateTopBarProps {
   setSpeechAnalysisDrawerOpen: (open: boolean) => void;
   setDeleteSpeechModalVisible: (visible: boolean) => void;
   speechData: Speech;
+  chatCollapsed: boolean;
+  setChatCollapsed: (collapsed: boolean) => void;
 }
 
 export default function SlateTopBar({
@@ -29,6 +32,8 @@ export default function SlateTopBar({
   setSpeechAnalysisDrawerOpen,
   setDeleteSpeechModalVisible,
   speechData,
+  chatCollapsed,
+  setChatCollapsed,
 }: SlateTopBarProps) {
   const items: MenuProps["items"] = [
     {
@@ -65,14 +70,25 @@ export default function SlateTopBar({
   ];
 
   const handleMenuClick = () => {
-    setCollapsed(!collapsed);
     const url = new URL(window.location.href);
     if (collapsed) {
+      setCollapsed(false);
+      setChatCollapsed(true);
       url.searchParams.set("sideMenu", "files");
     } else {
+      setCollapsed(true);
       url.searchParams.delete("sideMenu");
     }
     window.history.pushState({}, "", url);
+  };
+
+  const handleChatClick = () => {
+    if (chatCollapsed) {
+      setChatCollapsed(false);
+      setCollapsed(true);
+    } else {
+      setChatCollapsed(true);
+    }
   };
 
   return (
@@ -86,6 +102,11 @@ export default function SlateTopBar({
             className="transparent-btn"
             icon={<MenuOutlined />}
             onClick={handleMenuClick}
+          />
+          <Button
+            className="transparent-btn"
+            icon={<MessageOutlined />}
+            onClick={handleChatClick}
           />
           <Divider type="vertical" style={{ backgroundColor: "#aaa" }} />
           <div className="flex items-center gap-1">

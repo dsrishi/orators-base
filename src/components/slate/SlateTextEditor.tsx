@@ -30,6 +30,8 @@ type SlateTextEditorProps = {
   structuredViewOpen: boolean;
   setCollapsedMenu: (collapsed: Tab) => void;
   pauseViewOpen: boolean;
+  chatCollapsed: boolean;
+  setChatCollapsed: (collapsed: boolean) => void;
 };
 
 type CustomEditor = BaseEditor &
@@ -48,6 +50,8 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
   structuredViewOpen,
   setCollapsedMenu,
   pauseViewOpen,
+  chatCollapsed,
+  setChatCollapsed,
 }) => {
   const withInlines = (editor: CustomEditor) => {
     const { isInline, isVoid } = editor;
@@ -288,6 +292,8 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
         <SlateEditorMenu
           collapsed={collapsed}
           setCollapsed={setCollapsed}
+          chatCollapsed={chatCollapsed}
+          setChatCollapsed={setChatCollapsed}
           setCollapsedMenu={setCollapsedMenu}
         />
         <div

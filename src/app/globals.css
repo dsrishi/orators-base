@@ -37,6 +37,13 @@ body {
   font-style: normal;
 }
 
+.text-primary-gradient {
+  background: -webkit-linear-gradient(left, #5f0f40, #310e68);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
+}
+
 .primary-gradient {
   background: linear-gradient(to right, #5f0f40, #310e68);
 }

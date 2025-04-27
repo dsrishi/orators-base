@@ -433,10 +433,14 @@ export default function SlateEditorMenu({
   collapsed,
   setCollapsed,
   setCollapsedMenu,
+  chatCollapsed,
+  setChatCollapsed,
 }: {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
   setCollapsedMenu: (collapsed: Tab) => void;
+  chatCollapsed: boolean;
+  setChatCollapsed: (collapsed: boolean) => void;
 }) {
   const { theme } = useTheme();
   const editor = useSlate();
@@ -499,6 +503,7 @@ export default function SlateEditorMenu({
   const handleEditorClick = () => {
     if (collapsed) {
       setCollapsed(false);
+      setChatCollapsed(true);
     }
     setCollapsedMenu("editor");
     const url = new URL(window.location.href);
@@ -510,7 +515,7 @@ export default function SlateEditorMenu({
     <div
       className="fixed mx-auto px-3 py-1 z-10 top-[64px]"
       style={{
-        width: collapsed ? "100%" : "calc(100% - 280px)",
+        width: !collapsed || !chatCollapsed ? "calc(100% - 280px)" : "100%",
         transition: "width 0.2s",
       }}
     >
