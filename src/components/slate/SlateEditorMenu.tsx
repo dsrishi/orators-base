@@ -39,7 +39,6 @@ type CustomElement = {
     | "pause";
   children: CustomText[];
   align?: string;
-  seconds?: number;
 };
 
 type CustomText = {
@@ -52,6 +51,7 @@ type CustomText = {
   highlightColor?: string;
   color?: string;
   structure?: string;
+  pause?: string;
 };
 
 type BlockFormat =
@@ -64,7 +64,8 @@ type BlockFormat =
   | "align-right"
   | "align-justify"
   | "ordered-list"
-  | "bullet-list";
+  | "bullet-list"
+  | "pause";
 type MarkFormat =
   | "bold"
   | "italic"
@@ -72,7 +73,8 @@ type MarkFormat =
   | "highlight"
   | "color"
   | "highlightColor"
-  | "structure";
+  | "structure"
+  | "pause";
 type Format = BlockFormat | MarkFormat;
 
 declare module "slate" {
@@ -95,6 +97,7 @@ const isBlockFormat = (format: Format): format is BlockFormat => {
     "align-justify",
     "ordered-list",
     "bullet-list",
+    "pause",
   ].includes(format);
 };
 

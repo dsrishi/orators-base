@@ -1,8 +1,8 @@
 // components/SlateEditor.tsx (enhanced file)
 import React, { useMemo } from "react";
-import { createEditor, Editor, Transforms } from "slate";
+import { BaseEditor, createEditor, Editor, Transforms } from "slate";
 import { Editable, withReact, useSlateStatic, ReactEditor } from "slate-react";
-import { withHistory } from "slate-history";
+import { HistoryEditor, withHistory } from "slate-history";
 import { RenderElementProps } from "slate-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import SlateEditorMenu from "./SlateEditorMenu";
@@ -32,6 +32,12 @@ type SlateTextEditorProps = {
   pauseViewOpen: boolean;
 };
 
+type CustomEditor = BaseEditor &
+  ReactEditor &
+  HistoryEditor & {
+    nodeToDecorations?: Map<Element, Range[]>;
+  };
+
 type Tab = "files" | "templates" | "editor";
 
 const SlateEditor: React.FC<SlateTextEditorProps> = ({
@@ -43,7 +49,24 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
   setCollapsedMenu,
   pauseViewOpen,
 }) => {
-  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+  const withInlines = (editor: CustomEditor) => {
+    const { isInline, isVoid } = editor;
+
+    editor.isInline = (element) => {
+      return element.type === "pause" ? true : isInline(element);
+    };
+
+    // Pause elements might need to be void elements
+    editor.isVoid = (element) => {
+      return element.type === "pause" ? true : isVoid(element);
+    };
+
+    return editor;
+  };
+  const editor = useMemo(
+    () => withInlines(withHistory(withReact(createEditor()))),
+    []
+  );
   const { theme } = useTheme();
 
   // Custom element renderer
@@ -52,7 +75,7 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
       ? { textAlign: element.align as "left" | "center" | "right" }
       : {};
 
-    const editor = useSlateStatic(); // Get the editor instance
+    const editor = useSlateStatic();
 
     switch (element.type) {
       case "heading-one":
@@ -93,38 +116,43 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
             {...attributes}
             contentEditable={false}
             style={{
-              display: pauseViewOpen ? "inline" : "none",
-              background: "#000",
-              color: "#fff",
-              borderRadius: "4px",
-              padding: "0 4px",
-              fontSize: "0.9em",
-              verticalAlign: "middle",
-              cursor: "pointer",
+              display: "inline", // Force inline display
+              ...style,
             }}
           >
-            Pause-{element.seconds || 1}s
             <span
               style={{
-                marginLeft: "2px",
-                cursor: "pointer",
-                color: "#aaa",
+                display: pauseViewOpen ? "inline" : "none",
+                background: "#000",
+                color: "#fff",
+                borderRadius: "4px",
+                padding: "0 4px",
+                fontSize: "0.9em",
               }}
-              onClick={(event) => {
-                event.preventDefault();
-                try {
-                  const path = ReactEditor.findPath(
-                    editor as unknown as ReactEditor,
-                    element
-                  );
-                  Transforms.removeNodes(editor, { at: path });
-                } catch {
-                  console.warn("Could not remove pause element");
-                }
-              }}
-              title="Click to remove pause"
             >
-              <CloseCircleFilled />
+              {children}
+              <span
+                style={{
+                  marginLeft: "4px",
+                  cursor: "pointer",
+                  color: "#aaa",
+                }}
+                onClick={(event) => {
+                  event.preventDefault();
+                  try {
+                    const path = ReactEditor.findPath(
+                      editor as unknown as ReactEditor,
+                      element
+                    );
+                    Transforms.removeNodes(editor, { at: path });
+                  } catch {
+                    // ignore
+                  }
+                }}
+                title="Click to remove pause"
+              >
+                <CloseCircleFilled />
+              </span>
             </span>
           </span>
         );
@@ -207,6 +235,23 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
       );
     }
 
+    if (leaf.pause) {
+      renderedChildren = (
+        <span
+          style={{
+            backgroundColor: "#000",
+            color: "#fff",
+            borderRadius: "4px",
+            padding: "0 4px",
+            fontSize: "0.9em",
+          }}
+          contentEditable={false}
+        >
+          <span>Pause: {leaf.pause || "0s"}</span>
+        </span>
+      );
+    }
+
     return <span {...attributes}>{renderedChildren}</span>;
   };
 
@@ -259,7 +304,6 @@ const SlateEditor: React.FC<SlateTextEditorProps> = ({
             placeholder="Start writing your speech here..."
             renderElement={(props) => <Element {...props} />}
             renderLeaf={(props) => <Leaf {...props} />}
-            readOnly={false}
           />
         </div>
       </div>

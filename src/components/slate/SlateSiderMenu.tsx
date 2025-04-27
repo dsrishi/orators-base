@@ -1,5 +1,5 @@
 import { Button, Switch, Tooltip } from "antd";
-import { Editor, Transforms } from "slate";
+import { Editor, Range, Transforms, Element as SlateElement } from "slate";
 import { useSlate } from "slate-react";
 
 interface SlateSiderMenuProps {
@@ -37,7 +37,6 @@ type CustomElement = {
     | "pause";
   children: CustomText[];
   align?: string;
-  seconds?: number;
 };
 
 export default function SlateSiderMenu({
@@ -61,12 +60,35 @@ export default function SlateSiderMenu({
   };
 
   const insertPause = (seconds: number) => {
-    const pauseElement: CustomElement = {
-      type: "pause",
-      seconds,
-      children: [{ text: "" }],
-    };
-    Transforms.insertNodes(editor, pauseElement);
+    // Save the current selection
+    const selection = editor.selection;
+
+    if (selection && Range.isCollapsed(selection)) {
+      const pauseElement: CustomElement = {
+        type: "pause",
+        children: [{ text: `Pause-${seconds}s` }],
+      };
+
+      Transforms.insertNodes(editor, pauseElement, {
+        at: [0, 0],
+      });
+    }
+  };
+
+  // Check if the current selection is an inline element
+  const isInlineActive = () => {
+    const { selection } = editor;
+    if (!selection) return false;
+
+    const [match] = Editor.nodes(editor, {
+      at: Editor.unhangRange(editor, selection),
+      match: (n): n is CustomElement =>
+        !Editor.isEditor(n) &&
+        SlateElement.isElement(n) &&
+        (n as CustomElement).type === "pause",
+    });
+
+    return !!match;
   };
 
   return (
@@ -158,6 +180,14 @@ export default function SlateSiderMenu({
             Long Pause
           </Button>
           <Button onClick={() => insertPause(3)} disabled={!pauseViewOpen}>
+            Pause
+          </Button>
+          <Button
+            onClick={() => {
+              console.log(isInlineActive());
+            }}
+            disabled={!pauseViewOpen}
+          >
             Pause
           </Button>
         </div>
