@@ -501,6 +501,9 @@ export default function SlateEditorMenu({
       setCollapsed(false);
     }
     setCollapsedMenu("editor");
+    const url = new URL(window.location.href);
+    url.searchParams.set("sideMenu", "editor");
+    window.history.pushState({}, "", url);
   };
 
   return (

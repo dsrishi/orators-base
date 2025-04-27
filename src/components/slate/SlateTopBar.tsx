@@ -64,6 +64,17 @@ export default function SlateTopBar({
     },
   ];
 
+  const handleMenuClick = () => {
+    setCollapsed(!collapsed);
+    const url = new URL(window.location.href);
+    if (collapsed) {
+      url.searchParams.set("sideMenu", "files");
+    } else {
+      url.searchParams.delete("sideMenu");
+    }
+    window.history.pushState({}, "", url);
+  };
+
   return (
     <div className="fixed w-full mx-auto px-4 sm:px-6 lg:px-8 py-3 z-20 top-0 primary-gradient shadow-lg">
       <div className="flex items-center justify-between">
@@ -74,7 +85,7 @@ export default function SlateTopBar({
           <Button
             className="transparent-btn"
             icon={<MenuOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
+            onClick={handleMenuClick}
           />
           <Divider type="vertical" style={{ backgroundColor: "#aaa" }} />
           <div className="flex items-center gap-1">

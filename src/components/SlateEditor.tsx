@@ -60,7 +60,7 @@ export default function SlateEditor({
     getMostRecentFile(initialFiles) || initialFiles[0]
   );
 
-  const [collapsed, setCollapsed] = useState(initialFiles.length <= 1);
+  const [collapsed, setCollapsed] = useState(false);
   const [collapsedMenu, setCollapsedMenu] = useState<Tab>("files");
   const [saving, setSaving] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
@@ -124,7 +124,24 @@ export default function SlateEditor({
 
   // Hide the files if there is only one file
   useEffect(() => {
-    setCollapsed(files.length <= 1);
+    //get the params from the url
+    const url = new URL(window.location.href);
+    const sideMenu = url.searchParams.get("sideMenu");
+    if (sideMenu) {
+      if (sideMenu === "editor") {
+        setCollapsed(false);
+        setCollapsedMenu("editor");
+      } else if (sideMenu === "files") {
+        setCollapsed(false);
+        setCollapsedMenu("files");
+      } else if (sideMenu === "templates") {
+        setCollapsed(false);
+        setCollapsedMenu("templates");
+      }
+    } else {
+      setCollapsed(files.length <= 1);
+      setCollapsedMenu("files");
+    }
   }, []);
 
   useEffect(() => {

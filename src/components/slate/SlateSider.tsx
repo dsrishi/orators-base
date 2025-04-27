@@ -64,6 +64,13 @@ export default function SlateSider({
     },
   ];
 
+  function handleTabClick(tab: Tab) {
+    setCollapsedMenu(tab);
+    const url = new URL(window.location.href);
+    url.searchParams.set("sideMenu", tab);
+    window.history.pushState({}, "", url);
+  }
+
   return (
     <div>
       {!collapsed && (
@@ -82,7 +89,7 @@ export default function SlateSider({
                 <button
                   key={tab.id}
                   onClick={() => {
-                    setCollapsedMenu(tab.id);
+                    handleTabClick(tab.id);
                   }}
                   className={`flex-1 p-3 text-center cursor-pointer ${
                     collapsedMenu === tab.id
