@@ -156,52 +156,55 @@ export default function SlateSiderMenu({
           </Button>
         </div>
 
-        <div className="flex items-center justify-between mb-3">
-          <div className="text-sm text-gray-500">Pauses</div>
-          <Tooltip title="Create New File">
-            <Switch
-              defaultChecked={pauseViewOpen}
-              onChange={() => setPauseViewOpen(!pauseViewOpen)}
-              size="small"
-            />
-          </Tooltip>
-        </div>
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          <Button
-            onClick={() => togglePause(editor, 1)}
-            disabled={!pauseViewOpen}
-          >
-            Short Pause
-          </Button>
-          <Button
-            onClick={() => togglePause(editor, 3)}
-            disabled={!pauseViewOpen}
-          >
-            Long Pause
-          </Button>
-          <Button onClick={() => insertPause(3)} disabled={!pauseViewOpen}>
-            Pause
-          </Button>
-          <Button
-            onClick={() => {
-              console.log(isInlineActive());
-            }}
-            disabled={!pauseViewOpen}
-          >
-            Pause
-          </Button>
-        </div>
+        <div className="hidden">
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-sm text-gray-500">Pauses</div>
+            <Tooltip title="Coming Soon">
+              <Switch
+                disabled
+                defaultChecked={pauseViewOpen}
+                onChange={() => setPauseViewOpen(!pauseViewOpen)}
+                size="small"
+              />
+            </Tooltip>
+          </div>
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <Button
+              onClick={() => togglePause(editor, 1)}
+              disabled={!pauseViewOpen}
+            >
+              Short Pause
+            </Button>
+            <Button
+              onClick={() => togglePause(editor, 3)}
+              disabled={!pauseViewOpen}
+            >
+              Long Pause
+            </Button>
+            <Button onClick={() => insertPause(3)} disabled={!pauseViewOpen}>
+              Pause
+            </Button>
+            <Button
+              onClick={() => {
+                console.log(isInlineActive());
+              }}
+              disabled={!pauseViewOpen}
+            >
+              Clear
+            </Button>
+          </div>
 
-        <div className="text-sm text-gray-500 mb-3">Elements</div>
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          <Button disabled={!structuredViewOpen}>Joke</Button>
-          <Button disabled={!structuredViewOpen}>Story</Button>
-          <Button disabled={!structuredViewOpen}>Fact</Button>
-          <Button disabled={!structuredViewOpen}>Statistic</Button>
-          <Button disabled={!structuredViewOpen}>Quote</Button>
-          <Button disabled={!structuredViewOpen}>Question</Button>
-          <Button disabled={!structuredViewOpen}>Answer</Button>
-          <Button disabled={!structuredViewOpen}>Conclusion</Button>
+          <div className="text-sm text-gray-500 mb-3">Elements</div>
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <Button disabled={!structuredViewOpen}>Joke</Button>
+            <Button disabled={!structuredViewOpen}>Story</Button>
+            <Button disabled={!structuredViewOpen}>Fact</Button>
+            <Button disabled={!structuredViewOpen}>Statistic</Button>
+            <Button disabled={!structuredViewOpen}>Quote</Button>
+            <Button disabled={!structuredViewOpen}>Question</Button>
+            <Button disabled={!structuredViewOpen}>Answer</Button>
+            <Button disabled={!structuredViewOpen}>Conclusion</Button>
+          </div>
         </div>
       </div>
     </div>

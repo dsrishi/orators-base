@@ -91,8 +91,6 @@ export default function SlateEditor({
     // Store content in cache before saving
     unsavedContentCache.current[selectedFile.id] = content;
 
-    console.log(JSON.parse(content));
-
     setSaving(true);
     const { error } = await speechService.updateFileContent(
       speechId,
