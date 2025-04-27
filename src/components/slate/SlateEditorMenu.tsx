@@ -513,9 +513,14 @@ export default function SlateEditorMenu({
 
   return (
     <div
-      className="fixed mx-auto px-3 py-1 z-10 top-[64px]"
+      className={`fixed mx-auto px-3 py-1 z-10 top-[64px] ${
+        !collapsed
+          ? "lg:w-[calc(100vw-280px)] w-full"
+          : !chatCollapsed
+          ? "lg:w-[calc(2*100vw/3)] w-full"
+          : "w-full"
+      }`}
       style={{
-        width: !collapsed || !chatCollapsed ? "calc(100% - 280px)" : "100%",
         transition: "width 0.2s",
       }}
     >

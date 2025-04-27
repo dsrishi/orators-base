@@ -19,6 +19,7 @@ import SlateAnalyseDrawer from "./slate/SlateAnalyseDrawer";
 import { Slate, withReact } from "slate-react";
 import { withHistory } from "slate-history";
 import { createEditor, Descendant } from "slate";
+import SlateAIChat from "./slate/SlateAIChat";
 const { Sider, Content } = Layout;
 
 interface SlateEditorProps {
@@ -60,8 +61,8 @@ export default function SlateEditor({
     getMostRecentFile(initialFiles) || initialFiles[0]
   );
 
-  const [collapsed, setCollapsed] = useState(false);
-  const [chatCollapsed, setChatCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
+  const [chatCollapsed, setChatCollapsed] = useState(true);
   const [collapsedMenu, setCollapsedMenu] = useState<Tab>("files");
   const [saving, setSaving] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
@@ -303,7 +304,7 @@ export default function SlateEditor({
           </Sider>
 
           <Sider
-            width={280}
+            width={window.innerWidth < 900 ? 320 : window.innerWidth / 3}
             collapsible
             collapsed={chatCollapsed}
             collapsedWidth="0"
@@ -319,7 +320,7 @@ export default function SlateEditor({
               zIndex: 15,
             }}
           >
-            AI Chat
+            <SlateAIChat chatCollapsed={chatCollapsed} />
           </Sider>
 
           <Content
@@ -327,7 +328,11 @@ export default function SlateEditor({
               transition: "margin-left 0.2s",
             }}
             className={`${
-              !collapsed || !chatCollapsed ? "lg:ml-[280px] ml-0" : "ml-0"
+              !collapsed
+                ? "lg:ml-[280px] ml-0"
+                : !chatCollapsed
+                ? "lg:ml-[calc(100vw/3)]"
+                : "ml-0"
             }`}
           >
             <div className="mt-16 px-3 pt-2 pb-16">
