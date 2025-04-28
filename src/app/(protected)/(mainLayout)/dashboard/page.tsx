@@ -115,7 +115,7 @@ export default function Dashboard() {
                 border: "none",
                 boxShadow: "none",
               }}
-              className="primary-gradient"
+              className="primary-gradient-btn"
             >
               New Speech
             </Button>
@@ -156,7 +156,7 @@ export default function Dashboard() {
                   border: "none",
                   boxShadow: "none",
                 }}
-                className="primary-gradient"
+                className="primary-gradient-btn"
               >
                 New Speech
               </Button>

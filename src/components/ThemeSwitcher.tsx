@@ -12,11 +12,18 @@ export default function ThemeSwitcher() {
       icon={theme === "light" ? <MoonOutlined /> : <SunOutlined />}
       shape="circle"
       onClick={toggleTheme}
-      size="large"
-      style={{
-        backgroundColor: theme === "dark" ? "#1f1f1f" : "#fff",
-        color: theme === "dark" ? "#fff" : "#000",
-      }}
+      className="transparent-btn"
     />
+  );
+}
+
+export function ThemeSwitcher2() {
+  const { theme, toggleTheme } = useTheme();
+
+  return (
+    <div onClick={toggleTheme} className="flex items-center gap-2">
+      {theme === "light" ? <MoonOutlined /> : <SunOutlined />}
+      {theme === "light" ? "Dark Mode" : "Light Mode"}
+    </div>
   );
 }

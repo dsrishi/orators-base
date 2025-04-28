@@ -1,27 +1,27 @@
 import { Drawer } from "antd";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Editor } from "@tiptap/react";
 import { Speech } from "@/types/speech";
-import BasicStats from "./analysis/BasicStats";
-
-interface SpeechAnalysisDrawerProps {
+import { Descendant } from "slate";
+import SlateStructureStats from "../analysis/SlateStructureStats";
+import SlateStructureStatTable from "../analysis/structure/StructureStatTable";
+interface SlateAnalyseDrawerProps {
   open: boolean;
   onClose: () => void;
-  editor: Editor | null;
   speechData: Speech;
+  content: Descendant[];
 }
 
-export default function SpeechAnalysisDrawer({
+export default function SlateAnalyseDrawer({
   open,
   onClose,
-  editor,
   speechData,
-}: SpeechAnalysisDrawerProps) {
+  content,
+}: SlateAnalyseDrawerProps) {
   const { theme } = useTheme();
 
   return (
     <Drawer
-      title="Speech Analysis"
+      title={`Speech Analysis for ${speechData.title}`}
       placement="right"
       width={900}
       onClose={onClose}
@@ -51,7 +51,8 @@ export default function SpeechAnalysisDrawer({
         },
       }}
     >
-      <BasicStats editor={editor} speechData={speechData} />
+      <SlateStructureStats content={content} speechData={speechData} />
+      <SlateStructureStatTable content={content} />
     </Drawer>
   );
 }

@@ -5,10 +5,7 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useState } from "react";
-import Image from "next/image";
 import { useTheme } from "@/contexts/ThemeContext";
-import ThemeSwitcher from "@/components/ThemeSwitcher";
-import PublicRoute from "@/components/PublicRoute";
 
 interface LoginFormData {
   username: string;
@@ -51,34 +48,23 @@ export default function Login() {
   };
 
   return (
-    <PublicRoute>
+    <>
       {contextHolder}
-      <div className="min-h-screen relative">
-        <div className="absolute top-4 right-4">
-          <ThemeSwitcher />
-        </div>
-        <div className="flex items-center justify-center min-h-screen">
-          <Card
-            className="w-full max-w-md shadow-lg"
-            style={{
-              background: theme === "dark" ? "#1f1f1f" : "#ffffff",
-              color: theme === "dark" ? "#ffffff" : "#000000",
-              borderColor: theme === "dark" ? "#2d2d2d" : "#e5e5e5",
-            }}
-          >
-            <Image
-              src={"/logo.png"}
-              alt="Logo"
-              width={64}
-              height={64}
-              className="mx-auto mb-4"
-            />
+      <div className="relative">
+        <div
+          className="flex items-center justify-center"
+          style={{
+            minHeight: "100vh",
+          }}
+        >
+          <Card className="w-full max-w-lg">
             <div
-              className={`text-center text-2xl font-semibold font-inter mb-3 ${
-                theme === "dark" ? "text-gray-100" : "text-gray-800"
-              }`}
+              className={`text-center text-4xl font-semibold font-logo mb-2 text-primary-gradient`}
             >
-              Welcome back to OratorsBase
+              OratorsBase
+            </div>
+            <div className="text-gray-400 text-center font-semibold text-xl mb-6">
+              Welcome Back. Login to your account.
             </div>
             <Form
               form={form}
@@ -162,17 +148,12 @@ export default function Login() {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  className="w-full primary-gradient"
+                  className="w-full primary-gradient-btn"
                   loading={loading}
                   style={{
-                    height: "40px",
-                    fontSize: "16px",
                     border: "none",
-                    boxShadow:
-                      theme === "dark"
-                        ? "0 2px 8px rgba(0, 0, 0, 0.3)"
-                        : "none",
                   }}
+                  size="large"
                 >
                   Log in
                 </Button>
@@ -181,6 +162,6 @@ export default function Login() {
           </Card>
         </div>
       </div>
-    </PublicRoute>
+    </>
   );
 }

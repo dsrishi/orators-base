@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 :root {
   --background: #ffffff;
@@ -30,12 +31,41 @@ body {
   font-family: "Inter", sans-serif;
 }
 
+.font-logo {
+  font-family: "PT Serif", serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.text-primary-gradient {
+  background: -webkit-linear-gradient(left, #5f0f40, #310e68);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
+}
+
 .primary-gradient {
   background: linear-gradient(to right, #5f0f40, #310e68);
 }
 
-.primary-gradient:hover {
+.primary-gradient-btn {
+  background: linear-gradient(to right, #5f0f40, #310e68);
+}
+
+.primary-gradient-btn:hover {
   background: linear-gradient(to right, #7f1d5f, #4a1596) !important;
+}
+
+.transparent-btn {
+  background-color: transparent;
+  color: #aaa;
+  border: 1px solid #aaa;
+}
+
+.transparent-btn:hover {
+  background-color: transparent !important;
+  color: #ccc !important;
+  border: 1px solid #ccc !important;
 }
 
 @tailwind base;
@@ -72,6 +102,33 @@ body {
 
 /* Ensure nested lists also get padding */
 .prose ul ul, .prose ol ol, .prose ul ol, .prose ol ul {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+  padding-left: 1.5em; 
+}
+
+/* Add styles for slate lists */
+.slate ul {
+  list-style-type: disc; /* Or square, circle, etc. */
+  padding-left: 1.5em; /* Adjust indentation as needed */
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.slate ol {
+  list-style-type: decimal; /* Or lower-alpha, upper-roman, etc. */
+  padding-left: 1.5em; /* Adjust indentation as needed */
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.slate li {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+/* Ensure nested lists also get padding */
+.slate ul ul, .slate ol ol, .slate ul ol, .slate ol ul {
   margin-top: 0.25em;
   margin-bottom: 0.25em;
   padding-left: 1.5em; 
@@ -147,7 +204,7 @@ body {
   animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Version menu item hover styles */
+/* sider menu item hover styles */
 .ant-menu-item:hover .group-hover\:flex {
   display: flex !important;
 }

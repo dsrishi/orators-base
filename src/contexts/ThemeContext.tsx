@@ -83,6 +83,10 @@ const getAntdThemeConfig = (currentTheme: Theme): ThemeConfig => ({
       darkItemHoverBg: "#2d2d2d",
       darkItemSelectedColor: "#ffffff",
     },
+    Switch: {
+      handleBg: "#fff",
+      handleShadow: "#fff",
+    },
   },
 });
 

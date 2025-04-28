@@ -6,8 +6,10 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { useTheme } from "@/contexts/ThemeContext";
+
 import SpeechRecognition, {
   useSpeechRecognition,
+  // @ts-expect-error - need to fix this
 } from "react-speech-recognition";
 
 const { Paragraph, Text } = Typography;

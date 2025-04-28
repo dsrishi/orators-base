@@ -1,14 +1,14 @@
 "use client";
 
-import TiptapEditor from "@/components/TiptapEditor";
 import { useEffect, useState } from "react";
 import { speechService } from "@/services/speechService";
 import { Speech } from "@/types/speech";
 import { Button, Empty, Spin, message } from "antd";
 import { useParams, useRouter } from "next/navigation";
 import { useTheme } from "@/contexts/ThemeContext";
+import SlateEditor from "@/components/SlateEditor";
 
-export default function SpeechPage() {
+export default function SpeechMainPage() {
   const [speech, setSpeech] = useState<Speech | null>(null);
   const [loading, setLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
@@ -20,7 +20,7 @@ export default function SpeechPage() {
   useEffect(() => {
     async function loadSpeechData() {
       try {
-        const { data, error } = await speechService.getSpeechWithAllVersions(
+        const { data, error } = await speechService.getSpeechWithAllFiles(
           speechId
         );
 
@@ -66,7 +66,7 @@ export default function SpeechPage() {
           <Button
             type="primary"
             htmlType="submit"
-            className="w-full primary-gradient mt-3"
+            className="w-full primary-gradient-btn mt-3"
             onClick={() => router.push("/dashboard")}
             style={{
               height: "40px",
@@ -83,16 +83,16 @@ export default function SpeechPage() {
     );
   }
 
-  //if there are no speech versions available for a speech, add a button to add a version
-  if (speech?.versions?.length === 0) {
+  //if there are no speech files available for a speech, add a button to add a file
+  if (speech?.files?.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div>
-          <Empty description={<span className="">Speech not found</span>} />
+          <Empty description={<span className="">No files found</span>} />
           <Button
             type="primary"
             htmlType="submit"
-            className="w-full primary-gradient mt-3"
+            className="w-full primary-gradient-btn mt-3"
             style={{
               height: "40px",
               fontSize: "16px",
@@ -101,7 +101,7 @@ export default function SpeechPage() {
                 theme === "dark" ? "0 2px 8px rgba(0, 0, 0, 0.3)" : "none",
             }}
           >
-            Add a version
+            Add a file
           </Button>
         </div>
       </div>
@@ -111,11 +111,11 @@ export default function SpeechPage() {
   return (
     <>
       {contextHolder}
-      <main className="mt-16">
-        <TiptapEditor
+      <main>
+        <SlateEditor
           speechId={speechId}
           speechData={speech}
-          versions={speech.versions || []}
+          files={speech.files || []}
         />
       </main>
     </>
